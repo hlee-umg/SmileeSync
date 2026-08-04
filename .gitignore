@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+.env
+*.log
+
+# Modelos entrenados grandes / datos
+ml/data/*.csv
+ml/models/*.joblib
+
+# CDK
+infra/cdk.out/
+infra/.venv/
+
+# SO / editor
+.DS_Store
+.idea/
+.vscode/

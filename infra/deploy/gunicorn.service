@@ -1,0 +1,13 @@
+[Unit]
+Description=SmileeSync (Gunicorn)
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/smileesync/app
+ExecStart=/home/ubuntu/smileesync/app/.venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:8000 --workers 3
+Restart=always
+EnvironmentFile=/home/ubuntu/smileesync/app/.env
+
+[Install]
+WantedBy=multi-user.target

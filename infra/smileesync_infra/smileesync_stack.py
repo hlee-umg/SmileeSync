@@ -12,6 +12,12 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+# Parámetro público de Canonical con el AMI vigente de Ubuntu 24.04 (x86_64)
+UBUNTU_2404_SSM = (
+    "/aws/service/canonical/ubuntu/server/24.04/stable/"
+    "current/amd64/hvm/ebs-gp3/ami-id"
+)
+
 
 class SmileeSyncStack(Stack):
     def __init__(self, scope: Construct, cid: str, **kwargs) -> None:
@@ -28,21 +34,20 @@ class SmileeSyncStack(Stack):
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(80), "HTTP")
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), "HTTPS")
 
-        # Script de arranque: instala dependencias del servidor
+        # Script de arranque: instala dependencias base del servidor
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(
             "apt-get update -y",
-            "apt-get install -y python3-venv python3-pip nginx postgresql postgresql-contrib git",
+            "apt-get install -y python3-venv python3-pip nginx postgresql "
+            "postgresql-contrib git",
             "systemctl enable --now postgresql nginx",
         )
 
         instancia = ec2.Instance(
             self, "SmileeServer",
             instance_type=ec2.InstanceType("t3.small"),   # 2 vCPU / 2 GB
-            machine_image=ec2.MachineImage.generic_linux({
-                # Ubuntu 24.04 LTS (us-east-1). Reemplazar por el AMI vigente.
-                "us-east-1": "ami-0e2c8caa4b6378d8c"
-            }),
+            machine_image=ec2.MachineImage.from_ssm_parameter(
+                UBUNTU_2404_SSM, os=ec2.OperatingSystemType.LINUX),
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_group=sg,

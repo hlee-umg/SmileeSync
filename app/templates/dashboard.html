@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Inicio — SmileeSync{% endblock %}
+{% block encabezado %}Panel principal{% endblock %}
+{% block contenido %}
+<h4 class="mb-1">Bienvenido, {{ user.get_full_name|default:user.username }}</h4>
+<p class="text-secondary">Rol: <strong>{{ user.rol|default:"Sin rol asignado" }}</strong>. El menú de la izquierda muestra únicamente los módulos a los que tiene acceso.</p>
+<div class="row g-3 mt-2">
+  {% if user.rol.puede_usuarios or user.es_admin %}
+  <div class="col-md-4"><div class="card border-0 shadow-sm"><div class="card-body">
+    <i class="bi bi-people fs-3 text-primary"></i><h6 class="mt-2">Usuarios</h6>
+    <p class="small text-secondary mb-2">Administre usuarios, roles y accesos.</p>
+    <a href="{% url 'usuarios:lista' %}" class="btn btn-sm btn-outline-primary">Abrir</a>
+  </div></div></div>
+  {% endif %}
+  <div class="col-md-4"><div class="card border-0 shadow-sm bg-light"><div class="card-body">
+    <i class="bi bi-hourglass-split fs-3 text-secondary"></i><h6 class="mt-2">Otros módulos</h6>
+    <p class="small text-secondary mb-0">Pacientes, catálogos, agenda, inteligencia y reportes se habilitarán en próximas entregas.</p>
+  </div></div></div>
+</div>
+{% endblock %}

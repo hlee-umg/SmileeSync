@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block titulo %}Iniciar sesión — SmileeSync{% endblock %}
+{% block publico %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:100vh;">
+  <div class="card shadow-sm border-0" style="width:380px;">
+    <div class="card-body p-4">
+      <div class="text-center mb-3">
+        <div class="fs-3 fw-bold" style="color:#1f3a5f;"><i class="bi bi-heart-pulse"></i> SmileeSync</div>
+        <div class="text-secondary small">Gestión inteligente de citas odontológicas</div>
+      </div>
+      {% if form.errors %}
+        <div class="alert alert-danger py-2">Usuario o contraseña incorrectos.</div>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="username" class="form-control" autofocus required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <button class="btn w-100 text-white" style="background:#2e6cb5;" type="submit">Ingresar</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

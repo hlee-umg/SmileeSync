@@ -8,42 +8,46 @@ costo y activar el despliegue automático con GitHub Actions.
 
 ---
 
-## Parte 0 — Instalar prerrequisitos (en tu máquina)
+## Parte 0 y 1 — Acceso a AWS para ejecutar comandos
 
-- **AWS CLI**: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-- **Node.js** (para CDK): https://nodejs.org
-- **AWS CDK**: `npm install -g aws-cdk`
-- **Python 3.12+** y **git** (ya los tienes).
+AWS desaconseja crear *access keys* de larga duración. Tienes tres caminos;
+usa el **recomendado**.
 
-Verifica:
+### Opción A (recomendada): AWS CloudShell — sin instalar ni configurar nada
+
+CloudShell es una terminal en el navegador, **ya autenticada** con tu cuenta,
+con AWS CLI, Python, Node y git preinstalados. No necesitas access keys.
+
+1. Inicia sesión en la consola de AWS.
+2. Arriba a la derecha, haz clic en el ícono de **CloudShell** (`>_`).
+3. Instala CDK dentro de CloudShell (solo la primera vez):
+
+   ```bash
+   npm install -g aws-cdk
+   cdk --version
+   ```
+
+Con esto puedes correr directamente las Partes 3 en adelante **desde CloudShell**
+(clonas el repo ahí, o subes solo la carpeta `infra/`). No configures `aws` a mano:
+CloudShell ya usa tu identidad.
+
+> Nota: el almacenamiento persistente de CloudShell es ~1 GB en tu carpeta home;
+> suficiente para correr `cdk deploy` y guardar el `.pem`.
+
+### Opción B: CLI local sin access keys (`aws login`)
+
+Si prefieres trabajar desde tu máquina, instala **AWS CLI v2** (reciente),
+**Node.js**, **CDK** (`npm install -g aws-cdk`) y usa tu sesión del navegador:
 
 ```bash
-aws --version
-cdk --version
-python3 --version
+aws login          # abre el navegador y usa tus credenciales de consola
 ```
 
----
+### Opción C: access key clásico (solo si las anteriores no te sirven)
 
-## Parte 1 — Crear credenciales de acceso (IAM) y configurarlas
-
-1. En la consola de AWS entra a **IAM → Users → Create user** (nómbralo `smileesync-admin`).
-2. Marca **Provide user access to the AWS Management Console** solo si lo quieres; lo importante es el acceso programático.
-3. En permisos, adjunta la política **AdministratorAccess** (para el proyecto está bien; en producción real se acota).
-4. Crea el usuario, entra a la pestaña **Security credentials → Create access key → Command Line Interface (CLI)**.
-5. Guarda el **Access key ID** y el **Secret access key**.
-
-Configura la CLI:
-
-```bash
-aws configure
-# AWS Access Key ID:     <tu access key>
-# AWS Secret Access Key: <tu secret>
-# Default region name:   us-east-1
-# Default output format:  json
-```
-
-> Nunca subas estas llaves al repositorio.
+**IAM → Users → Create user** (`smileesync-admin`) con **AdministratorAccess**,
+luego **Security credentials → Create access key → CLI**, y `aws configure`.
+Guarda las llaves con cuidado y **nunca** las subas al repositorio.
 
 ---
 

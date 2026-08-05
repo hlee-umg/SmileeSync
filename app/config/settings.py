@@ -8,6 +8,16 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Carga automática de variables desde app/.env si existe, para que los comandos
+# de manage.py y el servidor (gunicorn) usen SIEMPRE la misma configuración.
+# load_dotenv no sobrescribe variables ya presentes en el entorno (las de
+# systemd tienen prioridad), así que es seguro en producción.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:
+    pass
+
 # --- Seguridad -------------------------------------------------------------
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-inseguro-cambiar-en-produccion')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'

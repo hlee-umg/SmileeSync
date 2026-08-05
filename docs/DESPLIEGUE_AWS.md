@@ -43,11 +43,30 @@ Si prefieres trabajar desde tu máquina, instala **AWS CLI v2** (reciente),
 aws login          # abre el navegador y usa tus credenciales de consola
 ```
 
-### Opción C: access key clásico (solo si las anteriores no te sirven)
+### Opción C: access key con perfil con nombre (ideal si manejas varias cuentas)
 
-**IAM → Users → Create user** (`smileesync-admin`) con **AdministratorAccess**,
-luego **Security credentials → Create access key → CLI**, y `aws configure`.
-Guarda las llaves con cuidado y **nunca** las subas al repositorio.
+Recomendado cuando trabajas con múltiples cuentas AWS: usa un **perfil con nombre**
+para aislar SmileeSync y no pisar tu cuenta por defecto.
+
+1. **IAM → Users → Create user** (`smileesync-admin`) con **AdministratorAccess**.
+2. **Security credentials → Create access key → CLI**. Guarda el Access key ID y el Secret.
+3. Configura un perfil dedicado (no el `default`):
+
+   ```bash
+   aws configure --profile smileesync
+   # Access Key ID / Secret / region: us-east-1 / output: json
+   ```
+
+4. Verifica que apuntas a la cuenta correcta:
+
+   ```bash
+   aws sts get-caller-identity --profile smileesync
+   ```
+
+A partir de aquí, **añade `--profile smileesync` a los comandos de CDK** (ver Parte 3),
+o exporta `export AWS_PROFILE=smileesync` en la sesión de terminal.
+
+> Nunca subas las llaves al repositorio.
 
 ---
 
@@ -72,10 +91,13 @@ cd "<ruta-del-repo>/smileesync/infra"
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-cdk bootstrap        # solo la primera vez en la cuenta/región
-cdk synth            # opcional: revisa lo que se va a crear
-cdk deploy           # crea la EC2, el security group y la IP elástica
+cdk bootstrap --profile smileesync    # solo la primera vez en la cuenta/región
+cdk synth   --profile smileesync      # opcional: revisa lo que se va a crear
+cdk deploy  --profile smileesync      # crea la EC2, el security group y la IP elástica
 ```
+
+> Si prefieres no repetir `--profile`, exporta antes: `export AWS_PROFILE=smileesync`.
+> El key pair de la Parte 2 también debe crearse con `--profile smileesync`.
 
 Al terminar, CDK imprime la salida **`IPPublica`**. Anótala: es la IP de tu servidor.
 

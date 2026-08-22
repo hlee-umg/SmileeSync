@@ -96,6 +96,14 @@ else:
 
 # --- Autenticación ---------------------------------------------------------
 AUTH_USER_MODEL = 'usuarios.Usuario'
+
+# Autenticación: primero por correo (EmailBackend); ModelBackend se mantiene
+# para el sitio de administración (/admin/), que usa el username.
+AUTHENTICATION_BACKENDS = [
+    'usuarios.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block titulo %}Recuperar contraseña — SmileeSync{% endblock %}
+{% block publico %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:100vh;">
+  <div class="card shadow-sm border-0" style="width:410px;">
+    <div class="card-body p-4">
+      <h5 class="mb-1">Pregunta de seguridad</h5>
+      <p class="text-secondary small">Paso 2 de 3 — Responde tu pregunta secreta.</p>
+      <div class="alert alert-light border"><strong>{{ pregunta }}</strong></div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.respuesta.label }}</label>
+          {{ form.respuesta }}
+          {% if form.respuesta.errors %}<div class="text-danger small">{{ form.respuesta.errors|striptags }}</div>{% endif %}
+        </div>
+        <button class="btn text-white w-100" style="background:#2e6cb5;" type="submit">Verificar</button>
+      </form>
+      <div class="text-center mt-3"><a href="{% url 'login' %}" class="small">Cancelar</a></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -9,4 +9,8 @@ urlpatterns = [
     path('<int:pk>/editar/', views.editar, name='editar'),
     path('<int:pk>/estado/', views.cambiar_estado, name='cambiar_estado'),
     path('historial/', views.historial, name='historial'),
+    # Recuperación de contraseña
+    path('recuperar/', views.recuperar_correo, name='recuperar_correo'),
+    path('recuperar/pregunta/', views.recuperar_pregunta, name='recuperar_pregunta'),
+    path('recuperar/nueva/', views.recuperar_nueva, name='recuperar_nueva'),
 ]

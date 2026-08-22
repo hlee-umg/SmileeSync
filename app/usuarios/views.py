@@ -81,3 +81,66 @@ def cambiar_estado(request, pk):
 def historial(request):
     registros = HistorialUsuario.objects.all()[:200]
     return render(request, 'usuarios/historial.html', {'registros': registros})
+
+
+# ================= Recuperación de contraseña (pregunta secreta) =================
+from .models import Usuario
+from .forms import RecuperarCorreoForm, RecuperarRespuestaForm, NuevaPasswordForm
+
+
+def recuperar_correo(request):
+    """Paso 1: el usuario ingresa su correo."""
+    if request.method == 'POST':
+        form = RecuperarCorreoForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email'].strip().lower()
+            usuario = Usuario.objects.filter(email__iexact=email).first()
+            if usuario and usuario.pregunta_secreta and usuario.respuesta_secreta:
+                request.session['recuperar_uid'] = usuario.pk
+                request.session.pop('recuperar_ok', None)
+                return redirect('usuarios:recuperar_pregunta')
+            form.add_error('email', 'No se encontró una cuenta con pregunta secreta configurada para ese correo.')
+    else:
+        form = RecuperarCorreoForm()
+    return render(request, 'registration/recuperar_correo.html', {'form': form})
+
+
+def recuperar_pregunta(request):
+    """Paso 2: se muestra la pregunta secreta y se valida la respuesta."""
+    uid = request.session.get('recuperar_uid')
+    usuario = Usuario.objects.filter(pk=uid).first() if uid else None
+    if not usuario:
+        return redirect('usuarios:recuperar_correo')
+    pregunta = usuario.get_pregunta_secreta_display()
+    if request.method == 'POST':
+        form = RecuperarRespuestaForm(request.POST)
+        if form.is_valid():
+            if usuario.check_respuesta_secreta(form.cleaned_data['respuesta']):
+                request.session['recuperar_ok'] = True
+                return redirect('usuarios:recuperar_nueva')
+            form.add_error('respuesta', 'La respuesta no es correcta.')
+    else:
+        form = RecuperarRespuestaForm()
+    return render(request, 'registration/recuperar_pregunta.html', {'form': form, 'pregunta': pregunta})
+
+
+def recuperar_nueva(request):
+    """Paso 3: define la nueva contraseña (solo si respondió correctamente)."""
+    uid = request.session.get('recuperar_uid')
+    if not uid or not request.session.get('recuperar_ok'):
+        return redirect('usuarios:recuperar_correo')
+    usuario = Usuario.objects.filter(pk=uid).first()
+    if not usuario:
+        return redirect('usuarios:recuperar_correo')
+    if request.method == 'POST':
+        form = NuevaPasswordForm(request.POST)
+        if form.is_valid():
+            usuario.set_password(form.cleaned_data['password1'])
+            usuario.save(update_fields=['password'])
+            request.session.pop('recuperar_uid', None)
+            request.session.pop('recuperar_ok', None)
+            messages.success(request, 'Tu contraseña fue restablecida. Ya puedes iniciar sesión.')
+            return redirect('login')
+    else:
+        form = NuevaPasswordForm()
+    return render(request, 'registration/recuperar_nueva.html', {'form': form})

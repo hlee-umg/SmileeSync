@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Recuperar contraseña — SmileeSync{% endblock %}
+{% block publico %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:100vh;">
+  <div class="card shadow-sm border-0" style="width:410px;">
+    <div class="card-body p-4">
+      <h5 class="mb-1">Nueva contraseña</h5>
+      <p class="text-secondary small">Paso 3 de 3 — Define tu nueva contraseña.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.password1.label }}</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors|striptags }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{ form.password2.label }}</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors|striptags }}</div>{% endif %}
+        </div>
+        <button class="btn text-white w-100" style="background:#2e6cb5;" type="submit">Guardar contraseña</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

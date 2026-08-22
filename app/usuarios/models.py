@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 
 
@@ -29,13 +30,26 @@ class Rol(models.Model):
 
 
 class Usuario(AbstractUser):
-    """Usuario del sistema. Extiende el usuario de Django y agrega rol,
-    teléfono y estado (para el borrado lógico)."""
+    """Usuario del sistema. El inicio de sesión se realiza con el CORREO
+    electrónico (único). Se agregan rol, teléfono, estado (borrado lógico) y
+    una pregunta secreta para la recuperación de contraseña."""
+    PREGUNTAS = [
+        ('MASCOTA', '¿Cuál fue el nombre de tu primera mascota?'),
+        ('CIUDAD', '¿En qué ciudad naciste?'),
+        ('ESCUELA', '¿Cuál fue el nombre de tu primera escuela?'),
+        ('MADRE', '¿Cuál es el segundo nombre de tu madre?'),
+        ('APODO', '¿Cuál era tu apodo de la infancia?'),
+    ]
+    # El correo pasa a ser único (identificador de inicio de sesión).
+    email = models.EmailField('correo electrónico', unique=True)
     rol = models.ForeignKey(
         Rol, on_delete=models.PROTECT, null=True, blank=True, related_name='usuarios',
         verbose_name='rol')
     telefono = models.CharField('teléfono', max_length=20, blank=True)
     estado = models.BooleanField('activo', default=True)  # borrado lógico
+    pregunta_secreta = models.CharField('pregunta secreta', max_length=10,
+                                        choices=PREGUNTAS, blank=True)
+    respuesta_secreta = models.CharField('respuesta secreta (cifrada)', max_length=128, blank=True)
 
     class Meta:
         db_table = 'usuario'
@@ -51,6 +65,16 @@ class Usuario(AbstractUser):
         if self.es_admin:
             return True
         return bool(self.rol and getattr(self.rol, f'puede_{modulo}', False))
+
+    def set_respuesta_secreta(self, texto):
+        """Guarda la respuesta secreta cifrada (normalizada a minúsculas)."""
+        self.respuesta_secreta = make_password((texto or '').strip().lower())
+
+    def check_respuesta_secreta(self, texto):
+        """Compara una respuesta con la guardada."""
+        if not self.respuesta_secreta:
+            return False
+        return check_password((texto or '').strip().lower(), self.respuesta_secreta)
 
 
 class HistorialUsuario(models.Model):

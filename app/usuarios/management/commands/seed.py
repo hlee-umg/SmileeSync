@@ -27,20 +27,27 @@ class Command(BaseCommand):
             objetos[nombre] = rol
             self.stdout.write(self.style.SUCCESS(f'Rol {"creado" if creado else "actualizado"}: {nombre}'))
 
-        if not Usuario.objects.filter(username='admin').exists():
+        admin = Usuario.objects.filter(email__iexact='admin@smileesync.local').first()
+        if not admin:
             admin = Usuario.objects.create_superuser(
-                'admin', 'admin@smileesync.local', 'Admin123!',
+                'admin@smileesync.local', 'admin@smileesync.local', 'Admin123!',
                 first_name='Administrador', last_name='General')
-            admin.rol = objetos['Administrador']
-            admin.save()
-            self.stdout.write(self.style.SUCCESS('Superusuario creado: admin / Admin123!'))
+            self.stdout.write(self.style.SUCCESS('Superusuario creado: admin@smileesync.local / Admin123!'))
+        admin.rol = objetos['Administrador']
+        admin.pregunta_secreta = 'MASCOTA'
+        admin.set_respuesta_secreta('firulais')
+        admin.save()
 
-        if not Usuario.objects.filter(username='recepcion').exists():
-            u = Usuario.objects.create_user(
-                'recepcion', 'recepcion@smileesync.local', 'Recepcion123!',
+        recep = Usuario.objects.filter(email__iexact='recepcion@smileesync.local').first()
+        if not recep:
+            recep = Usuario.objects.create_user(
+                'recepcion@smileesync.local', 'recepcion@smileesync.local', 'Recepcion123!',
                 first_name='Ana', last_name='Recepción')
-            u.rol = objetos['Recepcionista']
-            u.save()
-            self.stdout.write(self.style.SUCCESS('Usuario creado: recepcion / Recepcion123!'))
+            self.stdout.write(self.style.SUCCESS('Usuario creado: recepcion@smileesync.local / Recepcion123!'))
+        recep.rol = objetos['Recepcionista']
+        recep.pregunta_secreta = 'CIUDAD'
+        recep.set_respuesta_secreta('guatemala')
+        recep.save()
 
-        self.stdout.write(self.style.SUCCESS('Seed completado.'))
+        self.stdout.write(self.style.SUCCESS('Seed completado. Login por CORREO. '
+                                             'Pregunta secreta admin: mascota=firulais; recepcion: ciudad=guatemala'))

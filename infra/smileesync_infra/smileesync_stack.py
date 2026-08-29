@@ -57,8 +57,13 @@ class SmileeSyncStack(Stack):
         instancia = ec2.Instance(
             self, "SmileeServer",
             instance_type=ec2.InstanceType("t3.small"),   # 2 vCPU / 2 GB
-            machine_image=ec2.MachineImage.from_ssm_parameter(
-                UBUNTU_2404_SSM, os=ec2.OperatingSystemType.LINUX),
+            # Fijada al AMI actual del servidor en ejecución. NO usar
+            # from_ssm_parameter aquí: resuelve "la última AMI de Ubuntu"
+            # en cada deploy, lo que fuerza el reemplazo de la instancia
+            # (y con ella, la pérdida de PostgreSQL, que corre localmente
+            # sin RDS) cada vez que Canonical publica una AMI nueva.
+            machine_image=ec2.MachineImage.generic_linux(
+                {"us-east-1": "ami-052355af2a014bd2c"}),
             vpc=vpc,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             security_group=sg,

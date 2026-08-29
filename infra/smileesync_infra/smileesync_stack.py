@@ -34,6 +34,17 @@ class SmileeSyncStack(Stack):
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(80), "HTTP")
         sg.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), "HTTPS")
 
+        # PostgreSQL: acceso remoto para administración/desarrollo (VS Code,
+        # pgAdmin, etc.). Restringido a una IP/CIDR concreta via contexto CDK,
+        # para no exponer la base de datos a cualquier IP.
+        # Uso: cdk deploy -c dbAccessCidr=TU_IP/32
+        db_access_cidr = self.node.try_get_context("dbAccessCidr")
+        if db_access_cidr:
+            sg.add_ingress_rule(
+                ec2.Peer.ipv4(db_access_cidr), ec2.Port.tcp(5432),
+                "PostgreSQL - acceso remoto restringido"
+            )
+
         # Script de arranque: instala dependencias base del servidor
         user_data = ec2.UserData.for_linux()
         user_data.add_commands(

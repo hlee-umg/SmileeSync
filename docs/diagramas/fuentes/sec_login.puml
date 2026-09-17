@@ -1,0 +1,60 @@
+@startuml
+title Diagrama de secuencia — Inicio de sesión y control de acceso por rol
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBackgroundColor #EEF2FF
+  ParticipantBorderColor #4F46E5
+  ActorBackgroundColor #EEF2FF
+  ActorBorderColor #4F46E5
+}
+
+actor "Usuario" as U
+participant "Navegador" as B
+participant "Nginx\n(servidor web)" as N
+participant "Django / Gunicorn" as D
+participant "LoginCorreoForm" as F
+participant "EmailBackend" as EB
+database "PostgreSQL" as DB
+
+U -> B: Ingresa correo y contraseña
+B -> N: POST /login/
+N -> D: proxy inverso (WSGI)
+activate D
+
+D -> F: valida el formato del formulario
+activate F
+alt Formato inválido
+    F --> D: errores de validación
+    D --> B: reenvía el formulario con los errores
+else Formato válido
+    F --> D: datos limpios
+    deactivate F
+    D -> EB: authenticate(email, password)
+    activate EB
+    EB -> DB: SELECT * FROM usuario WHERE email = ?
+    DB --> EB: registro del usuario
+
+    alt Credenciales incorrectas o usuario inactivo
+        EB --> D: None
+        D --> B: "Correo o contraseña incorrectos"
+    else Credenciales válidas
+        EB --> D: objeto Usuario autenticado
+        deactivate EB
+        D -> DB: crea la sesión (django_session)
+        D -> D: evalúa rol.puede(modulo) para armar el menú
+        D --> B: redirige al módulo Principal
+        B --> U: muestra el panel con las opciones de su rol
+    end
+end
+deactivate D
+
+note over D, DB
+  El control de acceso (RBAC) se aplica en cada vista
+  mediante el decorador @modulo_requerido, no solo
+  al ocultar opciones del menú.
+end note
+
+@enduml

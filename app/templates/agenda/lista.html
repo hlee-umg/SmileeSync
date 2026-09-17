@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block titulo %}Consulta de citas — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Agenda y Citas{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Consulta de citas</h5>
+  <div class="d-flex gap-2">
+    <a href="{% url 'agenda:principal' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-calendar-week"></i> Ver calendario
+    </a>
+    <a href="{% url 'agenda:crear' %}" class="btn btn-sm btn-primary">
+      <i class="bi bi-plus-lg"></i> Nueva cita
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+
+    <form method="get" class="row g-2 mb-3">
+      <div class="col-md-3">
+        <input type="date" name="desde" value="{{ desde }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-md-3">
+        <input type="date" name="hasta" value="{{ hasta }}" class="form-control form-control-sm">
+      </div>
+      <div class="col-md-3">
+        <select name="odontologo" class="form-select form-select-sm">
+          <option value="">Todos los odontólogos</option>
+          {% for o in odontologos %}
+            <option value="{{ o.id }}" {% if odontologo == o.id|stringformat:"s" %}selected{% endif %}>{{ o }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="estado_cita" class="form-select form-select-sm">
+          <option value="">Todos los estados</option>
+          {% for valor, etiqueta in estados %}
+            <option value="{{ valor }}" {% if estado_cita == valor %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-sm btn-outline-primary w-100"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha</th><th>Hora</th><th>Paciente</th><th>Procedimiento</th><th>Odontólogo</th>
+            <th class="text-center">Asignado</th><th class="text-center">Real</th>
+            <th>Estado</th><th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cita in citas %}
+          <tr>
+            <td>{{ cita.fecha|date:"d/m/Y" }}</td>
+            <td>{{ cita.hora_inicio_programada|time:"H:i" }}</td>
+            <td>{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</td>
+            <td>{{ cita.procedimiento.nombre }}</td>
+            <td>{{ cita.odontologo }}</td>
+            <td class="text-center">{{ cita.duracion_asignada_min }} min</td>
+            <td class="text-center">
+              {% if cita.duracion_real_min %}
+                <span class="fw-semibold {% if cita.desvio > 0 %}text-danger{% else %}text-success{% endif %}">
+                  {{ cita.duracion_real_min }} min
+                </span>
+                <div class="small text-secondary">
+                  {% if cita.desvio > 0 %}+{% endif %}{{ cita.desvio }} min
+                </div>
+              {% else %}
+                <span class="text-secondary">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if cita.estado_cita == 'ATENDIDA' %}<span class="badge bg-success">Atendida</span>
+              {% elif cita.estado_cita == 'CANCELADA' %}<span class="badge bg-danger">Cancelada</span>
+              {% elif cita.estado_cita == 'REPROGRAMADA' %}<span class="badge bg-warning text-dark">Reprogramada</span>
+              {% else %}<span class="badge bg-primary">Programada</span>{% endif %}
+            </td>
+            <td class="text-end text-nowrap">
+              {% if cita.estado_cita != 'CANCELADA' and cita.estado_cita != 'ATENDIDA' %}
+                <a href="{% url 'agenda:editar' cita.pk %}" class="btn btn-sm btn-outline-primary"
+                   title="Reprogramar"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'agenda:tiempos' cita.pk %}" class="btn btn-sm btn-outline-success"
+                   title="Registrar atención"><i class="bi bi-check2-circle"></i></a>
+                <form method="post" action="{% url 'agenda:cancelar' cita.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="siguiente" value="{% url 'agenda:lista' %}">
+                  <button class="btn btn-sm btn-outline-danger" title="Cancelar">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </form>
+              {% else %}
+                <span class="text-secondary small">Sin acciones</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" class="text-center text-secondary py-4">
+            No hay citas registradas en el rango de fechas seleccionado.
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="small text-secondary mb-0">
+      <i class="bi bi-info-circle"></i>
+      La comparación entre el tiempo asignado y el tiempo real alimenta el conjunto
+      de entrenamiento del modelo predictivo.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

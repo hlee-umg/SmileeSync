@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block titulo %}Ficha de {{ paciente.nombres }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Pacientes{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Ficha clínica</h5>
+  <div class="d-flex gap-2">
+    <a href="{% url 'pacientes:lista' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Volver al listado
+    </a>
+    <a href="{% url 'pacientes:editar' paciente.pk %}" class="btn btn-sm btn-primary">
+      <i class="bi bi-pencil"></i> Editar datos
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-center mb-3">
+          <i class="bi bi-person-circle" style="font-size:3rem; color:var(--smilee);"></i>
+          <h5 class="mt-2 mb-1">{{ paciente.nombres }} {{ paciente.apellidos }}</h5>
+          {% if paciente.estado %}<span class="badge bg-success">Activo</span>
+          {% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}
+        </div>
+        <table class="table table-sm mb-0">
+          <tr><th class="text-secondary small">Código</th><td class="small"><code>{{ paciente.codigo }}</code></td></tr>
+          <tr><th class="text-secondary small">Nacimiento</th><td class="small">{{ paciente.fecha_nacimiento|date:"d/m/Y"|default:"—" }}</td></tr>
+          <tr><th class="text-secondary small">Sexo</th><td class="small">{{ paciente.get_sexo_display|default:"—" }}</td></tr>
+          <tr><th class="text-secondary small">Teléfono</th><td class="small">{{ paciente.telefono|default:"—" }}</td></tr>
+          <tr><th class="text-secondary small">Correo</th><td class="small">{{ paciente.email|default:"—" }}</td></tr>
+          <tr><th class="text-secondary small">Dirección</th><td class="small">{{ paciente.direccion|default:"—" }}</td></tr>
+          <tr><th class="text-secondary small">Registrado</th><td class="small">{{ paciente.creado|date:"d/m/Y" }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-clipboard2-pulse"></i> Antecedentes médicos</h6>
+
+        <table class="table table-sm align-middle">
+          <thead class="table-light"><tr><th>Tipo</th><th>Descripción</th><th>Registrado</th><th></th></tr></thead>
+          <tbody>
+            {% for a in antecedentes %}
+            <tr>
+              <td><span class="badge bg-warning text-dark">{{ a.tipo }}</span></td>
+              <td class="small">{{ a.descripcion }}</td>
+              <td class="small text-secondary">{{ a.creado|date:"d/m/Y" }}</td>
+              <td class="text-end">
+                <form method="post" action="{% url 'pacientes:quitar_antecedente' a.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger" title="Retirar">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-secondary small py-3">
+              Sin antecedentes médicos registrados.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <form method="post" class="row g-2 align-items-end border-top pt-3">
+          {% csrf_token %}
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">{{ form.tipo.label }}</label>
+            {{ form.tipo }}
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small fw-semibold">{{ form.descripcion.label }}</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+              <div class="text-danger small mt-1">{{ form.descripcion.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-sm btn-primary w-100"><i class="bi bi-plus-lg"></i> Agregar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-calendar-check"></i> Historial de citas</h6>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Fecha</th><th>Procedimiento</th><th>Odontólogo</th>
+                <th class="text-center">Asignado</th><th class="text-center">Real</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            {% for c in citas %}
+            <tr>
+              <td class="small">{{ c.fecha|date:"d/m/Y" }}</td>
+              <td class="small">{{ c.procedimiento.nombre }}</td>
+              <td class="small">{{ c.odontologo }}</td>
+              <td class="text-center small">{{ c.duracion_asignada_min }} min</td>
+              <td class="text-center small">
+                {% if c.duracion_real_min %}{{ c.duracion_real_min }} min{% else %}—{% endif %}
+              </td>
+              <td>
+                {% if c.estado_cita == 'ATENDIDA' %}<span class="badge bg-success">Atendida</span>
+                {% elif c.estado_cita == 'CANCELADA' %}<span class="badge bg-danger">Cancelada</span>
+                {% elif c.estado_cita == 'REPROGRAMADA' %}<span class="badge bg-warning text-dark">Reprogramada</span>
+                {% else %}<span class="badge bg-primary">Programada</span>{% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-secondary small py-3">
+              Este paciente aún no tiene citas registradas.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if historial %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-clock-history"></i> Auditoría del registro</h6>
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Fecha</th><th>Acción</th><th>Realizado por</th></tr></thead>
+          <tbody>
+            {% for h in historial %}
+            <tr>
+              <td class="small text-secondary">{{ h.fecha|date:"d/m/Y H:i" }}</td>
+              <td class="small">{{ h.get_accion_display }}</td>
+              <td class="small">{{ h.realizado_por }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

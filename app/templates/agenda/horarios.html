@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block titulo %}Horarios de {{ odontologo }} — SmileeSync{% endblock %}
+{% block encabezado %}Horarios de disponibilidad{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">{{ odontologo }}</h5>
+    <span class="small text-secondary">
+      {{ odontologo.especialidad.nombre }}
+      {% if odontologo.colegiado %}· Colegiado {{ odontologo.colegiado }}{% endif %}
+    </span>
+  </div>
+  <a href="{% url 'catalogo:lista' 'odontologos' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Volver a odontólogos
+  </a>
+</div>
+
+{% if total_franjas == 0 %}
+<div class="alert alert-warning">
+  <i class="bi bi-exclamation-triangle"></i>
+  <strong>Este odontólogo no tiene horario de atención configurado.</strong>
+  Mientras no se registre al menos una franja, el sistema rechazará todas las
+  citas que se intenten programar con él.
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0"><i class="bi bi-calendar-range"></i> Semana de atención</h6>
+          <span class="small text-secondary">
+            {{ horas_semana }} hora{{ horas_semana|pluralize:"s" }} por semana
+          </span>
+        </div>
+
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th style="width:130px;">Día</th><th>Franjas de atención</th>
+                <th class="text-end" style="width:80px;">Horas</th></tr>
+          </thead>
+          <tbody>
+            {% for dia in semana %}
+            <tr>
+              <td class="fw-semibold">{{ dia.nombre }}</td>
+              <td>
+                {% for f in dia.franjas %}
+                  <span class="badge bg-light text-dark border me-1 mb-1 d-inline-flex align-items-center">
+                    {{ f.hora_inicio|time:"H:i" }} – {{ f.hora_fin|time:"H:i" }}
+                    <form method="post" action="{% url 'agenda:quitar_horario' f.pk %}" class="d-inline ms-1">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-link text-danger p-0 border-0" title="Retirar franja"
+                              style="line-height:1;"><i class="bi bi-x"></i></button>
+                    </form>
+                  </span>
+                {% empty %}
+                  <span class="text-secondary small">Sin atención</span>
+                {% endfor %}
+              </td>
+              <td class="text-end small text-secondary">
+                {% if dia.horas %}{{ dia.horas }}{% else %}—{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-plus-circle"></i> Agregar franja de atención</h6>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ form.dia_semana.label }}</label>
+            {{ form.dia_semana }}
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small fw-semibold">{{ form.hora_inicio.label }}</label>
+              {{ form.hora_inicio }}
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-semibold">{{ form.hora_fin.label }}</label>
+              {{ form.hora_fin }}
+            </div>
+          </div>
+          {% for campo in form %}
+            {% if campo.errors %}
+              <div class="text-danger small mb-2">{{ campo.errors|striptags }}</div>
+            {% endif %}
+          {% endfor %}
+
+          <div class="form-check mb-3">
+            {{ form.replicar }}
+            <label class="form-check-label small" for="{{ form.replicar.id_for_label }}">
+              {{ form.replicar.label }}
+            </label>
+            <div class="form-text small">{{ form.replicar.help_text }}</div>
+          </div>
+
+          <button class="btn btn-primary w-100" type="submit">
+            <i class="bi bi-save"></i> Agregar franja
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-info-circle"></i> Cómo se usan estas franjas</h6>
+        <ul class="small text-secondary mb-0 ps-3">
+          <li>Una cita solo puede programarse si cabe completa dentro de una franja.</li>
+          <li>Las franjas no pueden traslaparse entre sí.</li>
+          <li>El total de horas semanales es la base del indicador de utilización de la agenda.</li>
+          <li>Retirar una franja no elimina las citas ya programadas dentro de ella.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

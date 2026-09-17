@@ -1,0 +1,76 @@
+@startuml
+title Diagrama de secuencia — Creación de usuario con validación de datos
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBackgroundColor #EEF2FF
+  ParticipantBorderColor #4F46E5
+  ActorBackgroundColor #EEF2FF
+  ActorBorderColor #4F46E5
+}
+
+actor "Administrador" as A
+participant "Navegador" as B
+participant "Vista crear()" as V
+participant "UsuarioCrearForm" as F
+participant "Modelo Usuario" as M
+participant "HistorialUsuario" as H
+database "PostgreSQL" as DB
+
+A -> B: Completa el formulario de nuevo usuario
+B -> V: POST /usuarios/crear/
+activate V
+V -> F: is_valid()
+activate F
+
+F -> F: clean_first_name() / clean_last_name()
+note right of F
+  Solo se admiten letras, tildes, ñ,
+  espacios, apóstrofos y guiones.
+  Se rechazan números y símbolos.
+end note
+
+alt Nombre o apellido con caracteres no permitidos
+    F --> V: ValidationError
+    V --> B: "El nombre solo puede contener letras y espacios"
+end
+
+F -> F: clean_email()
+note right of F
+  validate_email() verifica el formato
+  usuario@dominio.com y se comprueba
+  que el correo no esté duplicado.
+end note
+
+alt Correo con formato inválido
+    F --> V: ValidationError
+    V --> B: "Ingrese un correo electrónico válido"
+else Correo ya registrado
+    F --> V: ValidationError
+    V --> B: "Ya existe un usuario con ese correo"
+else Datos correctos
+    F -> F: clean() compara ambas contraseñas
+    F --> V: formulario válido
+    deactivate F
+
+    V -> M: save(commit=False)
+    activate M
+    M -> M: username = correo
+    M -> M: set_password() y set_respuesta_secreta()
+    M -> DB: INSERT INTO usuario
+    DB --> M: id del nuevo registro
+    deactivate M
+
+    V -> H: registrar(usuario, 'CREACION', autor)
+    activate H
+    H -> DB: INSERT INTO historial_usuario
+    deactivate H
+
+    V --> B: redirige al listado con mensaje de éxito
+    B --> A: "Usuario creado correctamente"
+end
+deactivate V
+
+@enduml

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block titulo %}Registrar atención — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Agenda y Citas{% endblock %}
+{% block contenido %}
+
+<div class="card border-0 shadow-sm" style="max-width:620px;">
+  <div class="card-body">
+    <h5 class="mb-1">Registrar atención</h5>
+    <p class="text-secondary small mb-3">
+      {{ cita.paciente.nombres }} {{ cita.paciente.apellidos }} ·
+      {{ cita.procedimiento.nombre }} · {{ cita.odontologo }}<br>
+      Programada el {{ cita.fecha|date:"d/m/Y" }} de
+      {{ cita.hora_inicio_programada|time:"H:i" }} a {{ cita.hora_fin_programada|time:"H:i" }}
+      ({{ cita.duracion_asignada_min }} minutos asignados).
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        {% for campo in form %}
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">{{ campo.label }}</label>
+            {{ campo }}
+            {% if campo.errors %}
+              <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="alert alert-light border small mt-3">
+        <i class="bi bi-lightbulb text-warning"></i>
+        Al guardar, la duración real se calcula automáticamente y se incorpora al
+        conjunto de datos con el que se entrena el modelo predictivo. Este registro
+        es lo que permite que las estimaciones mejoren con el tiempo.
+      </div>
+
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" type="submit">
+          <i class="bi bi-check2-circle"></i> Registrar atención
+        </button>
+        <a href="{% url 'agenda:lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

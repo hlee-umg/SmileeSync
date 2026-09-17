@@ -1,0 +1,214 @@
+erDiagram
+    ROL ||--o{ USUARIO : "asigna permisos a"
+    USUARIO |o--o{ ODONTOLOGO : "es cuenta de"
+    ESPECIALIDAD ||--o{ PROCEDIMIENTO : "clasifica"
+    ESPECIALIDAD ||--o{ ODONTOLOGO : "define perfil de"
+    PACIENTE ||--o{ ANTECEDENTE_MEDICO : "presenta"
+    ODONTOLOGO ||--o{ HORARIO_DISPONIBILIDAD : "declara"
+    PACIENTE ||--o{ CITA : "solicita"
+    ODONTOLOGO ||--o{ CITA : "atiende"
+    PROCEDIMIENTO ||--o{ CITA : "se aplica en"
+    CITA |o--o{ DATO_ENTRENAMIENTO : "genera dataset"
+    CITA ||--o{ PREDICCION : "recibe"
+    MODELO_VERSION ||--o{ PREDICCION : "produce"
+    USUARIO ||..o{ HISTORIAL_USUARIO : "auditado por"
+    PACIENTE ||..o{ HISTORIAL_PACIENTE : "auditado por"
+    CITA ||..o{ HISTORIAL_CITA : "auditado por"
+
+    ROL {
+        bigserial id PK
+        varchar nombre UK
+        varchar descripcion
+        boolean puede_usuarios
+        boolean puede_pacientes
+        boolean puede_catalogos
+        boolean puede_agenda
+        boolean puede_inteligencia
+        boolean puede_reportes
+        boolean estado
+        timestamp creado
+    }
+
+    USUARIO {
+        bigserial id PK
+        bigint rol_id FK
+        varchar email UK
+        varchar username UK
+        varchar password
+        varchar first_name
+        varchar last_name
+        varchar telefono
+        varchar pregunta_secreta
+        varchar respuesta_secreta
+        boolean is_active
+        boolean estado
+        timestamp last_login
+        timestamp date_joined
+    }
+
+    HISTORIAL_USUARIO {
+        bigserial id PK
+        integer usuario_ref
+        varchar username
+        varchar nombre_completo
+        varchar email
+        varchar rol
+        boolean estado_anterior
+        varchar accion
+        varchar realizado_por
+        timestamp fecha
+    }
+
+    ESPECIALIDAD {
+        bigserial id PK
+        varchar nombre UK
+        varchar descripcion
+        boolean estado
+        timestamp creado
+    }
+
+    PROCEDIMIENTO {
+        bigserial id PK
+        bigint especialidad_id FK
+        varchar codigo UK
+        varchar nombre
+        varchar nivel_complejidad
+        integer duracion_promedio_min
+        text descripcion
+        boolean estado
+        timestamp creado
+    }
+
+    ODONTOLOGO {
+        bigserial id PK
+        bigint usuario_id FK
+        bigint especialidad_id FK
+        varchar nombres
+        varchar apellidos
+        varchar colegiado
+        varchar telefono
+        boolean estado
+        timestamp creado
+    }
+
+    PACIENTE {
+        bigserial id PK
+        varchar codigo UK
+        varchar nombres
+        varchar apellidos
+        date fecha_nacimiento
+        varchar sexo
+        varchar telefono
+        varchar email
+        varchar direccion
+        boolean estado
+        timestamp creado
+    }
+
+    ANTECEDENTE_MEDICO {
+        bigserial id PK
+        bigint paciente_id FK
+        varchar tipo
+        text descripcion
+        boolean estado
+        timestamp creado
+    }
+
+    HISTORIAL_PACIENTE {
+        bigserial id PK
+        integer paciente_ref
+        varchar codigo
+        varchar nombre_completo
+        boolean estado_anterior
+        varchar accion
+        varchar realizado_por
+        timestamp fecha
+    }
+
+    HORARIO_DISPONIBILIDAD {
+        bigserial id PK
+        bigint odontologo_id FK
+        varchar dia_semana
+        time hora_inicio
+        time hora_fin
+        boolean estado
+        timestamp creado
+    }
+
+    CITA {
+        bigserial id PK
+        bigint paciente_id FK
+        bigint odontologo_id FK
+        bigint procedimiento_id FK
+        date fecha
+        time hora_inicio_programada
+        time hora_fin_programada
+        time hora_inicio_real
+        time hora_fin_real
+        integer duracion_asignada_min
+        integer duracion_real_min
+        varchar estado_cita
+        text observaciones
+        boolean estado
+        timestamp creado
+    }
+
+    HISTORIAL_CITA {
+        bigserial id PK
+        integer cita_ref
+        varchar paciente
+        varchar odontologo
+        date fecha_cita
+        varchar estado_cita_anterior
+        varchar accion
+        varchar realizado_por
+        timestamp fecha
+    }
+
+    MODELO_VERSION {
+        bigserial id PK
+        varchar nombre
+        varchar algoritmo
+        double mae
+        double rmse
+        double r2
+        timestamp fecha_entrenamiento
+        varchar ruta_archivo
+        boolean activo
+        boolean estado
+        timestamp creado
+    }
+
+    DATO_ENTRENAMIENTO {
+        bigserial id PK
+        bigint cita_id FK
+        varchar tipo_procedimiento
+        varchar odontologo
+        varchar dia_semana
+        integer hora_inicio
+        integer num_piezas
+        integer duracion_real_min
+        timestamp creado
+    }
+
+    PREDICCION {
+        bigserial id PK
+        bigint cita_id FK
+        bigint modelo_id FK
+        integer duracion_estimada_min
+        integer bloque_min_recomendado
+        integer bloque_max_recomendado
+        timestamp fecha
+    }
+
+    INDICADOR_DESEMPENO {
+        bigserial id PK
+        date fecha
+        integer citas_atendidas
+        double utilizacion_pct
+        double tiempo_espera_prom_min
+        double mae_actual
+        double rmse_actual
+        double r2_actual
+        timestamp creado
+    }

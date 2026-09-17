@@ -1,0 +1,82 @@
+@startuml
+title Diagrama de componentes — Arquitectura de despliegue de SmileeSync
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+}
+skinparam node {
+  BackgroundColor #FAFAF9
+  BorderColor #64748B
+}
+skinparam database {
+  BackgroundColor #ECFDF5
+  BorderColor #059669
+}
+skinparam artifact {
+  BackgroundColor #FEF3C7
+  BorderColor #D97706
+}
+
+node "Equipo del usuario" as CLIENTE {
+  component "Navegador web\nHTML5 · CSS3 · Bootstrap 5.3" as NAV
+}
+
+cloud "Internet" as NET
+
+node "Servidor AWS EC2\nUbuntu 24.04 · t3.small · IP elástica" as EC2 {
+
+  component "Nginx\nProxy inverso y archivos estáticos" as NGINX
+
+  component "Gunicorn\nServidor de aplicaciones WSGI (3 workers)" as GUNICORN
+
+  package "Aplicación Django 5 (patrón MVT)" as DJANGO {
+    component "Seguridad y Usuarios\nRBAC · auditoría" as M1
+    component "Pacientes" as M2
+    component "Catálogo Odontológico" as M3
+    component "Agenda y Citas" as M4
+    component "Inteligencia" as M5
+    component "Reportes e Indicadores" as M6
+    component "ORM de Django" as ORM
+  }
+
+  component "Motor predictivo\nscikit-learn · XGBoost · pandas" as ML
+  artifact "modelo_activo.joblib" as JOBLIB
+
+  database "PostgreSQL 16\n16 tablas · 6 módulos" as DB
+}
+
+node "GitHub" as GITHUB {
+  component "Repositorio SmileeSync" as REPO
+  component "GitHub Actions\nPruebas y despliegue continuo" as CI
+}
+
+NAV --> NET : HTTPS
+NET --> NGINX : puertos 80 / 443
+NGINX --> GUNICORN : WSGI (127.0.0.1:8000)
+GUNICORN --> DJANGO : procesa la solicitud
+
+M1 --> ORM
+M2 --> ORM
+M3 --> ORM
+M4 --> ORM
+M5 --> ORM
+M6 --> ORM
+ORM --> DB : SQL (psycopg2)
+
+M5 --> ML : solicita la estimación
+ML ..> JOBLIB : carga el modelo entrenado
+ML --> ORM : registra la predicción
+
+REPO --> CI : push a la rama main
+CI ..> EC2 : despliegue por SSH\n(git pull · migrate · collectstatic)
+
+note bottom of EC2
+  Todos los componentes se ejecutan en una única instancia EC2.
+  PostgreSQL reside en el disco de la instancia (sin RDS), por lo
+  que el respaldo de la base de datos es una tarea crítica.
+end note
+
+@enduml

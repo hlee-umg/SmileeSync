@@ -17,6 +17,33 @@
     .sidebar .brand { color:#fff; font-weight:700; letter-spacing:.5px; }
     .navbar-top { background:#fff; border-bottom:1px solid #e6e9ef; }
     .muted-link { opacity:.55; }
+
+    /* --- Calendario del módulo Principal --- */
+    .cal-celda { height:62px; vertical-align:top; }
+    .cal-hora { width:74px; color:#64748b; font-size:.78rem; vertical-align:top; }
+    .cita { border-radius:.35rem; padding:.28rem .45rem; font-size:.74rem; line-height:1.2; }
+    .cita-prog   { background:#dbeafe; border-left:3px solid #2563eb; color:#1e3a8a; }
+    .cita-aten   { background:#dcfce7; border-left:3px solid #16a34a; color:#14532d; }
+    .cita-canc   { background:#fee2e2; border-left:3px solid #dc2626; color:#7f1d1d;
+                   text-decoration:line-through; }
+    .cita-reprog { background:#fef3c7; border-left:3px solid #d97706; color:#78350f; }
+    .cita a { color:inherit; }
+    .leyenda { display:inline-block; width:14px; height:14px; border-radius:3px;
+               vertical-align:-2px; }
+    .leyenda.cita-prog   { background:#dbeafe; }
+    .leyenda.cita-aten   { background:#dcfce7; }
+    .leyenda.cita-canc   { background:#fee2e2; }
+    .leyenda.cita-reprog { background:#fef3c7; }
+
+    /* --- Tarjetas de indicadores --- */
+    .kpi { border:0; box-shadow:0 1px 3px rgba(15,23,42,.08); }
+    .kpi .valor { font-size:1.75rem; font-weight:700; color:var(--smilee); line-height:1.2; }
+    .kpi .etiqueta { font-size:.72rem; color:#64748b; text-transform:uppercase;
+                     letter-spacing:.03em; }
+
+    /* --- Panel de recomendación del modelo --- */
+    .recomendacion { background:#eef4fc; border-radius:.5rem; }
+    .estimacion-valor { font-size:2.2rem; font-weight:700; color:var(--smilee); }
   </style>
 </head>
 <body>
@@ -27,22 +54,22 @@
     <nav class="col-md-3 col-lg-2 d-md-block sidebar p-0">
       <div class="p-3 brand fs-5"><i class="bi bi-heart-pulse"></i> SmileeSync</div>
       <ul class="nav flex-column py-2">
-        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Inicio</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'principal' %}active{% endif %}" href="{% url 'agenda:principal' %}"><i class="bi bi-speedometer2"></i> Inicio</a></li>
 
         {% if user.rol.puede_usuarios or user.es_admin %}
         <li class="nav-item"><a class="nav-link {% if 'usuarios' in request.path %}active{% endif %}" href="{% url 'usuarios:lista' %}"><i class="bi bi-people"></i> Usuarios</a></li>
         {% endif %}
 
         {% if user.rol.puede_pacientes or user.es_admin %}
-        <li class="nav-item"><a class="nav-link muted-link" href="#" title="Módulo en desarrollo"><i class="bi bi-person-vcard"></i> Pacientes</a></li>
+        <li class="nav-item"><a class="nav-link {% if 'pacientes' in request.path %}active{% endif %}" href="{% url 'pacientes:lista' %}"><i class="bi bi-person-vcard"></i> Pacientes</a></li>
         {% endif %}
 
         {% if user.rol.puede_catalogos or user.es_admin %}
-        <li class="nav-item"><a class="nav-link muted-link" href="#" title="Módulo en desarrollo"><i class="bi bi-journal-medical"></i> Catálogos</a></li>
+        <li class="nav-item"><a class="nav-link {% if 'catalogo' in request.path %}active{% endif %}" href="{% url 'catalogo:lista' 'procedimientos' %}"><i class="bi bi-journal-medical"></i> Catálogos</a></li>
         {% endif %}
 
         {% if user.rol.puede_agenda or user.es_admin %}
-        <li class="nav-item"><a class="nav-link muted-link" href="#" title="Módulo en desarrollo"><i class="bi bi-calendar-week"></i> Agenda y Citas</a></li>
+        <li class="nav-item"><a class="nav-link {% if 'citas' in request.path %}active{% endif %}" href="{% url 'agenda:lista' %}"><i class="bi bi-calendar-week"></i> Agenda y Citas</a></li>
         {% endif %}
 
         {% if user.rol.puede_inteligencia or user.es_admin %}

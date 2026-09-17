@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ titulo }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Agenda y Citas{% endblock %}
+{% block contenido %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">{{ titulo }}</h5>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 small">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for campo in form %}
+              <div class="{% if campo.name == 'observaciones' or campo.name == 'paciente' %}col-12{% else %}col-md-6{% endif %}">
+                <label class="form-label small fw-semibold">{{ campo.label }}</label>
+                {{ campo }}
+                {% if campo.help_text %}
+                  <div class="form-text small">{{ campo.help_text }}</div>
+                {% endif %}
+                {% if campo.errors %}
+                  <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" type="submit">
+              <i class="bi bi-calendar-check"></i>
+              {% if es_nueva %}Programar cita{% else %}Guardar cambios{% endif %}
+            </button>
+            <a href="{% url 'agenda:principal' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3" style="border-top:4px solid var(--smilee2) !important;">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-cpu text-primary"></i> Recomendación del sistema</h6>
+
+        <div id="panel-estimacion" {% if not estimacion %}class="d-none"{% endif %}>
+          <div class="text-center py-2 mb-3 recomendacion">
+            <div class="small text-secondary">Duración estimada</div>
+            <div class="estimacion-valor">
+              <span id="est-duracion">{{ estimacion.duracion_min|default:"—" }}</span>
+              <span class="fs-6 fw-normal">min</span>
+            </div>
+            <div class="small text-secondary">
+              Bloque recomendado:
+              <strong><span id="est-bloque">{{ estimacion.bloque_min }} – {{ estimacion.bloque_max }}</span> min</strong>
+            </div>
+          </div>
+          <table class="table table-sm small mb-3">
+            <tr>
+              <td class="text-secondary">Origen de la estimación</td>
+              <td class="text-end">
+                <span id="est-origen" class="badge bg-secondary">{{ estimacion.etiqueta_origen }}</span>
+              </td>
+            </tr>
+          </table>
+          <div class="alert alert-light border small mb-0" id="est-detalle">{{ estimacion.detalle }}</div>
+        </div>
+
+        <p class="small text-secondary mb-0" id="aviso-estimacion" {% if estimacion %}class="d-none"{% endif %}>
+          Seleccione el procedimiento, el odontólogo, la fecha y la hora: el sistema
+          calculará automáticamente la duración estimada a partir del historial real
+          de atenciones de la clínica.
+        </p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-info-circle"></i> Validaciones aplicadas</h6>
+        <ul class="small text-secondary mb-0 ps-3">
+          <li>La cita debe caber dentro del horario de atención del odontólogo.</li>
+          <li>No puede traslaparse con otra cita del mismo odontólogo.</li>
+          <li>La hora de finalización se calcula automáticamente.</li>
+          <li>No se admiten fechas anteriores al día de hoy.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Consulta la estimación de duración al servidor cada vez que cambian los datos
+// relevantes, y precarga el campo de duración con el valor sugerido.
+(function () {
+  const url = "{% url 'agenda:estimar' %}";
+  const campo = (n) => document.querySelector(`[name="${n}"]`);
+  const panel = document.getElementById('panel-estimacion');
+  const aviso = document.getElementById('aviso-estimacion');
+  const duracion = campo('duracion_asignada_min');
+  let duracionTocadaPorUsuario = {% if es_nueva %}false{% else %}true{% endif %};
+
+  if (duracion) {
+    duracion.addEventListener('input', () => { duracionTocadaPorUsuario = true; });
+  }
+
+  const insignias = { modelo: 'bg-dark', historico: 'bg-primary', catalogo: 'bg-secondary' };
+
+  async function actualizar() {
+    const proc = campo('procedimiento'), odo = campo('odontologo');
+    if (!proc || !odo || !proc.value || !odo.value) return;
+
+    const parametros = new URLSearchParams({
+      procedimiento: proc.value,
+      odontologo: odo.value,
+      fecha: campo('fecha') ? campo('fecha').value : '',
+      hora: campo('hora_inicio_programada') ? campo('hora_inicio_programada').value : '',
+      piezas: campo('num_piezas') ? campo('num_piezas').value : 1,
+    });
+
+    try {
+      const r = await fetch(`${url}?${parametros}`);
+      const d = await r.json();
+      if (!d.disponible) return;
+
+      document.getElementById('est-duracion').textContent = d.duracion;
+      document.getElementById('est-bloque').textContent = `${d.bloque_min} – ${d.bloque_max}`;
+      const origen = document.getElementById('est-origen');
+      origen.textContent = d.etiqueta_origen;
+      origen.className = 'badge ' + (insignias[d.origen] || 'bg-secondary');
+      document.getElementById('est-detalle').textContent = d.detalle;
+
+      panel.classList.remove('d-none');
+      if (aviso) aviso.classList.add('d-none');
+
+      // Solo se precarga la duración si el usuario no la ha escrito a mano:
+      // la decisión final es suya, el sistema únicamente sugiere.
+      if (duracion && !duracionTocadaPorUsuario) duracion.value = d.duracion;
+    } catch (e) {
+      /* si falla la consulta, el formulario sigue siendo utilizable */
+    }
+  }
+
+  ['procedimiento', 'odontologo', 'fecha', 'hora_inicio_programada', 'num_piezas']
+    .forEach((n) => { const c = campo(n); if (c) c.addEventListener('change', actualizar); });
+
+  actualizar();
+})();
+</script>
+
+{% endblock %}

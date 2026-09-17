@@ -1,0 +1,107 @@
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam backgroundColor white
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+  ArrowColor #334155
+}
+skinparam package {
+  BackgroundColor #FAFAF9
+  BorderColor #94A3B8
+}
+
+actor "Administrador" as ADMIN
+actor "Recepcionista" as RECEP
+actor "Odontólogo" as ODONT
+actor "Asistente" as ASIST
+actor "Motor predictivo" as ML
+
+rectangle "Sistema SmileeSync" {
+
+  package "Seguridad y Usuarios" {
+    usecase "Iniciar sesión" as UC01
+    usecase "Recuperar contraseña" as UC02
+    usecase "Gestionar usuarios" as UC03
+    usecase "Gestionar roles y permisos" as UC04
+    usecase "Consultar historial de auditoría" as UC05
+  }
+
+  package "Pacientes" {
+    usecase "Registrar paciente" as UC06
+    usecase "Consultar ficha de paciente" as UC07
+    usecase "Registrar antecedentes médicos" as UC08
+  }
+
+  package "Catálogo Odontológico" {
+    usecase "Gestionar procedimientos" as UC09
+    usecase "Gestionar especialidades" as UC10
+    usecase "Gestionar odontólogos" as UC11
+  }
+
+  package "Agenda y Citas" {
+    usecase "Programar cita" as UC12
+    usecase "Consultar calendario" as UC13
+    usecase "Reprogramar o cancelar cita" as UC14
+    usecase "Registrar tiempos reales de atención" as UC15
+    usecase "Definir horarios de disponibilidad" as UC16
+  }
+
+  package "Inteligencia" {
+    usecase "Estimar duración del procedimiento" as UC17
+    usecase "Recomendar bloque de tiempo" as UC18
+    usecase "Entrenar modelo predictivo" as UC19
+  }
+
+  package "Reportes e Indicadores" {
+    usecase "Consultar indicadores de desempeño" as UC20
+    usecase "Generar reporte de utilización" as UC21
+  }
+}
+
+ADMIN --> UC01
+ADMIN --> UC03
+ADMIN --> UC04
+ADMIN --> UC05
+ADMIN --> UC09
+ADMIN --> UC10
+ADMIN --> UC11
+ADMIN --> UC16
+ADMIN --> UC19
+ADMIN --> UC20
+ADMIN --> UC21
+
+RECEP --> UC01
+RECEP --> UC02
+RECEP --> UC06
+RECEP --> UC07
+RECEP --> UC12
+RECEP --> UC13
+RECEP --> UC14
+
+ODONT --> UC01
+ODONT --> UC07
+ODONT --> UC08
+ODONT --> UC13
+ODONT --> UC15
+ODONT --> UC16
+
+ASIST --> UC01
+ASIST --> UC06
+ASIST --> UC13
+ASIST --> UC15
+
+UC17 --> ML
+UC19 --> ML
+
+UC12 ..> UC17 : <<include>>
+UC17 ..> UC18 : <<include>>
+UC12 ..> UC13 : <<include>>
+UC14 ..> UC13 : <<include>>
+UC15 ..> UC19 : <<extend>>
+UC20 ..> UC21 : <<extend>>
+
+@enduml

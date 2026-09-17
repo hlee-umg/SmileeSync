@@ -1,0 +1,192 @@
+classDiagram
+    direction TB
+
+    namespace SeguridadYUsuarios {
+        class Rol {
+            +String nombre
+            +String descripcion
+            +bool puede_usuarios
+            +bool puede_pacientes
+            +bool puede_catalogos
+            +bool puede_agenda
+            +bool puede_inteligencia
+            +bool puede_reportes
+            +bool estado
+            +DateTime creado
+        }
+        class Usuario {
+            +String email
+            +String username
+            +String first_name
+            +String last_name
+            +String telefono
+            +String pregunta_secreta
+            +String respuesta_secreta
+            +bool estado
+            +es_admin() bool
+            +puede(modulo) bool
+            +set_respuesta_secreta(texto)
+            +check_respuesta_secreta(texto) bool
+        }
+        class HistorialUsuario {
+            +int usuario_ref
+            +String username
+            +String nombre_completo
+            +String email
+            +String rol
+            +bool estado_anterior
+            +String accion
+            +String realizado_por
+            +DateTime fecha
+            +registrar(usuario, accion, por)
+        }
+    }
+
+    namespace CatalogoOdontologico {
+        class Especialidad {
+            +String nombre
+            +String descripcion
+            +bool estado
+            +DateTime creado
+        }
+        class Procedimiento {
+            +String codigo
+            +String nombre
+            +String nivel_complejidad
+            +int duracion_promedio_min
+            +String descripcion
+            +bool estado
+            +DateTime creado
+        }
+        class Odontologo {
+            +String nombres
+            +String apellidos
+            +String colegiado
+            +String telefono
+            +bool estado
+            +DateTime creado
+        }
+    }
+
+    namespace Pacientes {
+        class Paciente {
+            +String codigo
+            +String nombres
+            +String apellidos
+            +Date fecha_nacimiento
+            +String sexo
+            +String telefono
+            +String email
+            +String direccion
+            +bool estado
+            +DateTime creado
+        }
+        class AntecedenteMedico {
+            +String tipo
+            +String descripcion
+            +bool estado
+            +DateTime creado
+        }
+        class HistorialPaciente {
+            +int paciente_ref
+            +String codigo
+            +String nombre_completo
+            +bool estado_anterior
+            +String accion
+            +String realizado_por
+            +DateTime fecha
+        }
+    }
+
+    namespace AgendaYCitas {
+        class HorarioDisponibilidad {
+            +String dia_semana
+            +Time hora_inicio
+            +Time hora_fin
+            +bool estado
+            +DateTime creado
+        }
+        class Cita {
+            +Date fecha
+            +Time hora_inicio_programada
+            +Time hora_fin_programada
+            +Time hora_inicio_real
+            +Time hora_fin_real
+            +int duracion_asignada_min
+            +int duracion_real_min
+            +String estado_cita
+            +String observaciones
+            +bool estado
+            +DateTime creado
+        }
+        class HistorialCita {
+            +int cita_ref
+            +String paciente
+            +String odontologo
+            +Date fecha_cita
+            +String estado_cita_anterior
+            +String accion
+            +String realizado_por
+            +DateTime fecha
+        }
+    }
+
+    namespace Inteligencia {
+        class ModeloVersion {
+            +String nombre
+            +String algoritmo
+            +float mae
+            +float rmse
+            +float r2
+            +DateTime fecha_entrenamiento
+            +String ruta_archivo
+            +bool activo
+            +bool estado
+        }
+        class DatoEntrenamiento {
+            +String tipo_procedimiento
+            +String odontologo
+            +String dia_semana
+            +int hora_inicio
+            +int num_piezas
+            +int duracion_real_min
+            +DateTime creado
+        }
+        class Prediccion {
+            +int duracion_estimada_min
+            +int bloque_min_recomendado
+            +int bloque_max_recomendado
+            +DateTime fecha
+        }
+    }
+
+    namespace ReportesEIndicadores {
+        class IndicadorDesempeno {
+            +Date fecha
+            +int citas_atendidas
+            +float utilizacion_pct
+            +float tiempo_espera_prom_min
+            +float mae_actual
+            +float rmse_actual
+            +float r2_actual
+            +DateTime creado
+        }
+    }
+
+    Usuario "0..*" --> "1" Rol : posee
+    Odontologo "0..*" --> "0..1" Usuario : vinculado a
+    Procedimiento "0..*" --> "1" Especialidad : clasificado en
+    Odontologo "0..*" --> "1" Especialidad : ejerce
+    Paciente "1" *-- "0..*" AntecedenteMedico : registra
+    Odontologo "1" *-- "0..*" HorarioDisponibilidad : define
+    Cita "0..*" --> "1" Paciente : atiende a
+    Cita "0..*" --> "1" Odontologo : asignada a
+    Cita "0..*" --> "1" Procedimiento : aplica
+    DatoEntrenamiento "0..*" --> "0..1" Cita : derivado de
+    Cita "1" *-- "0..*" Prediccion : estimada por
+    Prediccion "0..*" --> "1" ModeloVersion : generada con
+    ModeloVersion ..> DatoEntrenamiento : entrenado con
+
+    HistorialUsuario ..> Usuario : audita
+    HistorialPaciente ..> Paciente : audita
+    HistorialCita ..> Cita : audita

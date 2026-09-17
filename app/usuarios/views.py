@@ -8,11 +8,6 @@ from .decorators import modulo_requerido
 
 
 @login_required
-def dashboard(request):
-    return render(request, 'dashboard.html')
-
-
-@login_required
 @modulo_requerido('usuarios')
 def lista(request):
     q = request.GET.get('q', '').strip()

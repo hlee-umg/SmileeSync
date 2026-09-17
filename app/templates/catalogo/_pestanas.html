@@ -1,0 +1,18 @@
+{% comment %}
+Pestañas compartidas por las tres entidades del catálogo. Se incluye con
+{% include 'catalogo/_pestanas.html' %} pasando la variable `entidad`.
+{% endcomment %}
+<ul class="nav nav-tabs mb-0">
+  <li class="nav-item">
+    <a class="nav-link {% if entidad == 'procedimientos' %}active{% endif %}"
+       href="{% url 'catalogo:lista' 'procedimientos' %}">Procedimientos</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if entidad == 'especialidades' %}active{% endif %}"
+       href="{% url 'catalogo:lista' 'especialidades' %}">Especialidades</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if entidad == 'odontologos' %}active{% endif %}"
+       href="{% url 'catalogo:lista' 'odontologos' %}">Odontólogos</a>
+  </li>
+</ul>

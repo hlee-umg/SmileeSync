@@ -1,5 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+
+# Los validadores viven en un módulo común para que la regla con que se valida
+# el nombre de un usuario sea la misma que la del nombre de un paciente.
+from config.validadores import validar_email_real as _validar_email_real
+from config.validadores import validar_nombre as _validar_nombre
+from config.validadores import unificar_mensaje_email
 from .models import Usuario, Rol
 
 BASE = 'form-control'
@@ -37,10 +43,17 @@ class UsuarioCrearForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['rol'].queryset = Rol.objects.filter(estado=True)
+        unificar_mensaje_email(self.fields['email'])
         _estilizar(self.fields)
 
+    def clean_first_name(self):
+        return _validar_nombre(self.cleaned_data.get('first_name'), 'nombre')
+
+    def clean_last_name(self):
+        return _validar_nombre(self.cleaned_data.get('last_name'), 'apellido')
+
     def clean_email(self):
-        email = self.cleaned_data['email'].strip().lower()
+        email = _validar_email_real(self.cleaned_data.get('email'))
         if Usuario.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('Ya existe un usuario con ese correo.')
         return email
@@ -69,10 +82,17 @@ class UsuarioEditarForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['rol'].queryset = Rol.objects.filter(estado=True)
+        unificar_mensaje_email(self.fields['email'])
         _estilizar(self.fields)
 
+    def clean_first_name(self):
+        return _validar_nombre(self.cleaned_data.get('first_name'), 'nombre')
+
+    def clean_last_name(self):
+        return _validar_nombre(self.cleaned_data.get('last_name'), 'apellido')
+
     def clean_email(self):
-        email = self.cleaned_data['email'].strip().lower()
+        email = _validar_email_real(self.cleaned_data.get('email'))
         qs = Usuario.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
         if qs.exists():
             raise forms.ValidationError('Ya existe otro usuario con ese correo.')

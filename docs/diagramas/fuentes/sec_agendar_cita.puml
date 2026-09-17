@@ -1,0 +1,76 @@
+@startuml
+title Diagrama de secuencia — Programación de cita con predicción de duración
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam sequence {
+  ArrowColor #334155
+  LifeLineBorderColor #94A3B8
+  ParticipantBackgroundColor #EEF2FF
+  ParticipantBorderColor #4F46E5
+  ActorBackgroundColor #EEF2FF
+  ActorBorderColor #4F46E5
+}
+
+actor "Recepcionista" as R
+participant "Navegador" as B
+participant "Vista de Agenda" as V
+participant "HorarioDisponibilidad" as HD
+participant "Motor predictivo\n(scikit-learn / XGBoost)" as ML
+participant "ModeloVersion\n(.joblib)" as MV
+participant "Cita" as C
+participant "Prediccion" as P
+database "PostgreSQL" as DB
+
+R -> B: Selecciona paciente, procedimiento y odontólogo
+B -> V: solicita los bloques disponibles
+activate V
+
+V -> HD: consultar disponibilidad del odontólogo
+activate HD
+HD -> DB: SELECT FROM horario_disponibilidad
+DB --> HD: franjas libres del día
+HD --> V: franjas disponibles
+deactivate HD
+
+V -> ML: estimar_duracion(procedimiento, odontólogo, día, hora, piezas)
+activate ML
+ML -> MV: cargar el modelo activo
+activate MV
+MV -> DB: SELECT FROM modelo_version WHERE activo = true
+DB --> MV: ruta del archivo .joblib
+MV --> ML: modelo entrenado
+deactivate MV
+
+ML -> ML: predice la duración en minutos
+ML -> ML: calcula el bloque recomendado (mínimo - máximo)
+ML --> V: duración estimada y bloque sugerido
+deactivate ML
+
+V -> P: guardar la predicción generada
+activate P
+P -> DB: INSERT INTO prediccion
+deactivate P
+
+V --> B: muestra los bloques sugeridos por el sistema
+B --> R: visualiza la recomendación sobre el calendario
+deactivate V
+
+R -> B: confirma o ajusta el bloque de tiempo
+B -> V: POST guardar la cita
+activate V
+V -> C: crear cita con duracion_asignada_min
+activate C
+C -> DB: INSERT INTO cita
+DB --> C: cita registrada
+deactivate C
+V --> B: "Cita programada correctamente"
+B --> R: la cita aparece en el calendario
+deactivate V
+
+note over ML, DB
+  Al finalizar la atención se registra la duración real.
+  Ese dato alimenta la tabla dato_entrenamiento y permite
+  reentrenar el modelo, mejorando la precisión con el tiempo.
+end note
+
+@enduml

@@ -5,9 +5,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h5 class="mb-0">Listado de pacientes</h5>
-  <a href="{% url 'pacientes:crear' %}" class="btn btn-sm btn-primary">
+  {% if escritura.pacientes %}<a href="{% url 'pacientes:crear' %}" class="btn btn-sm btn-primary">
     <i class="bi bi-plus-lg"></i> Nuevo paciente
-  </a>
+  </a>{% endif %}
 </div>
 
 <div class="card border-0 shadow-sm">
@@ -53,6 +53,7 @@
             <td class="text-end text-nowrap">
               <a href="{% url 'pacientes:ficha' p.pk %}" class="btn btn-sm btn-outline-secondary"
                  title="Ver ficha"><i class="bi bi-eye"></i></a>
+              {% if escritura.pacientes %}
               <a href="{% url 'pacientes:editar' p.pk %}" class="btn btn-sm btn-outline-primary"
                  title="Editar"><i class="bi bi-pencil"></i></a>
               <form method="post" action="{% url 'pacientes:estado' p.pk %}" class="d-inline">
@@ -62,6 +63,7 @@
                   <i class="bi {% if p.estado %}bi-slash-circle{% else %}bi-check-circle{% endif %}"></i>
                 </button>
               </form>
+              {% endif %}
             </td>
           </tr>
           {% empty %}

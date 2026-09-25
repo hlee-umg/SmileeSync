@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block titulo %}Cita de {{ cita.paciente }} — SmileeSync{% endblock %}
+{% block encabezado %}Detalle de la cita{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h5 class="mb-1">{{ cita.paciente }}</h5>
+    <span class="small text-secondary">
+      {{ cita.fecha|date:"l j \d\e F \d\e Y" }} ·
+      {{ cita.hora_inicio_programada|time:"H:i" }} a {{ cita.hora_fin_programada|time:"H:i" }}
+    </span>
+  </div>
+  <div class="text-end">
+    {% if cita.estado_cita == 'ATENDIDA' %}<span class="badge bg-success">Atendida</span>
+    {% elif cita.estado_cita == 'CANCELADA' %}<span class="badge bg-danger">Cancelada</span>
+    {% elif cita.estado_cita == 'REPROGRAMADA' %}<span class="badge bg-warning text-dark">Reprogramada</span>
+    {% else %}<span class="badge bg-primary">Programada</span>{% endif %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-clipboard-pulse"></i> Datos de la atención</h6>
+        <table class="table table-sm mb-0">
+          <tr><th style="width:190px;" class="fw-semibold">Paciente</th>
+              <td>{{ cita.paciente }}
+                <a href="{% url 'pacientes:ficha' cita.paciente.pk %}"
+                   class="small ms-1 text-decoration-none">ver ficha</a></td></tr>
+          <tr><th class="fw-semibold">Odontólogo</th><td>{{ cita.odontologo }}</td></tr>
+          <tr><th class="fw-semibold">Procedimiento</th>
+              <td>{{ cita.procedimiento.nombre }}
+                <span class="text-secondary small">
+                  (catálogo: {{ cita.procedimiento.duracion_promedio_min }} min)
+                </span></td></tr>
+          <tr><th class="fw-semibold">Duración asignada</th>
+              <td>{{ cita.duracion_asignada_min }} min</td></tr>
+          {% if cita.hora_inicio_real %}
+          <tr><th class="fw-semibold">Atención real</th>
+              <td>{{ cita.hora_inicio_real|time:"H:i" }} a {{ cita.hora_fin_real|time:"H:i" }}
+                  ({{ cita.duracion_real_min }} min)</td></tr>
+          <tr><th class="fw-semibold">Desviación</th>
+              <td>
+                {% if desvio > 0 %}
+                  <span class="text-danger">+{{ desvio }} min sobre lo asignado</span>
+                {% elif desvio < 0 %}
+                  <span class="text-success">{{ desvio }} min bajo lo asignado</span>
+                {% else %}<span class="text-success">Sin desviación</span>{% endif %}
+              </td></tr>
+          {% endif %}
+          {% if cita.observaciones %}
+          <tr><th class="fw-semibold">Observaciones</th><td>{{ cita.observaciones }}</td></tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-lightning-charge"></i> Acciones</h6>
+        {% if escritura.agenda and abierta %}
+          <div class="d-grid gap-2">
+            <a href="{% url 'agenda:tiempos' cita.pk %}" class="btn btn-success">
+              <i class="bi bi-check2-circle"></i> Registrar la atención
+            </a>
+            <a href="{% url 'agenda:editar' cita.pk %}" class="btn btn-outline-primary">
+              <i class="bi bi-pencil"></i> Reprogramar
+            </a>
+            <form method="post" action="{% url 'agenda:cancelar' cita.pk %}"
+                  onsubmit="return confirm('¿Cancelar esta cita?');">
+              {% csrf_token %}
+              <input type="hidden" name="siguiente" value="{{ volver }}">
+              <button class="btn btn-outline-danger w-100">
+                <i class="bi bi-x-circle"></i> Cancelar la cita
+              </button>
+            </form>
+          </div>
+        {% elif not escritura.agenda %}
+          <p class="small text-secondary mb-0">
+            <i class="bi bi-eye"></i> Su rol es de solo consulta, por lo que esta cita
+            no puede modificarse desde aquí.
+          </p>
+        {% else %}
+          <p class="small text-secondary mb-0">
+            La cita ya está {{ cita.get_estado_cita_display|lower }}, por lo que no admite
+            más cambios.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-cpu"></i> Estimación del modelo</h6>
+        {% if prediccion %}
+          <p class="mb-1">
+            <span class="fs-4 fw-semibold">{{ prediccion.duracion_estimada_min }}</span>
+            <span class="text-secondary">min estimados</span>
+          </p>
+          <p class="small text-secondary mb-0">
+            Bloque recomendado: {{ prediccion.bloque_min_recomendado }} a
+            {{ prediccion.bloque_max_recomendado }} min ·
+            Modelo {{ prediccion.modelo.nombre }}
+          </p>
+        {% else %}
+          <p class="small text-secondary mb-0">
+            Esta cita se programó sin una predicción del modelo. La duración se tomó del
+            promedio del catálogo o del histórico del procedimiento.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="{{ volver }}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Volver al calendario
+  </a>
+</div>
+
+{% endblock %}

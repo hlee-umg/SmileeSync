@@ -9,19 +9,21 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from catalogo.models import Odontologo
 from inteligencia.servicio import (estimar_duracion, registrar_dato_entrenamiento,
                                    registrar_prediccion)
 from pacientes.models import Paciente
-from usuarios.decorators import modulo_requerido
+from usuarios.decorators import escritura_requerida, modulo_requerido
 
-from .forms import CitaForm, HorarioForm, RegistrarTiemposForm
+from .forms import CitaForm, HorarioForm, RegistrarTiemposForm, hay_traslape
 from .models import Cita, HistorialCita, HorarioDisponibilidad
 
 DIAS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
-NOMBRES_DIA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+NOMBRES_DIA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
+               'Domingo']
 HORA_APERTURA = 7
 HORA_CIERRE = 19
 
@@ -49,56 +51,147 @@ def _semana_solicitada(request):
     return _lunes_de(timezone.localdate())
 
 
-def _minutos_disponibles(lunes, odontologos):
-    """Suma los minutos de atención declarados por los odontólogos en la semana."""
+def _fecha_solicitada(request, parametro='fecha'):
+    """Lee una fecha de la consulta; por omisión, la de hoy."""
+    texto = request.GET.get(parametro)
+    if texto:
+        try:
+            return datetime.strptime(texto, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+    return timezone.localdate()
+
+
+def _minutos_disponibles(odontologos, dias):
+    """Minutos de atención declarados por los odontólogos en los días indicados.
+
+    `dias` es la lista de fechas que abarca la vista, de modo que el
+    denominador de la utilización corresponda al período mostrado y no a una
+    semana fija.
+    """
+    codigos = [DIAS[d.weekday()] for d in dias]
     total = 0
     franjas = HorarioDisponibilidad.objects.filter(estado=True,
                                                    odontologo__in=odontologos)
     for f in franjas:
-        if f.dia_semana in DIAS[:6]:
+        repeticiones = codigos.count(f.dia_semana)
+        if repeticiones:
             inicio = datetime.combine(date.today(), f.hora_inicio)
             fin = datetime.combine(date.today(), f.hora_fin)
-            total += max(0, int((fin - inicio).total_seconds() // 60))
+            total += repeticiones * max(0, int((fin - inicio).total_seconds() // 60))
     return total
 
 
-def _rejilla_semanal(citas, lunes):
-    """Organiza las citas en una rejilla de horas por días para la plantilla."""
+PASO_SUGERENCIA_MIN = 15
+
+
+def _huecos_sugeridos(odontologo, fechas, duracion, hoy, ahora):
+    """Primer inicio viable de cada hora para una cita de `duracion` minutos.
+
+    Un inicio es viable si la cita completa cabe dentro de una franja de
+    disponibilidad del odontólogo y no se traslapa con ninguna de sus citas
+    vigentes. Devuelve {(indice_dia, hora): 'HH:MM'} para que la plantilla
+    resalte esas casillas.
+    """
+    if not (odontologo and duracion):
+        return {}
+
+    franjas_por_dia = {}
+    for f in HorarioDisponibilidad.objects.filter(odontologo=odontologo, estado=True):
+        franjas_por_dia.setdefault(f.dia_semana, []).append(f)
+
+    ocupadas = {}
+    for c in (Cita.objects
+              .filter(odontologo=odontologo, fecha__in=fechas, estado=True)
+              .exclude(estado_cita='CANCELADA')):
+        ocupadas.setdefault(c.fecha, []).append((c.hora_inicio_programada,
+                                                 c.hora_fin_programada))
+
+    sugeridos = {}
+    for indice, fecha in enumerate(fechas):
+        for franja in franjas_por_dia.get(DIAS[fecha.weekday()], []):
+            candidato = datetime.combine(fecha, franja.hora_inicio)
+            limite = datetime.combine(fecha, franja.hora_fin)
+            while candidato + timedelta(minutes=duracion) <= limite:
+                inicio_h = candidato.time()
+                fin_h = (candidato + timedelta(minutes=duracion)).time()
+                ya_paso = fecha < hoy or (fecha == hoy and inicio_h < ahora)
+                choca = any(hay_traslape(inicio_h, fin_h, oi, of)
+                            for oi, of in ocupadas.get(fecha, []))
+                clave = (indice, inicio_h.hour)
+                if not ya_paso and not choca and clave not in sugeridos:
+                    sugeridos[clave] = inicio_h.strftime('%H:%M')
+                candidato += timedelta(minutes=PASO_SUGERENCIA_MIN)
+    return sugeridos
+
+
+def _rejilla(citas, inicio, dias_visibles, sugeridos=None):
+    """Organiza las citas en una rejilla de horas por días para la plantilla.
+
+    Cada casilla lleva su fecha y su hora, de modo que la plantilla pueda
+    enlazar directamente a la programación de una cita en ese espacio.
+    """
     rejilla = {}
     for cita in citas:
-        indice_dia = (cita.fecha - lunes).days
-        if 0 <= indice_dia < 6:
+        indice_dia = (cita.fecha - inicio).days
+        if 0 <= indice_dia < dias_visibles:
             hora = cita.hora_inicio_programada.hour
             rejilla.setdefault(hora, {}).setdefault(indice_dia, []).append(cita)
 
-    horas_con_citas = sorted(rejilla.keys())
-    if horas_con_citas:
-        desde = max(HORA_APERTURA, min(horas_con_citas) - 1)
-        hasta = min(HORA_CIERRE, max(horas_con_citas) + 2)
+    # El rango de horas visible abarca tanto las citas existentes como los
+    # espacios sugeridos: de lo contrario una recomendación podría quedar
+    # fuera de la rejilla y el usuario no la vería.
+    horas = sorted(rejilla.keys()) + [h for _, h in (sugeridos or {})]
+    if horas:
+        desde = max(HORA_APERTURA, min(horas) - 1)
+        hasta = min(HORA_CIERRE, max(horas) + 2)
     else:
         desde, hasta = 8, 18
 
     filas = []
     for hora in range(desde, hasta):
-        celdas = [{'indice': d, 'citas': rejilla.get(hora, {}).get(d, [])}
-                  for d in range(6)]
+        celdas = []
+        for d in range(dias_visibles):
+            fecha = inicio + timedelta(days=d)
+            celdas.append({
+                'indice': d,
+                'citas': rejilla.get(hora, {}).get(d, []),
+                'fecha': fecha.isoformat(),
+                'hora': f'{hora:02d}:00',
+                'sugerida': (sugeridos or {}).get((d, hora)),
+            })
         filas.append({'hora': f'{hora:02d}:00', 'celdas': celdas})
     return filas
 
 
 # ══════════════════════════ MÓDULO PRINCIPAL ══════════════════════════
 @login_required
+@modulo_requerido('agenda')
 def principal(request):
-    """Pantalla de inicio: indicadores del día y calendario semanal."""
+    """Pantalla de inicio: indicadores y calendario, por semana o por día."""
     hoy = timezone.localdate()
-    lunes = _semana_solicitada(request)
-    domingo = lunes + timedelta(days=6)
+    vista = 'dia' if request.GET.get('vista') == 'dia' else 'semana'
+
+    if vista == 'dia':
+        inicio = _fecha_solicitada(request)
+        dias_visibles = 1
+        anterior = inicio - timedelta(days=1)
+        siguiente = inicio + timedelta(days=1)
+        es_periodo_actual = inicio == hoy
+    else:
+        inicio = _lunes_de(_fecha_solicitada(request, 'semana'))
+        dias_visibles = 6
+        anterior = inicio - timedelta(days=7)
+        siguiente = inicio + timedelta(days=7)
+        es_periodo_actual = inicio == _lunes_de(hoy)
+    fin = inicio + timedelta(days=dias_visibles - 1)
+    fechas = [inicio + timedelta(days=i) for i in range(dias_visibles)]
 
     odontologos = Odontologo.objects.filter(estado=True)
     filtro_odontologo = request.GET.get('odontologo', '')
 
     citas = (Cita.objects
-             .filter(fecha__range=(lunes, domingo), estado=True)
+             .filter(fecha__range=(inicio, fin), estado=True)
              .select_related('paciente', 'odontologo', 'procedimiento')
              .order_by('fecha', 'hora_inicio_programada'))
     if filtro_odontologo.isdigit():
@@ -110,11 +203,30 @@ def principal(request):
     for cita in citas:
         cita.clase_css = CLASES_ESTADO.get(cita.estado_cita, 'cita-prog')
 
+    # --- recomendación de bloques: dónde cabe el procedimiento elegido ---
+    from catalogo.models import Procedimiento
+    procedimientos = Procedimiento.objects.filter(estado=True)
+    id_proc = request.GET.get('procedimiento', '')
+    piezas = request.GET.get('piezas', '1')
+    piezas = int(piezas) if piezas.isdigit() and int(piezas) > 0 else 1
+    estimacion = None
+    sugeridos = {}
+    odontologo_sug = (odontologos.filter(id=int(filtro_odontologo)).first()
+                      if filtro_odontologo.isdigit() else None)
+    procedimiento_sug = (procedimientos.filter(pk=int(id_proc)).first()
+                         if id_proc.isdigit() else None)
+    if procedimiento_sug and odontologo_sug:
+        estimacion = estimar_duracion(procedimiento_sug, odontologo_sug,
+                                      inicio, time(9, 0), piezas)
+        sugeridos = _huecos_sugeridos(odontologo_sug, fechas,
+                                      estimacion.duracion_min, hoy,
+                                      timezone.localtime().time())
+
     # --- indicadores ---
     citas_hoy = sum(1 for c in citas if c.fecha == hoy and c.estado_cita != 'CANCELADA')
     minutos_ocupados = (citas.exclude(estado_cita='CANCELADA')
                         .aggregate(total=Sum('duracion_asignada_min'))['total'] or 0)
-    minutos_disponibles = _minutos_disponibles(lunes, odontologos_kpi)
+    minutos_disponibles = _minutos_disponibles(odontologos_kpi, fechas)
     utilizacion = round(minutos_ocupados / minutos_disponibles * 100) if minutos_disponibles else 0
 
     desviacion = (Cita.objects
@@ -129,21 +241,30 @@ def principal(request):
         error_medio = None
 
     contexto = {
-        'lunes': lunes,
-        'domingo': domingo,
-        'semana_anterior': (lunes - timedelta(days=7)).isoformat(),
-        'semana_siguiente': (lunes + timedelta(days=7)).isoformat(),
-        'es_semana_actual': lunes == _lunes_de(hoy),
-        'dias': [{'nombre': NOMBRES_DIA[i], 'fecha': lunes + timedelta(days=i),
-                  'es_hoy': (lunes + timedelta(days=i)) == hoy} for i in range(6)],
-        'filas': _rejilla_semanal(citas, lunes),
+        'vista': vista,
+        'inicio': inicio,
+        'fin': fin,
+        'parametro_periodo': 'fecha' if vista == 'dia' else 'semana',
+        'periodo_anterior': anterior.isoformat(),
+        'periodo_siguiente': siguiente.isoformat(),
+        'periodo_hoy': (hoy if vista == 'dia' else _lunes_de(hoy)).isoformat(),
+        'es_periodo_actual': es_periodo_actual,
+        'dias': [{'nombre': NOMBRES_DIA[f.weekday()], 'fecha': f, 'es_hoy': f == hoy}
+                 for f in fechas],
+        'filas': _rejilla(citas, inicio, dias_visibles, sugeridos),
+        'procedimientos': procedimientos,
+        'procedimiento_sug': id_proc,
+        'piezas': piezas,
+        'estimacion': estimacion,
+        'odontologo_sug': odontologo_sug,
+        'total_sugeridos': len(sugeridos),
         'odontologos': odontologos,
         'filtro_odontologo': filtro_odontologo,
         'kpi_citas_hoy': citas_hoy,
         'kpi_utilizacion': utilizacion,
         'kpi_pacientes': Paciente.objects.filter(estado=True).count(),
         'kpi_error_medio': error_medio,
-        'kpi_citas_semana': citas.exclude(estado_cita='CANCELADA').count(),
+        'kpi_citas_periodo': citas.exclude(estado_cita='CANCELADA').count(),
     }
     return render(request, 'agenda/principal.html', contexto)
 
@@ -183,6 +304,33 @@ def lista(request):
         'odontologo': odontologo, 'estado_cita': estado_cita,
         'odontologos': Odontologo.objects.filter(estado=True),
         'estados': Cita.ESTADOS,
+    })
+
+
+@login_required
+@modulo_requerido('agenda')
+def detalle(request, pk):
+    """Ficha de una cita, con las acciones disponibles según su estado.
+
+    Es el destino al pulsar una cita en el calendario: reúne en un solo lugar
+    la reprogramación, el registro de la atención y la cancelación, que antes
+    estaban repartidas entre el listado y la propia rejilla.
+    """
+    cita = get_object_or_404(
+        Cita.objects.select_related('paciente', 'odontologo', 'procedimiento'), pk=pk)
+
+    prediccion = cita.predicciones.select_related('modelo').order_by('-fecha').first()
+    abierta = cita.estado_cita in ('PROGRAMADA', 'REPROGRAMADA')
+    desvio = None
+    if cita.duracion_real_min:
+        desvio = cita.duracion_real_min - cita.duracion_asignada_min
+
+    return render(request, 'agenda/detalle.html', {
+        'cita': cita,
+        'prediccion': prediccion,
+        'abierta': abierta,
+        'desvio': desvio,
+        'volver': request.GET.get('volver') or reverse('agenda:principal'),
     })
 
 
@@ -249,7 +397,7 @@ def estimar(request):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def crear(request):
     estimacion = None
     if request.method == 'POST':
@@ -274,6 +422,12 @@ def crear(request):
             inicial['fecha'] = request.GET['fecha']
         if request.GET.get('hora'):
             inicial['hora_inicio_programada'] = request.GET['hora']
+        # Al programar desde una casilla del calendario, el odontólogo del
+        # filtro activo viene preseleccionado.
+        if request.GET.get('odontologo', '').isdigit():
+            inicial['odontologo'] = int(request.GET['odontologo'])
+        if request.GET.get('procedimiento', '').isdigit():
+            inicial['procedimiento'] = int(request.GET['procedimiento'])
         form = CitaForm(initial=inicial)
 
     return render(request, 'agenda/form.html', {
@@ -283,7 +437,7 @@ def crear(request):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def editar(request, pk):
     """Reprogramación de una cita existente."""
     cita = get_object_or_404(Cita, pk=pk, estado=True)
@@ -314,7 +468,7 @@ def editar(request, pk):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def cancelar(request, pk):
     """Cancelación de una cita: cambia su estado y conserva el registro."""
     cita = get_object_or_404(Cita, pk=pk, estado=True)
@@ -334,7 +488,7 @@ def cancelar(request, pk):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def horarios(request, odontologo_id):
     """Configuración de las franjas de atención de un odontólogo.
 
@@ -384,7 +538,7 @@ def horarios(request, odontologo_id):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def quitar_horario(request, pk):
     """Retira una franja de disponibilidad mediante borrado lógico.
 
@@ -424,7 +578,7 @@ def quitar_horario(request, pk):
 
 
 @login_required
-@modulo_requerido('agenda')
+@escritura_requerida('agenda')
 def registrar_tiempos(request, pk):
     """Registro de los tiempos reales de atención al cerrar la cita."""
     cita = get_object_or_404(Cita, pk=pk, estado=True)

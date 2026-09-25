@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block titulo %}Inicio — SmileeSync{% endblock %}
-{% block encabezado %}Módulo Principal — Agenda de la semana{% endblock %}
+{% block encabezado %}Módulo Principal — Agenda de la clínica{% endblock %}
 {% block contenido %}
+
+{# Sufijo común de los enlaces, para conservar el filtro de odontólogo #}
+{% with filtro="" %}{% endwith %}
 
 <div class="row g-3 mb-3">
   <div class="col-6 col-md-3">
@@ -38,18 +41,34 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div class="d-flex align-items-center gap-2">
-        <a href="?semana={{ semana_anterior }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
-           class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
-        <h6 class="mb-0">
-          Semana del {{ lunes|date:"j" }} al {{ domingo|date:"j \d\e F \d\e Y" }}
-          {% if es_semana_actual %}<span class="badge bg-primary ms-1">Actual</span>{% endif %}
+        <a href="?vista={{ vista }}&{{ parametro_periodo }}={{ periodo_anterior }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+           class="btn btn-sm btn-outline-secondary" title="Anterior">
+          <i class="bi bi-chevron-left"></i></a>
+        <a href="?vista={{ vista }}&{{ parametro_periodo }}={{ periodo_hoy }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+           class="btn btn-sm {% if es_periodo_actual %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Hoy</a>
+        <a href="?vista={{ vista }}&{{ parametro_periodo }}={{ periodo_siguiente }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+           class="btn btn-sm btn-outline-secondary" title="Siguiente">
+          <i class="bi bi-chevron-right"></i></a>
+        <h6 class="mb-0 ms-2">
+          {% if vista == 'dia' %}
+            {{ inicio|date:"l j \d\e F \d\e Y"|capfirst }}
+          {% else %}
+            Semana del {{ inicio|date:"j" }} al {{ fin|date:"j \d\e F \d\e Y" }}
+          {% endif %}
         </h6>
-        <a href="?semana={{ semana_siguiente }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
-           class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
       </div>
-      <div class="d-flex gap-2">
+
+      <div class="d-flex gap-2 align-items-center">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Vista del calendario">
+          <a href="?vista=dia&fecha={{ inicio|date:'Y-m-d' }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+             class="btn {% if vista == 'dia' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Día</a>
+          <a href="?vista=semana&semana={{ inicio|date:'Y-m-d' }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+             class="btn {% if vista == 'semana' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Semana</a>
+        </div>
+
         <form method="get" class="d-flex gap-2">
-          <input type="hidden" name="semana" value="{{ lunes|date:'Y-m-d' }}">
+          <input type="hidden" name="vista" value="{{ vista }}">
+          <input type="hidden" name="{{ parametro_periodo }}" value="{{ inicio|date:'Y-m-d' }}">
           <select name="odontologo" class="form-select form-select-sm" style="width:auto;"
                   onchange="this.form.submit()">
             <option value="">Todos los odontólogos</option>
@@ -60,11 +79,72 @@
             {% endfor %}
           </select>
         </form>
-        {% if user.rol.puede_agenda or user.es_admin %}
+
+        {% if escritura.agenda %}
         <a href="{% url 'agenda:crear' %}" class="btn btn-sm btn-primary">
           <i class="bi bi-plus-lg"></i> Nueva cita
         </a>
         {% endif %}
+      </div>
+    </div>
+
+    {# ---- Recomendación de bloques: dónde cabe el procedimiento ---- #}
+    <div class="card bg-light border-0 mb-3">
+      <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+          <input type="hidden" name="vista" value="{{ vista }}">
+          <input type="hidden" name="{{ parametro_periodo }}" value="{{ inicio|date:'Y-m-d' }}">
+          <input type="hidden" name="odontologo" value="{{ filtro_odontologo }}">
+          <div class="col-md-4">
+            <label class="form-label small fw-semibold mb-1">
+              <i class="bi bi-magic"></i> ¿Dónde cabe este procedimiento?
+            </label>
+            <select name="procedimiento" class="form-select form-select-sm">
+              <option value="">Seleccione un procedimiento…</option>
+              {% for p in procedimientos %}
+                <option value="{{ p.id }}" {% if procedimiento_sug == p.id|stringformat:"s" %}selected{% endif %}>
+                  {{ p.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small fw-semibold mb-1">Piezas</label>
+            <input type="number" name="piezas" min="1" max="32" value="{{ piezas }}"
+                   class="form-control form-control-sm">
+          </div>
+          <div class="col-6 col-md-2">
+            <button class="btn btn-sm btn-outline-primary w-100">
+              <i class="bi bi-search"></i> Buscar espacio
+            </button>
+          </div>
+          <div class="col-md-4">
+            {% if estimacion %}
+              <div class="small">
+                <span class="badge bg-primary">{{ estimacion.duracion_min }} min estimados</span>
+                <span class="text-secondary">
+                  bloque {{ estimacion.bloque_min }}–{{ estimacion.bloque_max }} min ·
+                  {{ estimacion.etiqueta_origen }}
+                </span><br>
+                <span class="text-secondary">
+                  {{ total_sugeridos }} espacio{{ total_sugeridos|pluralize:"s" }}
+                  disponible{{ total_sugeridos|pluralize:"s" }} para {{ odontologo_sug }}
+                  en el período mostrado.
+                </span>
+              </div>
+            {% elif procedimiento_sug and not filtro_odontologo %}
+              <div class="small text-danger">
+                Elija también un odontólogo en el filtro de arriba: la estimación
+                depende de quién atiende.
+              </div>
+            {% else %}
+              <div class="small text-secondary">
+                El sistema estima la duración y marca en el calendario los espacios
+                donde la cita cabe completa.
+              </div>
+            {% endif %}
+          </div>
+        </form>
       </div>
     </div>
 
@@ -88,25 +168,30 @@
             {% for celda in fila.celdas %}
               <td class="cal-celda">
                 {% for cita in celda.citas %}
-                  <div class="cita {{ cita.clase_css }} mb-1">
+                  <a href="{% url 'agenda:detalle' cita.pk %}"
+                     class="cita {{ cita.clase_css }} mb-1 d-block text-decoration-none"
+                     title="Ver el detalle de la cita">
                     <strong>{{ cita.hora_inicio_programada|time:"H:i" }}</strong>
                     {{ cita.paciente.nombres }} {{ cita.paciente.apellidos|slice:":1" }}.<br>
                     <span class="text-muted">
                       {{ cita.procedimiento.nombre|truncatechars:22 }} ·
                       {{ cita.duracion_asignada_min }} min
                     </span>
-                    {% if user.rol.puede_agenda or user.es_admin %}
-                      <div class="mt-1">
-                        <a href="{% url 'agenda:editar' cita.pk %}" class="small text-decoration-none"
-                           title="Reprogramar"><i class="bi bi-pencil"></i></a>
-                        {% if cita.estado_cita == 'PROGRAMADA' or cita.estado_cita == 'REPROGRAMADA' %}
-                        <a href="{% url 'agenda:tiempos' cita.pk %}" class="small text-decoration-none ms-1"
-                           title="Registrar atención"><i class="bi bi-check2-circle"></i></a>
-                        {% endif %}
-                      </div>
-                    {% endif %}
-                  </div>
+                  </a>
                 {% endfor %}
+                {% if celda.sugerida %}
+                  <a class="hueco-sugerido{% if not escritura.agenda %} pe-none{% endif %}"
+                     href="{% url 'agenda:crear' %}?fecha={{ celda.fecha }}&hora={{ celda.sugerida }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}{% if procedimiento_sug %}&procedimiento={{ procedimiento_sug }}{% endif %}"
+                     title="Cabe una cita de {{ estimacion.duracion_min }} min a las {{ celda.sugerida }}">
+                    <i class="bi bi-magic"></i> {{ celda.sugerida }}
+                  </a>
+                {% elif escritura.agenda %}
+                  <a class="casilla-libre"
+                     href="{% url 'agenda:crear' %}?fecha={{ celda.fecha }}&hora={{ celda.hora }}{% if filtro_odontologo %}&odontologo={{ filtro_odontologo }}{% endif %}"
+                     title="Programar una cita el {{ celda.fecha }} a las {{ celda.hora }}">
+                    <i class="bi bi-plus"></i>
+                  </a>
+                {% endif %}
               </td>
             {% endfor %}
           </tr>
@@ -120,20 +205,24 @@
       <span><span class="leyenda cita-aten"></span> Atendida</span>
       <span><span class="leyenda cita-canc"></span> Cancelada</span>
       <span><span class="leyenda cita-reprog"></span> Reprogramada</span>
+      {% if escritura.agenda %}
+        <span class="text-secondary">
+          <i class="bi bi-plus-square"></i> Pulse una casilla libre para programar
+        </span>
+      {% endif %}
       <span class="ms-auto text-secondary">
-        {{ kpi_citas_semana }} cita{{ kpi_citas_semana|pluralize:"s" }} activa{{ kpi_citas_semana|pluralize:"s" }} esta semana
+        {{ kpi_citas_periodo }} cita{{ kpi_citas_periodo|pluralize:"s" }}
+        activa{{ kpi_citas_periodo|pluralize:"s" }} en el período
       </span>
     </div>
 
   </div>
 </div>
 
-{% if user.rol.puede_agenda or user.es_admin %}
 <div class="mt-3">
   <a href="{% url 'agenda:lista' %}" class="btn btn-sm btn-outline-secondary">
     <i class="bi bi-list-ul"></i> Ver consulta detallada de citas
   </a>
 </div>
-{% endif %}
 
 {% endblock %}

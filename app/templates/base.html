@@ -28,6 +28,21 @@
                    text-decoration:line-through; }
     .cita-reprog { background:#fef3c7; border-left:3px solid #d97706; color:#78350f; }
     .cita a { color:inherit; }
+    a.cita:hover { filter:brightness(.95); }
+    /* Casilla libre del calendario: el signo aparece al pasar el cursor, de
+       modo que la rejilla no se llene de iconos. */
+    .casilla-libre { display:block; text-align:center; color:#cbd5e1;
+                     text-decoration:none; font-size:1rem; line-height:1.1;
+                     border-radius:.35rem; opacity:0; transition:opacity .12s; }
+    .cal-celda:hover .casilla-libre { opacity:1; }
+    .casilla-libre:hover { background:#eef2f7; color:#2563eb; }
+    /* Espacio donde cabe el procedimiento consultado: siempre visible, para
+       que la recomendación del modelo se lea de un vistazo en la rejilla. */
+    .hueco-sugerido { display:block; text-align:center; font-size:.72rem;
+                      font-weight:600; text-decoration:none; border-radius:.35rem;
+                      padding:.2rem .25rem; background:#e7f7f0; color:#0f7a56;
+                      border:1px dashed #1baf7a; }
+    .hueco-sugerido:hover { background:#d3f0e4; color:#0b5c41; }
     .leyenda { display:inline-block; width:14px; height:14px; border-radius:3px;
                vertical-align:-2px; }
     .leyenda.cita-prog   { background:#dbeafe; }
@@ -90,6 +105,12 @@
           <a class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
             <i class="bi bi-person-circle"></i> {{ user.get_full_name|default:user.username }}
             <span class="badge bg-secondary ms-1">{{ user.rol|default:"Sin rol" }}</span>
+            {% if solo_consulta %}
+              <span class="badge bg-light text-dark border ms-1"
+                    title="Su rol permite consultar la información, pero no modificarla">
+                <i class="bi bi-eye"></i> Solo consulta
+              </span>
+            {% endif %}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><form method="post" action="{% url 'logout' %}" class="px-2">{% csrf_token %}

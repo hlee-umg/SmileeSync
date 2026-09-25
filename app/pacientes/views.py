@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from usuarios.decorators import modulo_requerido
+from usuarios.decorators import escritura_requerida, modulo_requerido
 
 from .forms import AntecedenteMedicoForm, PacienteForm
 from .models import AntecedenteMedico, HistorialPaciente, Paciente
@@ -47,7 +47,7 @@ def lista(request):
 
 
 @login_required
-@modulo_requerido('pacientes')
+@escritura_requerida('pacientes')
 def crear(request):
     if request.method == 'POST':
         form = PacienteForm(request.POST)
@@ -63,7 +63,7 @@ def crear(request):
 
 
 @login_required
-@modulo_requerido('pacientes')
+@escritura_requerida('pacientes')
 def editar(request, pk):
     paciente = get_object_or_404(Paciente, pk=pk)
     if request.method == 'POST':
@@ -111,7 +111,7 @@ def ficha(request, pk):
 
 
 @login_required
-@modulo_requerido('pacientes')
+@escritura_requerida('pacientes')
 def cambiar_estado(request, pk):
     """Borrado lógico: activa o desactiva sin eliminar físicamente el registro."""
     paciente = get_object_or_404(Paciente, pk=pk)
@@ -126,7 +126,7 @@ def cambiar_estado(request, pk):
 
 
 @login_required
-@modulo_requerido('pacientes')
+@escritura_requerida('pacientes')
 def quitar_antecedente(request, pk):
     """Borrado lógico de un antecedente médico."""
     antecedente = get_object_or_404(AntecedenteMedico, pk=pk)

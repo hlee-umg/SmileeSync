@@ -16,6 +16,13 @@ class Rol(models.Model):
     puede_inteligencia = models.BooleanField('módulo inteligencia', default=False)
     puede_reportes = models.BooleanField('módulo reportes', default=False)
 
+    # Los campos 'puede_*' conceden acceso al módulo; este determina si ese
+    # acceso incluye escritura. Un rol de solo consulta ve la información de
+    # sus módulos, pero no puede crearla ni modificarla.
+    solo_lectura = models.BooleanField(
+        'solo consulta', default=False,
+        help_text='Permite ver los módulos asignados, sin crear ni modificar registros.')
+
     estado = models.BooleanField('activo', default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
 
@@ -65,6 +72,17 @@ class Usuario(AbstractUser):
         if self.es_admin:
             return True
         return bool(self.rol and getattr(self.rol, f'puede_{modulo}', False))
+
+    @property
+    def es_solo_consulta(self):
+        """Un rol de solo consulta no modifica información en ningún módulo."""
+        if self.es_admin:
+            return False
+        return bool(self.rol and self.rol.solo_lectura)
+
+    def puede_escribir(self, modulo):
+        """Acceso de escritura: exige el módulo y que el rol no sea de consulta."""
+        return self.puede(modulo) and not self.es_solo_consulta
 
     def set_respuesta_secreta(self, texto):
         """Guarda la respuesta secreta cifrada (normalizada a minúsculas)."""

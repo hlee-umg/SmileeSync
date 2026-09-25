@@ -12,10 +12,13 @@ class Command(BaseCommand):
                                   puede_agenda=True, puede_inteligencia=True, puede_reportes=True),
             'Recepcionista': dict(descripcion='Gestión de pacientes, agenda y reportes',
                                   puede_pacientes=True, puede_agenda=True, puede_reportes=True),
-            'Odontólogo': dict(descripcion='Agenda y pacientes',
-                               puede_pacientes=True, puede_agenda=True),
-            'Asistente': dict(descripcion='Apoyo en la agenda',
-                              puede_agenda=True),
+            # Según la Tabla 3 del documento, odontólogos y asistentes
+            # consultan la agenda pero no la modifican.
+            'Odontólogo': dict(descripcion='Consulta de agenda y pacientes',
+                               puede_pacientes=True, puede_agenda=True,
+                               solo_lectura=True),
+            'Asistente': dict(descripcion='Consulta de la agenda',
+                              puede_agenda=True, solo_lectura=True),
         }
         objetos = {}
         for nombre, campos in roles.items():

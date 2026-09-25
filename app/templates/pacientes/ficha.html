@@ -9,9 +9,9 @@
     <a href="{% url 'pacientes:lista' %}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-arrow-left"></i> Volver al listado
     </a>
-    <a href="{% url 'pacientes:editar' paciente.pk %}" class="btn btn-sm btn-primary">
+    {% if escritura.pacientes %}<a href="{% url 'pacientes:editar' paciente.pk %}" class="btn btn-sm btn-primary">
       <i class="bi bi-pencil"></i> Editar datos
-    </a>
+    </a>{% endif %}
   </div>
 </div>
 
@@ -52,12 +52,14 @@
               <td class="small">{{ a.descripcion }}</td>
               <td class="small text-secondary">{{ a.creado|date:"d/m/Y" }}</td>
               <td class="text-end">
+                {% if escritura.pacientes %}
                 <form method="post" action="{% url 'pacientes:quitar_antecedente' a.pk %}" class="d-inline">
                   {% csrf_token %}
                   <button class="btn btn-sm btn-outline-danger" title="Retirar">
                     <i class="bi bi-x"></i>
                   </button>
                 </form>
+                {% endif %}
               </td>
             </tr>
             {% empty %}
@@ -68,6 +70,7 @@
           </tbody>
         </table>
 
+        {% if escritura.pacientes %}
         <form method="post" class="row g-2 align-items-end border-top pt-3">
           {% csrf_token %}
           <div class="col-md-3">
@@ -85,6 +88,7 @@
             <button class="btn btn-sm btn-primary w-100"><i class="bi bi-plus-lg"></i> Agregar</button>
           </div>
         </form>
+        {% endif %}
       </div>
     </div>
 

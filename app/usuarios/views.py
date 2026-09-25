@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Usuario, HistorialUsuario
 from .forms import UsuarioCrearForm, UsuarioEditarForm
-from .decorators import modulo_requerido
+from .decorators import escritura_requerida, modulo_requerido
 
 
 @login_required
@@ -18,7 +18,7 @@ def lista(request):
 
 
 @login_required
-@modulo_requerido('usuarios')
+@escritura_requerida('usuarios')
 def crear(request):
     if request.method == 'POST':
         form = UsuarioCrearForm(request.POST)
@@ -33,7 +33,7 @@ def crear(request):
 
 
 @login_required
-@modulo_requerido('usuarios')
+@escritura_requerida('usuarios')
 def editar(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
     if request.method == 'POST':
@@ -51,7 +51,7 @@ def editar(request, pk):
 
 
 @login_required
-@modulo_requerido('usuarios')
+@escritura_requerida('usuarios')
 def cambiar_estado(request, pk):
     """Borrado lógico: activa/desactiva sin eliminar físicamente.
     Registra el cambio en la tabla de histórico."""

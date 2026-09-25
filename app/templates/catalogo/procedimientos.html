@@ -5,9 +5,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h5 class="mb-0">Catálogo de procedimientos</h5>
-  <a href="{% url 'catalogo:crear' 'procedimientos' %}" class="btn btn-sm btn-primary">
+  {% if escritura.catalogos %}<a href="{% url 'catalogo:crear' 'procedimientos' %}" class="btn btn-sm btn-primary">
     <i class="bi bi-plus-lg"></i> Nuevo procedimiento
-  </a>
+  </a>{% endif %}
 </div>
 
 {% include 'catalogo/_pestanas.html' %}
@@ -42,6 +42,7 @@
               {% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}
             </td>
             <td class="text-end text-nowrap">
+              {% if escritura.catalogos %}
               <a href="{% url 'catalogo:editar' 'procedimientos' p.pk %}"
                  class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
               <form method="post" action="{% url 'catalogo:estado' 'procedimientos' p.pk %}" class="d-inline">
@@ -50,6 +51,7 @@
                   <i class="bi {% if p.estado %}bi-slash-circle{% else %}bi-check-circle{% endif %}"></i>
                 </button>
               </form>
+              {% endif %}
             </td>
           </tr>
           {% empty %}

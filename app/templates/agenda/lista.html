@@ -9,9 +9,9 @@
     <a href="{% url 'agenda:principal' %}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-calendar-week"></i> Ver calendario
     </a>
-    <a href="{% url 'agenda:crear' %}" class="btn btn-sm btn-primary">
+    {% if escritura.agenda %}<a href="{% url 'agenda:crear' %}" class="btn btn-sm btn-primary">
       <i class="bi bi-plus-lg"></i> Nueva cita
-    </a>
+    </a>{% endif %}
   </div>
 </div>
 
@@ -83,7 +83,7 @@
               {% else %}<span class="badge bg-primary">Programada</span>{% endif %}
             </td>
             <td class="text-end text-nowrap">
-              {% if cita.estado_cita != 'CANCELADA' and cita.estado_cita != 'ATENDIDA' %}
+              {% if escritura.agenda and cita.estado_cita != 'CANCELADA' and cita.estado_cita != 'ATENDIDA' %}
                 <a href="{% url 'agenda:editar' cita.pk %}" class="btn btn-sm btn-outline-primary"
                    title="Reprogramar"><i class="bi bi-pencil"></i></a>
                 <a href="{% url 'agenda:tiempos' cita.pk %}" class="btn btn-sm btn-outline-success"

@@ -16,3 +16,27 @@ def modulo_requerido(modulo):
             raise PermissionDenied('No tiene acceso a este módulo.')
         return _envuelta
     return decorador
+
+
+def escritura_requerida(modulo):
+    """Restringe una vista que modifica información.
+
+    Exige acceso al módulo y, además, que el rol no sea de solo consulta. Se
+    aplica a las vistas de alta, edición, cambio de estado y registro de
+    tiempos, de modo que la restricción no dependa de ocultar el botón en la
+    plantilla: el acceso directo a la dirección también queda denegado.
+    """
+    def decorador(vista):
+        @wraps(vista)
+        def _envuelta(request, *args, **kwargs):
+            u = request.user
+            if not u.is_authenticated:
+                return redirect('login')
+            if not u.puede(modulo):
+                raise PermissionDenied('No tiene acceso a este módulo.')
+            if u.es_solo_consulta:
+                raise PermissionDenied(
+                    'Su rol es de solo consulta: no puede modificar información.')
+            return vista(request, *args, **kwargs)
+        return _envuelta
+    return decorador

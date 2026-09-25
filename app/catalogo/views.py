@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from usuarios.decorators import modulo_requerido
+from usuarios.decorators import escritura_requerida, modulo_requerido
 
 from .forms import EspecialidadForm, OdontologoForm, ProcedimientoForm
 from .models import Especialidad, Odontologo, Procedimiento
@@ -74,7 +74,7 @@ def lista(request, entidad='procedimientos'):
 
 
 @login_required
-@modulo_requerido('catalogos')
+@escritura_requerida('catalogos')
 def crear(request, entidad):
     cfg = _config(entidad)
     if request.method == 'POST':
@@ -93,7 +93,7 @@ def crear(request, entidad):
 
 
 @login_required
-@modulo_requerido('catalogos')
+@escritura_requerida('catalogos')
 def editar(request, entidad, pk):
     cfg = _config(entidad)
     registro = get_object_or_404(cfg['modelo'], pk=pk)
@@ -112,7 +112,7 @@ def editar(request, entidad, pk):
 
 
 @login_required
-@modulo_requerido('catalogos')
+@escritura_requerida('catalogos')
 def cambiar_estado(request, entidad, pk):
     """Borrado lógico: el registro dado de baja deja de ofrecerse al programar
     una cita, pero conserva su vínculo con las citas históricas."""

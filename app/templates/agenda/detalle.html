@@ -35,6 +35,11 @@
                 <span class="text-secondary small">
                   (catálogo: {{ cita.procedimiento.duracion_promedio_min }} min)
                 </span></td></tr>
+          <tr><th class="fw-semibold">Unidad dental</th>
+              <td>
+                {% if cita.unidad %}{{ cita.unidad }}
+                {% else %}<span class="text-secondary">Sin asignar</span>{% endif %}
+              </td></tr>
           <tr><th class="fw-semibold">Duración asignada</th>
               <td>{{ cita.duracion_asignada_min }} min</td></tr>
           {% if cita.hora_inicio_real %}

@@ -15,4 +15,6 @@ urlpatterns = [
     path('citas/<int:pk>/tiempos/', views.registrar_tiempos, name='tiempos'),
     path('horarios/<int:odontologo_id>/', views.horarios, name='horarios'),
     path('horarios/franja/<int:pk>/quitar/', views.quitar_horario, name='quitar_horario'),
+    path('ausencias/<int:odontologo_id>/', views.ausencias, name='ausencias'),
+    path('ausencias/<int:pk>/quitar/', views.quitar_ausencia, name='quitar_ausencia'),
 ]

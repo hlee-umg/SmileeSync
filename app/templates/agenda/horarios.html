@@ -11,9 +11,14 @@
       {% if odontologo.colegiado %}· Colegiado {{ odontologo.colegiado }}{% endif %}
     </span>
   </div>
-  <a href="{% url 'catalogo:lista' 'odontologos' %}" class="btn btn-sm btn-outline-secondary">
-    <i class="bi bi-arrow-left"></i> Volver a odontólogos
-  </a>
+  <div class="d-flex gap-2">
+    <a href="{% url 'agenda:ausencias' odontologo.pk %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-calendar-x"></i> Ausencias
+    </a>
+    <a href="{% url 'catalogo:lista' 'odontologos' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Volver a odontólogos
+    </a>
+  </div>
 </div>
 
 {% if total_franjas == 0 %}

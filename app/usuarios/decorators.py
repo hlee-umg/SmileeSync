@@ -40,3 +40,16 @@ def escritura_requerida(modulo):
             return vista(request, *args, **kwargs)
         return _envuelta
     return decorador
+
+
+def puede_gestionar_odontologo(usuario, odontologo):
+    """Si el usuario puede administrar la disponibilidad de ese odontólogo.
+
+    Además de quien tiene escritura en la agenda, se permite al propio
+    odontólogo sobre su ficha: su rol es de solo consulta para la agenda de la
+    clínica, pero marcar sus ausencias es información suya. Es el único caso en
+    que un rol de consulta escribe, y está acotado a sus propios registros.
+    """
+    if usuario.puede_escribir('agenda'):
+        return True
+    return bool(odontologo and odontologo.usuario_id == usuario.pk)

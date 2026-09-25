@@ -85,7 +85,8 @@ class Command(BaseCommand):
         from django.utils import timezone
 
         from agenda.models import Cita, HorarioDisponibilidad
-        from catalogo.models import Especialidad, Odontologo, Procedimiento
+        from agenda.disponibilidad import asignar_unidad
+        from catalogo.models import Especialidad, Odontologo, Procedimiento, UnidadDental
         from pacientes.models import AntecedenteMedico, Paciente
 
         # --- Especialidades ---
@@ -100,6 +101,18 @@ class Command(BaseCommand):
             obj, _ = Especialidad.objects.get_or_create(
                 nombre=nombre, defaults={'descripcion': desc})
             especialidades[nombre] = obj
+
+        # --- Unidades dentales (sillones) ---
+        # Son el recurso que limita la operación: la clínica tiene menos
+        # unidades que odontólogos. Se administran como registros del catálogo,
+        # de modo que incorporar otra silla es darla de alta.
+        for codigo, nombre, ubicacion in [
+            ('SIL-01', 'Sillón 1', 'Consultorio principal'),
+            ('SIL-02', 'Sillón 2', 'Consultorio secundario'),
+        ]:
+            UnidadDental.objects.get_or_create(
+                codigo=codigo,
+                defaults={'nombre': nombre, 'ubicacion': ubicacion})
 
         # --- Procedimientos ---
         procedimientos = {}
@@ -181,6 +194,10 @@ class Command(BaseCommand):
             (0, time(8, 0), 'PAC-0001', 'PROC-001', giron, 'PROGRAMADA', None),
             (0, time(9, 0), 'PAC-0002', 'PROC-003', paz, 'PROGRAMADA', None),
             (1, time(8, 0), 'PAC-0004', 'PROC-002', giron, 'PROGRAMADA', None),
+            # Simultánea con la anterior: ocupa el segundo sillón y deja la
+            # clínica sin unidades libres a esa hora, para poder mostrar la
+            # restricción de capacidad.
+            (1, time(8, 0), 'PAC-0005', 'PROC-001', paz, 'PROGRAMADA', None),
             (1, time(10, 0), 'PAC-0003', 'PROC-005', paz, 'PROGRAMADA', None),
             (1, time(14, 30), 'PAC-0006', 'PROC-001', giron, 'PROGRAMADA', None),
             (2, time(9, 0), 'PAC-0005', 'PROC-004', paz, 'PROGRAMADA', None),
@@ -199,9 +216,12 @@ class Command(BaseCommand):
             if Cita.objects.filter(paciente=pacientes[cod_paciente], fecha=fecha,
                                    hora_inicio_programada=hora).exists():
                 continue
+            # Se asigna la primera unidad libre, igual que hace el sistema al
+            # programar desde la pantalla.
+            unidad = asignar_unidad(fecha, hora, fin_dt.time())
             Cita.objects.create(
                 paciente=pacientes[cod_paciente], odontologo=odo,
-                procedimiento=procedimiento, fecha=fecha,
+                procedimiento=procedimiento, unidad=unidad, fecha=fecha,
                 hora_inicio_programada=hora, hora_fin_programada=fin_dt.time(),
                 duracion_asignada_min=duracion,
                 hora_inicio_real=hora if real else None,

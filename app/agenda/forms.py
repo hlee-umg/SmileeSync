@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 from django import forms
 from django.utils import timezone
 
 from catalogo.models import Odontologo, Procedimiento
 from pacientes.models import Paciente
-from .models import Cita, HorarioDisponibilidad
+from .disponibilidad import (asignar_unidad, franjas_efectivas, hay_traslape,
+                             unidades_activas)
+from .models import AusenciaOdontologo, Cita, HorarioDisponibilidad
 
 BASE = 'form-control'
 DIAS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
@@ -15,11 +17,6 @@ def sumar_minutos(hora, minutos):
     """Suma minutos a un objeto time y devuelve el time resultante."""
     base = datetime.combine(datetime.today(), hora)
     return (base + timedelta(minutes=minutos)).time()
-
-
-def hay_traslape(inicio_a, fin_a, inicio_b, fin_b):
-    """Dos intervalos se traslapan si cada uno empieza antes de que el otro termine."""
-    return inicio_a < fin_b and inicio_b < fin_a
 
 
 class CitaForm(forms.ModelForm):
@@ -83,18 +80,25 @@ class CitaForm(forms.ModelForm):
             return limpio
         limpio['hora_fin_programada'] = fin
 
-        # --- la cita debe caber en una franja de disponibilidad del odontólogo ---
+        # --- la cita debe caber en la disponibilidad efectiva del odontólogo ---
+        # (patrón semanal menos las ausencias registradas para esa fecha)
         dia = DIAS[fecha.weekday()]
-        franjas = HorarioDisponibilidad.objects.filter(
-            odontologo=odontologo, dia_semana=dia, estado=True)
-        if not franjas.exists():
+        tiene_patron = HorarioDisponibilidad.objects.filter(
+            odontologo=odontologo, dia_semana=dia, estado=True).exists()
+        franjas = franjas_efectivas(odontologo, fecha)
+
+        if not tiene_patron:
             self.add_error('fecha',
                            f'{odontologo} no tiene horario de atención configurado para '
                            f'ese día de la semana.')
-        elif not any(f.hora_inicio <= inicio and fin <= f.hora_fin for f in franjas):
+        elif not franjas:
+            self.add_error('fecha',
+                           f'{odontologo} tiene registrada una ausencia que cubre toda '
+                           f'su jornada del {fecha.strftime("%d/%m/%Y")}.')
+        elif not any(f_ini <= inicio and fin <= f_fin for f_ini, f_fin in franjas):
             disponibles = ', '.join(
-                f'{f.hora_inicio.strftime("%H:%M")} a {f.hora_fin.strftime("%H:%M")}'
-                for f in franjas)
+                f'{f_ini.strftime("%H:%M")} a {f_fin.strftime("%H:%M")}'
+                for f_ini, f_fin in franjas)
             self.add_error('hora_inicio_programada',
                            f'La cita queda fuera del horario de atención. '
                            f'{odontologo} atiende ese día de {disponibles}.')
@@ -116,12 +120,37 @@ class CitaForm(forms.ModelForm):
                     f'{otra.hora_fin_programada.strftime("%H:%M")}).')
                 break
 
+        # --- debe quedar una unidad dental libre ---
+        # Es la restricción física de la clínica: hay menos sillones que
+        # odontólogos, de modo que dos profesionales libres a la misma hora no
+        # significan dos citas simultáneas posibles.
+        unidades = unidades_activas()
+        if not unidades:
+            self.add_error(None,
+                           'No hay unidades dentales activas en el catálogo, por lo '
+                           'que no es posible programar citas.')
+        else:
+            libre = asignar_unidad(fecha, inicio, fin,
+                                   excluir_cita=self.instance.pk)
+            if libre is None:
+                self.add_error(
+                    'hora_inicio_programada',
+                    f'Las {len(unidades)} unidades dentales están ocupadas en ese '
+                    f'horario. Elija otro espacio o consulte la recomendación del '
+                    f'calendario.')
+            else:
+                limpio['unidad'] = libre
+
         return limpio
 
     def save(self, commit=True):
         cita = super().save(commit=False)
         cita.hora_fin_programada = sumar_minutos(cita.hora_inicio_programada,
                                                  cita.duracion_asignada_min)
+        # La unidad se asigna sola: son intercambiables, así que se toma la
+        # primera libre en lugar de pedírsela al usuario.
+        if self.cleaned_data.get('unidad'):
+            cita.unidad = self.cleaned_data['unidad']
         if commit:
             cita.save()
         return cita
@@ -244,3 +273,56 @@ class RegistrarTiemposForm(forms.ModelForm):
         if commit:
             cita.save()
         return cita
+
+
+class AusenciaForm(forms.ModelForm):
+    """Registro de una ausencia puntual del odontólogo.
+
+    Es la excepción al patrón semanal: el horario habitual sigue vigente y esta
+    fecha concreta queda descontada de su disponibilidad.
+    """
+    class Meta:
+        model = AusenciaOdontologo
+        fields = ['fecha', 'todo_el_dia', 'hora_inicio', 'hora_fin', 'motivo']
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': BASE}),
+            'hora_inicio': forms.TimeInput(attrs={'type': 'time', 'class': BASE}),
+            'hora_fin': forms.TimeInput(attrs={'type': 'time', 'class': BASE}),
+            'motivo': forms.TextInput(attrs={'class': BASE,
+                                             'placeholder': 'Congreso, vacaciones…'}),
+        }
+        labels = {'todo_el_dia': 'Toda la jornada'}
+
+    def __init__(self, *args, odontologo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.odontologo = odontologo
+        self.fields['todo_el_dia'].initial = True
+        for campo in ('hora_inicio', 'hora_fin', 'motivo'):
+            self.fields[campo].required = False
+
+    def clean(self):
+        limpio = super().clean()
+        if limpio.get('todo_el_dia'):
+            # Se guarda la jornada completa para que el cálculo de
+            # disponibilidad tenga siempre un intervalo con el que operar.
+            limpio['hora_inicio'] = time(0, 0)
+            limpio['hora_fin'] = time(23, 59)
+            return limpio
+
+        inicio, fin = limpio.get('hora_inicio'), limpio.get('hora_fin')
+        if not inicio or not fin:
+            self.add_error('hora_inicio',
+                           'Indique el rango de horas, o marque toda la jornada.')
+        elif fin <= inicio:
+            self.add_error('hora_fin',
+                           'La hora de finalización debe ser posterior a la de inicio.')
+        return limpio
+
+    def save(self, commit=True):
+        ausencia = super().save(commit=False)
+        ausencia.odontologo = self.odontologo
+        ausencia.hora_inicio = self.cleaned_data['hora_inicio']
+        ausencia.hora_fin = self.cleaned_data['hora_fin']
+        if commit:
+            ausencia.save()
+        return ausencia

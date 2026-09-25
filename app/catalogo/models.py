@@ -65,3 +65,28 @@ class Odontologo(models.Model):
 
     def __str__(self):
         return f'{self.nombres} {self.apellidos}'
+
+
+class UnidadDental(models.Model):
+    """Sillón o unidad dental de la clínica.
+
+    Es el recurso físico que limita la operación: la clínica dispone de menos
+    unidades que odontólogos, de modo que dos profesionales libres a la misma
+    hora no implican dos citas simultáneas posibles. Las unidades son
+    intercambiables, por lo que el sistema asigna la primera libre al programar.
+    """
+    codigo = models.CharField('código', max_length=20, unique=True)
+    nombre = models.CharField('nombre', max_length=80)
+    ubicacion = models.CharField('ubicación', max_length=120, blank=True)
+    observaciones = models.CharField('observaciones', max_length=200, blank=True)
+    estado = models.BooleanField('activo', default=True)  # borrado lógico
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'unidad_dental'
+        verbose_name = 'Unidad dental'
+        verbose_name_plural = 'Unidades dentales'
+        ordering = ['codigo']
+
+    def __str__(self):
+        return f'{self.codigo} - {self.nombre}'

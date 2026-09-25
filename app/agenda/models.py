@@ -29,6 +29,12 @@ class Cita(models.Model):
                                    related_name='citas', verbose_name='odontólogo')
     procedimiento = models.ForeignKey('catalogo.Procedimiento', on_delete=models.PROTECT,
                                       related_name='citas', verbose_name='procedimiento')
+    # La unidad se asigna automáticamente al programar, tomando la primera
+    # libre. Admite nulo por las citas anteriores a la incorporación de las
+    # unidades al sistema.
+    unidad = models.ForeignKey('catalogo.UnidadDental', on_delete=models.PROTECT,
+                               related_name='citas', verbose_name='unidad dental',
+                               null=True, blank=True)
     fecha = models.DateField('fecha')
     hora_inicio_programada = models.TimeField('hora inicio programada')
     hora_fin_programada = models.TimeField('hora fin programada')
@@ -67,3 +73,36 @@ class HistorialCita(models.Model):
         verbose_name = 'Historial de cita'
         verbose_name_plural = 'Historial de citas'
         ordering = ['-fecha']
+
+
+class AusenciaOdontologo(models.Model):
+    """Excepción puntual al horario semanal de un odontólogo.
+
+    El patrón de `HorarioDisponibilidad` define la disponibilidad habitual; esta
+    tabla registra las fechas concretas en que esa disponibilidad no aplica
+    —congreso, vacaciones, una diligencia personal—, ya sea por toda la jornada
+    o por una franja. La disponibilidad efectiva de una fecha es el patrón
+    semanal menos las ausencias registradas para ella.
+    """
+    odontologo = models.ForeignKey('catalogo.Odontologo', on_delete=models.CASCADE,
+                                   related_name='ausencias', verbose_name='odontólogo')
+    fecha = models.DateField('fecha')
+    todo_el_dia = models.BooleanField('toda la jornada', default=True)
+    hora_inicio = models.TimeField('hora de inicio')
+    hora_fin = models.TimeField('hora de finalización')
+    motivo = models.CharField('motivo', max_length=200, blank=True)
+    registrada_por = models.CharField('registrada por', max_length=150, blank=True)
+    estado = models.BooleanField('activo', default=True)  # borrado lógico
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'ausencia_odontologo'
+        verbose_name = 'Ausencia de odontólogo'
+        verbose_name_plural = 'Ausencias de odontólogos'
+        ordering = ['-fecha', 'hora_inicio']
+
+    def __str__(self):
+        if self.todo_el_dia:
+            return f'{self.odontologo} — {self.fecha} (toda la jornada)'
+        return (f'{self.odontologo} — {self.fecha} '
+                f'{self.hora_inicio:%H:%M} a {self.hora_fin:%H:%M}')

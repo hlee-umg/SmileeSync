@@ -7,6 +7,7 @@ from datetime import date, datetime, time, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Avg, Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -16,10 +17,14 @@ from catalogo.models import Odontologo
 from inteligencia.servicio import (estimar_duracion, registrar_dato_entrenamiento,
                                    registrar_prediccion)
 from pacientes.models import Paciente
-from usuarios.decorators import escritura_requerida, modulo_requerido
+from usuarios.decorators import (escritura_requerida, modulo_requerido,
+                                 puede_gestionar_odontologo)
 
-from .forms import CitaForm, HorarioForm, RegistrarTiemposForm, hay_traslape
-from .models import Cita, HistorialCita, HorarioDisponibilidad
+from .disponibilidad import (capacidad_minutos, franjas_efectivas,
+                             hay_traslape, unidades_libres)
+from .forms import AusenciaForm, CitaForm, HorarioForm, RegistrarTiemposForm
+from .models import (AusenciaOdontologo, Cita, HistorialCita,
+                     HorarioDisponibilidad)
 
 DIAS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
 NOMBRES_DIA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
@@ -62,24 +67,6 @@ def _fecha_solicitada(request, parametro='fecha'):
     return timezone.localdate()
 
 
-def _minutos_disponibles(odontologos, dias):
-    """Minutos de atención declarados por los odontólogos en los días indicados.
-
-    `dias` es la lista de fechas que abarca la vista, de modo que el
-    denominador de la utilización corresponda al período mostrado y no a una
-    semana fija.
-    """
-    codigos = [DIAS[d.weekday()] for d in dias]
-    total = 0
-    franjas = HorarioDisponibilidad.objects.filter(estado=True,
-                                                   odontologo__in=odontologos)
-    for f in franjas:
-        repeticiones = codigos.count(f.dia_semana)
-        if repeticiones:
-            inicio = datetime.combine(date.today(), f.hora_inicio)
-            fin = datetime.combine(date.today(), f.hora_fin)
-            total += repeticiones * max(0, int((fin - inicio).total_seconds() // 60))
-    return total
 
 
 PASO_SUGERENCIA_MIN = 15
@@ -96,10 +83,6 @@ def _huecos_sugeridos(odontologo, fechas, duracion, hoy, ahora):
     if not (odontologo and duracion):
         return {}
 
-    franjas_por_dia = {}
-    for f in HorarioDisponibilidad.objects.filter(odontologo=odontologo, estado=True):
-        franjas_por_dia.setdefault(f.dia_semana, []).append(f)
-
     ocupadas = {}
     for c in (Cita.objects
               .filter(odontologo=odontologo, fecha__in=fechas, estado=True)
@@ -109,18 +92,21 @@ def _huecos_sugeridos(odontologo, fechas, duracion, hoy, ahora):
 
     sugeridos = {}
     for indice, fecha in enumerate(fechas):
-        for franja in franjas_por_dia.get(DIAS[fecha.weekday()], []):
-            candidato = datetime.combine(fecha, franja.hora_inicio)
-            limite = datetime.combine(fecha, franja.hora_fin)
+        # Disponibilidad efectiva: el patrón semanal menos las ausencias.
+        for f_ini, f_fin in franjas_efectivas(odontologo, fecha):
+            candidato = datetime.combine(fecha, f_ini)
+            limite = datetime.combine(fecha, f_fin)
             while candidato + timedelta(minutes=duracion) <= limite:
                 inicio_h = candidato.time()
                 fin_h = (candidato + timedelta(minutes=duracion)).time()
+                clave = (indice, inicio_h.hour)
                 ya_paso = fecha < hoy or (fecha == hoy and inicio_h < ahora)
                 choca = any(hay_traslape(inicio_h, fin_h, oi, of)
                             for oi, of in ocupadas.get(fecha, []))
-                clave = (indice, inicio_h.hour)
+                # Un espacio solo sirve si además queda un sillón libre.
                 if not ya_paso and not choca and clave not in sugeridos:
-                    sugeridos[clave] = inicio_h.strftime('%H:%M')
+                    if unidades_libres(fecha, inicio_h, fin_h):
+                        sugeridos[clave] = inicio_h.strftime('%H:%M')
                 candidato += timedelta(minutes=PASO_SUGERENCIA_MIN)
     return sugeridos
 
@@ -188,7 +174,16 @@ def principal(request):
     fechas = [inicio + timedelta(days=i) for i in range(dias_visibles)]
 
     odontologos = Odontologo.objects.filter(estado=True)
-    filtro_odontologo = request.GET.get('odontologo', '')
+
+    # Un odontólogo ve su propia agenda al entrar: si no se pidió un filtro
+    # explícito y su usuario está vinculado a una ficha, se preselecciona. Que
+    # el parámetro no venga significa que es la primera visita; que venga vacío
+    # significa que eligió "Todos los odontólogos" a propósito.
+    filtro_odontologo = request.GET.get('odontologo')
+    ficha_propia = odontologos.filter(usuario=request.user).first()
+    if filtro_odontologo is None and ficha_propia:
+        filtro_odontologo = str(ficha_propia.pk)
+    filtro_odontologo = filtro_odontologo or ''
 
     citas = (Cita.objects
              .filter(fecha__range=(inicio, fin), estado=True)
@@ -226,7 +221,7 @@ def principal(request):
     citas_hoy = sum(1 for c in citas if c.fecha == hoy and c.estado_cita != 'CANCELADA')
     minutos_ocupados = (citas.exclude(estado_cita='CANCELADA')
                         .aggregate(total=Sum('duracion_asignada_min'))['total'] or 0)
-    minutos_disponibles = _minutos_disponibles(odontologos_kpi, fechas)
+    minutos_disponibles = capacidad_minutos(list(odontologos_kpi), fechas)
     utilizacion = round(minutos_ocupados / minutos_disponibles * 100) if minutos_disponibles else 0
 
     desviacion = (Cita.objects
@@ -257,6 +252,7 @@ def principal(request):
         'piezas': piezas,
         'estimacion': estimacion,
         'odontologo_sug': odontologo_sug,
+        'ficha_propia': ficha_propia,
         'total_sugeridos': len(sugeridos),
         'odontologos': odontologos,
         'filtro_odontologo': filtro_odontologo,
@@ -601,3 +597,69 @@ def registrar_tiempos(request, pk):
     else:
         form = RegistrarTiemposForm(instance=cita)
     return render(request, 'agenda/tiempos.html', {'form': form, 'cita': cita})
+
+
+@login_required
+@modulo_requerido('agenda')
+def ausencias(request, odontologo_id):
+    """Ausencias puntuales de un odontólogo: excepciones a su patrón semanal.
+
+    Lo puede administrar quien tenga escritura en la agenda y, además, el
+    propio odontólogo sobre su ficha: su rol es de consulta para la agenda de
+    la clínica, pero sus ausencias son información suya.
+    """
+    odontologo = get_object_or_404(Odontologo, pk=odontologo_id)
+    if not puede_gestionar_odontologo(request.user, odontologo):
+        raise PermissionDenied('Solo puede registrar sus propias ausencias.')
+
+    if request.method == 'POST':
+        form = AusenciaForm(request.POST, odontologo=odontologo)
+        if form.is_valid():
+            ausencia = form.save(commit=False)
+            ausencia.registrada_por = request.user.username
+            ausencia.save()
+            afectadas = (Cita.objects
+                         .filter(odontologo=odontologo, fecha=ausencia.fecha,
+                                 estado=True)
+                         .exclude(estado_cita='CANCELADA')
+                         .filter(hora_inicio_programada__lt=ausencia.hora_fin,
+                                 hora_fin_programada__gt=ausencia.hora_inicio)
+                         .count())
+            messages.success(request, f'Ausencia registrada para el '
+                                      f'{ausencia.fecha.strftime("%d/%m/%Y")}.')
+            if afectadas:
+                messages.warning(
+                    request,
+                    f'Atención: {afectadas} cita{"s" if afectadas != 1 else ""} ya '
+                    f'programada{"s" if afectadas != 1 else ""} cae'
+                    f'{"n" if afectadas != 1 else ""} dentro de esa ausencia. '
+                    f'La ausencia no las cancela: debe reprogramarlas.')
+            return redirect('agenda:ausencias', odontologo_id=odontologo.pk)
+    else:
+        form = AusenciaForm(odontologo=odontologo)
+
+    hoy = timezone.localdate()
+    registradas = (AusenciaOdontologo.objects
+                   .filter(odontologo=odontologo, estado=True)
+                   .order_by('-fecha'))
+    return render(request, 'agenda/ausencias.html', {
+        'odontologo': odontologo,
+        'form': form,
+        'proximas': [a for a in registradas if a.fecha >= hoy],
+        'pasadas': [a for a in registradas if a.fecha < hoy][:10],
+    })
+
+
+@login_required
+@modulo_requerido('agenda')
+def quitar_ausencia(request, pk):
+    """Retira una ausencia mediante borrado lógico."""
+    ausencia = get_object_or_404(AusenciaOdontologo, pk=pk)
+    if not puede_gestionar_odontologo(request.user, ausencia.odontologo):
+        raise PermissionDenied('Solo puede retirar sus propias ausencias.')
+    if request.method == 'POST':
+        ausencia.estado = False
+        ausencia.save(update_fields=['estado'])
+        messages.success(request, f'Ausencia del '
+                                  f'{ausencia.fecha.strftime("%d/%m/%Y")} retirada.')
+    return redirect('agenda:ausencias', odontologo_id=ausencia.odontologo_id)

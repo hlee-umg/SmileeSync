@@ -113,7 +113,16 @@ c2.force_login(odontologo_usuario)
 cuerpo_ro = c2.get(url).content.decode()
 probar('no aparece el botón Nueva cita', 'Nueva cita' not in cuerpo_ro)
 probar('no aparecen casillas libres', 'class="casilla-libre"' not in cuerpo_ro)
-probar('sigue viendo las citas', f'/citas/{cita.pk}/' in cuerpo_ro)
+# el odontólogo ve su propia agenda por omisión, así que se verifica con una
+# cita suya; y que pueda cambiar el filtro para ver las de toda la clínica
+propia = (Cita.objects.filter(odontologo__usuario=odontologo_usuario, estado=True)
+          .exclude(estado_cita='CANCELADA').order_by('fecha').first())
+if propia:
+    cuerpo_propia = c2.get(url, {'fecha': propia.fecha.isoformat(),
+                                 'vista': 'dia'}).content.decode()
+    probar('ve sus propias citas', f'/citas/{propia.pk}/' in cuerpo_propia)
+cuerpo_todos = c2.get(url, {'odontologo': ''}).content.decode()
+probar('puede ver las de toda la clínica', f'/citas/{cita.pk}/' in cuerpo_todos)
 cuerpo_ro_det = c2.get(reverse('agenda:detalle', args=[cita.pk])).content.decode()
 probar('el detalle explica que es solo consulta',
        'solo consulta' in cuerpo_ro_det and 'Registrar la atención' not in cuerpo_ro_det)

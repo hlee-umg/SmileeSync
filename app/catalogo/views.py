@@ -11,8 +11,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from usuarios.decorators import escritura_requerida, modulo_requerido
 
-from .forms import EspecialidadForm, OdontologoForm, ProcedimientoForm
-from .models import Especialidad, Odontologo, Procedimiento
+from .forms import (EspecialidadForm, OdontologoForm, ProcedimientoForm,
+                    UnidadDentalForm)
+from .models import Especialidad, Odontologo, Procedimiento, UnidadDental
 
 # Configuración de cada entidad del catálogo: modelo, formulario y etiquetas.
 ENTIDADES = {
@@ -27,6 +28,13 @@ ENTIDADES = {
         'singular': 'especialidad', 'plural': 'Especialidades',
         'orden': ['nombre'],
         'busqueda': lambda q: Q(nombre__icontains=q) | Q(descripcion__icontains=q),
+    },
+    'unidades': {
+        'modelo': UnidadDental, 'form': UnidadDentalForm,
+        'singular': 'unidad dental', 'plural': 'Unidades dentales',
+        'orden': ['codigo'],
+        'busqueda': lambda q: (Q(codigo__icontains=q) | Q(nombre__icontains=q) |
+                               Q(ubicacion__icontains=q)),
     },
     'odontologos': {
         'modelo': Odontologo, 'form': OdontologoForm,

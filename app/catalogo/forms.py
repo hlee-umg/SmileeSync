@@ -3,7 +3,7 @@ from django import forms
 from config.validadores import validar_codigo, validar_nombre, validar_telefono
 from usuarios.models import Usuario
 
-from .models import Especialidad, Odontologo, Procedimiento
+from .models import Especialidad, Odontologo, Procedimiento, UnidadDental
 
 BASE = 'form-control'
 
@@ -123,3 +123,34 @@ class OdontologoForm(forms.ModelForm):
         if existe.exists():
             raise forms.ValidationError('Ya existe un odontólogo con ese número de colegiado.')
         return colegiado
+
+
+class UnidadDentalForm(forms.ModelForm):
+    """Alta y edición de un sillón. Al gestionarse como registro del catálogo,
+    incorporar una unidad nueva amplía la capacidad de la clínica sin tocar
+    el código."""
+    class Meta:
+        model = UnidadDental
+        fields = ['codigo', 'nombre', 'ubicacion', 'observaciones']
+        labels = {'ubicacion': 'Ubicación'}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for campo in ('ubicacion', 'observaciones'):
+            self.fields[campo].required = False
+        _estilizar(self.fields)
+
+    def clean_codigo(self):
+        codigo = validar_codigo(self.cleaned_data.get('codigo'), 'código')
+        existe = UnidadDental.objects.filter(codigo__iexact=codigo)
+        if self.instance.pk:
+            existe = existe.exclude(pk=self.instance.pk)
+        if existe.exists():
+            raise forms.ValidationError('Ya existe una unidad con ese código.')
+        return codigo
+
+    def clean_nombre(self):
+        nombre = (self.cleaned_data.get('nombre') or '').strip()
+        if len(nombre) < 3:
+            raise forms.ValidationError('El nombre debe tener al menos tres caracteres.')
+        return nombre

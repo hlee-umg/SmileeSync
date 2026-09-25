@@ -72,10 +72,16 @@
           <select name="odontologo" class="form-select form-select-sm" style="width:auto;"
                   onchange="this.form.submit()">
             <option value="">Todos los odontólogos</option>
+            {% if ficha_propia %}<option value="{{ ficha_propia.id }}"
+              {% if filtro_odontologo == ficha_propia.id|stringformat:"s" %}selected{% endif %}>
+              Mi agenda ({{ ficha_propia }})
+            </option>{% endif %}
             {% for o in odontologos %}
+              {% if o != ficha_propia %}
               <option value="{{ o.id }}" {% if filtro_odontologo == o.id|stringformat:"s" %}selected{% endif %}>
                 {{ o }}
               </option>
+              {% endif %}
             {% endfor %}
           </select>
         </form>

@@ -21,6 +21,13 @@ from agenda.forms import hay_traslape                              # noqa: E402
 ok = fallo = 0
 
 
+def sin_etiquetas(html):
+    """Texto visible de la página, para leer una cifra sin que las etiquetas
+    HTML que la envuelven partan la expresión regular."""
+    return re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', html))
+
+
+
 def probar(titulo, condicion, detalle=''):
     global ok, fallo
     if condicion:
@@ -60,7 +67,7 @@ cuerpo = c.get(url, {'semana': lunes.isoformat(), 'odontologo': odo.pk,
                      'procedimiento': corto.pk}).content.decode()
 probar('aparecen huecos sugeridos', 'class="hueco-sugerido' in cuerpo)
 probar('se muestra la duración estimada', 'min estimados' in cuerpo)
-plano = re.sub(r'\s+', ' ', cuerpo)
+plano = sin_etiquetas(cuerpo)
 m = re.search(r'(\d+) espacios? disponibles?', plano)
 probar('se informa cuántos espacios hay', m is not None)
 espacios_corto = int(m.group(1)) if m else 0
@@ -68,7 +75,7 @@ espacios_corto = int(m.group(1)) if m else 0
 print('\n3. Un procedimiento más largo no ofrece más espacios que uno corto')
 cuerpo_l = c.get(url, {'semana': lunes.isoformat(), 'odontologo': odo.pk,
                        'procedimiento': largo.pk}).content.decode()
-m2 = re.search(r'(\d+) espacios? disponibles?', re.sub(r'\s+', ' ', cuerpo_l))
+m2 = re.search(r'(\d+) espacios? disponibles?', sin_etiquetas(cuerpo_l))
 espacios_largo = int(m2.group(1)) if m2 else 0
 probar('el procedimiento largo tiene menos o igual espacios',
        espacios_largo <= espacios_corto, f'{largo.duracion_promedio_min}min='

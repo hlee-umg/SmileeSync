@@ -76,8 +76,20 @@ probar('el procedimiento largo tiene menos o igual espacios',
 
 print('\n4. Sin odontólogo se pide elegir uno')
 cuerpo_n = c.get(url, {'semana': lunes.isoformat(), 'procedimiento': corto.pk}).content.decode()
-probar('avisa que falta el odontólogo', 'Elija también un odontólogo' in cuerpo_n)
+probar('avisa que falta el odontólogo', 'Falta el odontólogo' in cuerpo_n)
 probar('no marca huecos', 'class="hueco-sugerido' not in cuerpo_n)
+
+print('\n4b. Sin procedimiento se pide elegir uno')
+cuerpo_p = c.get(url, {'semana': lunes.isoformat(), 'odontologo': odo.pk}).content.decode()
+probar('avisa que falta el procedimiento', 'Falta el procedimiento' in cuerpo_p)
+# El panel pide los dos campos en el mismo formulario: cambiar de odontólogo en
+# el filtro de arriba no debe descartar el procedimiento ya consultado.
+probar('el filtro del calendario conserva el procedimiento consultado',
+       f'name="procedimiento" value="{corto.pk}"' in cuerpo_n,
+       corto.pk)
+probar('el panel ofrece elegir el odontólogo sin salir de él',
+       cuerpo_p.count('name="odontologo"') >= 2,
+       cuerpo_p.count('name="odontologo"'))
 
 print('\n5. Los huecos propuestos son realmente válidos')
 cuerpo = c.get(url, {'semana': lunes.isoformat(), 'odontologo': odo.pk,

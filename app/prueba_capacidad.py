@@ -101,6 +101,18 @@ r = programar(tercero, pacientes[2], futuro, '09:00')
 probar('la tercera se rechaza', Cita.objects.count() == antes)
 probar('el mensaje explica que no hay unidades',
        'unidades dentales están ocupadas' in r.content.decode())
+# Con una sola unidad activa el mensaje se redacta en singular: es el caso que
+# se usa para mostrar la restricción de capacidad en una demostración.
+extra.estado = True
+extra.save()
+UnidadDental.objects.exclude(pk=extra.pk).update(estado=False)
+r = programar(odos[1], pacientes[5], futuro, '11:00')
+r = programar(tercero, pacientes[4], futuro, '11:00')
+probar('con una sola unidad el mensaje va en singular',
+       'La única unidad dental está ocupada' in r.content.decode())
+UnidadDental.objects.exclude(pk=extra.pk).update(estado=True)
+extra.estado = False
+extra.save()
 probar('no quedan unidades libres a esa hora',
        unidades_libres(futuro, time(9, 0), time(9, 20)) == [])
 

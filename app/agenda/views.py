@@ -326,6 +326,11 @@ def detalle(request, pk):
         'prediccion': prediccion,
         'abierta': abierta,
         'desvio': desvio,
+        # Enlaces al expediente: la nota de la visita y el renglón del plan de
+        # tratamiento que esta cita atiende, si viene de uno.
+        'nota': cita.nota if _tiene_nota(cita) else None,
+        'renglones': cita.renglones_plan.filter(estado=True).select_related(
+            'plan', 'procedimiento'),
         'volver': request.GET.get('volver') or reverse('agenda:principal'),
     })
 
@@ -392,10 +397,29 @@ def estimar(request):
     })
 
 
+def _renglon_solicitado(request):
+    """Renglón del plan de tratamiento que esta cita va a atender, si viene uno.
+
+    Es el vínculo entre el plan y la agenda: el plan presupuesta el trabajo y la
+    cita lo ejecuta, de modo que al programarla el renglón queda marcado como
+    agendado en lugar de quedar suelto.
+    """
+    from clinico.models import DetallePlan, PlanTratamiento
+
+    valor = request.POST.get('renglon') or request.GET.get('renglon') or ''
+    if not valor.isdigit():
+        return None
+    return (DetallePlan.objects
+            .filter(pk=int(valor), estado=True, estado_detalle='PENDIENTE',
+                    plan__estado_plan__in=PlanTratamiento.ABIERTOS)
+            .select_related('plan').first())
+
+
 @login_required
 @escritura_requerida('agenda')
 def crear(request):
     estimacion = None
+    renglon = _renglon_solicitado(request)
     if request.method == 'POST':
         form = CitaForm(request.POST)
         estimacion = _estimacion_para(form)
@@ -411,6 +435,13 @@ def crear(request):
             messages.success(request, f'Cita programada para {cita.paciente} '
                                       f'el {cita.fecha.strftime("%d/%m/%Y")} '
                                       f'a las {cita.hora_inicio_programada.strftime("%H:%M")}.')
+            if renglon and renglon.plan.paciente_id == cita.paciente_id:
+                renglon.cita = cita
+                renglon.estado_detalle = 'AGENDADO'
+                renglon.save(update_fields=['cita', 'estado_detalle'])
+                messages.info(request, f'Queda ligada al renglón «{renglon}» del '
+                                       f'plan {renglon.plan.codigo}.')
+                return redirect('clinico:plan_detalle', pk=renglon.plan_id)
             return redirect('agenda:principal')
     else:
         inicial = {}
@@ -424,11 +455,19 @@ def crear(request):
             inicial['odontologo'] = int(request.GET['odontologo'])
         if request.GET.get('procedimiento', '').isdigit():
             inicial['procedimiento'] = int(request.GET['procedimiento'])
+        # Al venir de un plan de tratamiento, llegan además el paciente y la
+        # duración que el modelo estimó al presupuestar el renglón.
+        if request.GET.get('paciente', '').isdigit():
+            inicial['paciente'] = int(request.GET['paciente'])
+        if request.GET.get('duracion', '').isdigit():
+            inicial['duracion_asignada_min'] = int(request.GET['duracion'])
+        if request.GET.get('piezas', '').isdigit():
+            inicial['num_piezas'] = int(request.GET['piezas'])
         form = CitaForm(initial=inicial)
 
     return render(request, 'agenda/form.html', {
         'form': form, 'titulo': 'Programar nueva cita',
-        'estimacion': estimacion, 'es_nueva': True,
+        'estimacion': estimacion, 'es_nueva': True, 'renglon': renglon,
     })
 
 
@@ -573,6 +612,33 @@ def quitar_horario(request, pk):
     return redirect('agenda:horarios', odontologo_id=odontologo_id)
 
 
+def _tiene_nota(cita):
+    """Si la cita ya tiene nota clínica. El acceso inverso uno a uno levanta
+    excepción cuando no existe, por lo que se comprueba con `hasattr`."""
+    return hasattr(cita, 'nota') and cita.nota is not None
+
+
+def _cerrar_renglones(request, cita):
+    """Cierra los renglones del plan que esta cita atendió y avanza el plan.
+
+    Al atenderse la cita, el renglón presupuestado queda ejecutado: el avance
+    del plan no depende de que alguien lo marque a mano.
+    """
+    renglones = list(cita.renglones_plan.filter(estado=True)
+                     .exclude(estado_detalle__in=('COMPLETADO', 'ANULADO'))
+                     .select_related('plan'))
+    for renglon in renglones:
+        renglon.estado_detalle = 'COMPLETADO'
+        renglon.save(update_fields=['estado_detalle'])
+    for plan in {r.plan for r in renglones}:
+        estado = plan.actualizar_avance()
+        messages.info(request, f'Plan {plan.codigo}: {plan.avance}% ejecutado '
+                              f'({plan.get_estado_plan_display().lower()}).')
+        if estado == 'FINALIZADO' and plan.saldo > 0:
+            messages.warning(request, f'El plan {plan.codigo} quedó finalizado con '
+                                      f'un saldo de Q{plan.saldo:.2f} por cobrar.')
+
+
 @login_required
 @escritura_requerida('agenda')
 def registrar_tiempos(request, pk):
@@ -593,6 +659,13 @@ def registrar_tiempos(request, pk):
                 f'Atención registrada: {cita.duracion_real_min} minutos reales '
                 f'frente a {cita.duracion_asignada_min} asignados. '
                 f'El dato se incorporó al entrenamiento del modelo.')
+            _cerrar_renglones(request, cita)
+            # El expediente del paciente queda incompleto sin la nota de la
+            # visita, así que se ofrece escribirla en el momento a quien tiene
+            # competencia para hacerlo.
+            if request.user.puede_escribir('clinico') and not _tiene_nota(cita):
+                return redirect(f'{reverse("clinico:nota_nueva", args=[cita.paciente_id])}'
+                                f'?cita={cita.pk}')
             return redirect('agenda:lista')
     else:
         form = RegistrarTiemposForm(instance=cita)

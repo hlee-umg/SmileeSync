@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block titulo %}Odontograma de {{ paciente.nombres }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0"><i class="bi bi-grid-3x3"></i> Estado actual de la boca</h6>
+          <span class="small text-secondary">
+            Nomenclatura FDI · {{ resumen.piezas_registradas }} de 32 piezas con registro
+          </span>
+        </div>
+
+        <div class="arcada">
+          {% for cuadrante in cuadrantes %}
+          <div class="cuadrante">
+            <div class="cuadrante-rotulo">{{ cuadrante.nombre }}</div>
+            <div class="piezas">
+              {% for p in cuadrante.piezas %}
+              <a class="pieza {{ p.clase }}{% if p.es_seleccionada %} seleccionada{% endif %}"
+                 href="?pieza={{ p.numero }}"
+                 title="{{ p.numero }} — {{ p.nombre }}{% if p.hallazgo %}: {{ p.hallazgo.get_tipo_display }}{% else %}: sin registro{% endif %}">
+                <span class="marca">
+                  {% if p.hallazgo %}{{ p.hallazgo.simbolo }}{% else %}&nbsp;{% endif %}
+                </span>
+                <span class="num">{{ p.numero }}</span>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="small text-secondary mt-3">
+          <span class="leyenda-pieza pieza-sana" style="background:#f1f5f9;"></span> Sana
+          <span class="ms-3 leyenda-pieza" style="background:#dbeafe;"></span> Tratada
+          <span class="ms-3 leyenda-pieza" style="background:#fee2e2;"></span> Por atender
+          <span class="ms-3 leyenda-pieza" style="background:#334155;"></span> Ausente
+          <span class="ms-3 leyenda-pieza" style="background:#fff;"></span> Sin registro
+          <span class="ms-3">· Pulse una pieza para ver su historial o registrar un hallazgo.</span>
+        </div>
+      </div>
+    </div>
+
+    {% if pieza %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-1">
+          <i class="bi bi-bounding-box"></i> Pieza {{ pieza.numero }}
+          <span class="text-secondary fw-normal small">— {{ pieza.nombre }}</span>
+        </h6>
+
+        {% if pieza.caras %}
+          <div class="mb-3 mt-3">
+            <div class="small fw-semibold mb-1">Estado vigente por cara</div>
+            <table class="table table-sm mb-0">
+              <thead class="table-light"><tr><th>Cara</th><th>Hallazgo</th>
+                  <th>Fecha</th><th>Observación</th></tr></thead>
+              <tbody>
+                {% for clave, h in pieza.caras.items %}
+                <tr>
+                  <td class="small">{{ h.get_cara_display }}</td>
+                  <td class="small">
+                    <span class="badge {% if h.es_patologico %}bg-danger{% elif h.tipo == 'AUSENTE' %}bg-dark{% else %}bg-primary{% endif %}">
+                      {{ h.get_tipo_display }}
+                    </span>
+                  </td>
+                  <td class="small text-secondary">{{ h.fecha|date:"d/m/Y" }}</td>
+                  <td class="small text-secondary">{{ h.observacion|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="small text-secondary mt-3">
+            Esta pieza no tiene hallazgos registrados.
+          </p>
+        {% endif %}
+
+        {% if pieza.historial %}
+        <div class="small fw-semibold mb-1 mt-4">Historial de la pieza</div>
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Fecha</th><th>Cara</th><th>Hallazgo</th>
+              <th>Registrado por</th><th class="text-end"></th></tr></thead>
+          <tbody>
+            {% for h in pieza.historial %}
+            <tr>
+              <td class="small text-secondary">{{ h.fecha|date:"d/m/Y" }}</td>
+              <td class="small">{{ h.get_cara_display }}</td>
+              <td class="small">{{ h.get_tipo_display }}
+                {% if h.observacion %}
+                  <span class="text-secondary">· {{ h.observacion }}</span>
+                {% endif %}
+              </td>
+              <td class="small text-secondary">{{ h.registrado_por|default:"—" }}</td>
+              <td class="text-end">
+                {% if escritura.clinico %}
+                <form method="post" action="{% url 'clinico:quitar_hallazgo' h.pk %}"
+                      onsubmit="return confirm('¿Retirar este hallazgo? El anterior de esa pieza volverá a ser el vigente.');">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger" title="Retirar">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    {% if escritura.clinico %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-plus-circle"></i> Registrar un hallazgo</h6>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 small">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          {% for campo in form %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ campo.label }}</label>
+            {{ campo }}
+            {% if campo.errors %}
+              <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <button class="btn btn-primary w-100"><i class="bi bi-save"></i> Registrar</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-light border small">
+      <i class="bi bi-eye"></i> Su rol consulta el expediente pero no lo registra:
+      el odontograma y las notas clínicas los escribe el personal odontológico.
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-info-circle"></i> Cómo se registra</h6>
+        <ul class="small text-secondary mb-0 ps-3">
+          <li>Cada hallazgo se agrega, no reemplaza al anterior: la pieza conserva
+              su historia y el odontograma muestra el más reciente.</li>
+          <li>Los estados que describen la pieza completa (ausente, implante,
+              indicada para extracción) no se registran por cara.</li>
+          <li>Los hallazgos por atender son el punto de partida del plan de
+              tratamiento.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

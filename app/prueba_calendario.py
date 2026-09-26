@@ -5,6 +5,8 @@ import re
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS',
+                      'testserver,localhost,127.0.0.1')
 django.setup()
 
 from django.test import Client                                    # noqa: E402
@@ -34,18 +36,25 @@ c.force_login(admin)
 hoy = timezone.localdate()
 url = reverse('agenda:principal')
 
-print('1. Vista semanal (por omisión)')
-r = c.get(url)
+# La rejilla se examina sobre la semana que contiene las citas programadas, no
+# sobre la semana en curso: si hoy es sábado o domingo, la semana actual ya no
+# tiene días hábiles por delante y el calendario aparece —correctamente— vacío.
+cita = (Cita.objects.filter(fecha__gte=hoy, estado=True,
+                            estado_cita__in=['PROGRAMADA', 'REPROGRAMADA'])
+        .order_by('fecha').first())
+semana = cita.fecha - timezone.timedelta(days=cita.fecha.weekday())
+
+print('1. Vista semanal')
+r = c.get(url, {'semana': semana.isoformat()})
 cuerpo = r.content.decode()
 probar('responde 200', r.status_code == 200, r.status_code)
 probar('muestra la semana', 'Semana del' in cuerpo)
 probar('hay botones Día y Semana', '>Día</a>' in cuerpo and '>Semana</a>' in cuerpo)
 probar('hay botón Hoy', '>Hoy</a>' in cuerpo)
+probar('la vista por omisión es la semana en curso',
+       'Semana del' in c.get(url).content.decode())
 
 print('\n2. Las citas enlazan a su detalle')
-cita = (Cita.objects.filter(fecha__gte=hoy, estado=True,
-                            estado_cita__in=['PROGRAMADA', 'REPROGRAMADA'])
-        .order_by('fecha').first())
 enlaces = re.findall(r'href="(/citas/\d+/)"', cuerpo)
 probar('la rejilla contiene enlaces a detalle', len(enlaces) > 0, len(enlaces))
 probar('el enlace de una cita de la semana está presente',
@@ -64,11 +73,11 @@ if m:
 
 print('\n4. El odontólogo del filtro se precarga')
 odo = Odontologo.objects.filter(estado=True).first()
-r = c.get(url, {'odontologo': odo.pk})
+r = c.get(url, {'odontologo': odo.pk, 'semana': semana.isoformat()})
 cuerpo_f = r.content.decode()
 probar('el enlace de casilla lleva el odontólogo',
        f'&odontologo={odo.pk}' in cuerpo_f)
-r = c.get(reverse('agenda:crear'), {'fecha': hoy.isoformat(), 'hora': '09:00',
+r = c.get(reverse('agenda:crear'), {'fecha': semana.isoformat(), 'hora': '09:00',
                                     'odontologo': odo.pk})
 probar('el formulario preselecciona al odontólogo',
        f'value="{odo.pk}" selected' in r.content.decode())
@@ -110,7 +119,7 @@ if atendida:
 print('\n8. Un rol de solo consulta no ve acciones ni casillas libres')
 c2 = Client()
 c2.force_login(odontologo_usuario)
-cuerpo_ro = c2.get(url).content.decode()
+cuerpo_ro = c2.get(url, {'semana': semana.isoformat()}).content.decode()
 probar('no aparece el botón Nueva cita', 'Nueva cita' not in cuerpo_ro)
 probar('no aparecen casillas libres', 'class="casilla-libre"' not in cuerpo_ro)
 # el odontólogo ve su propia agenda por omisión, así que se verifica con una
@@ -121,7 +130,8 @@ if propia:
     cuerpo_propia = c2.get(url, {'fecha': propia.fecha.isoformat(),
                                  'vista': 'dia'}).content.decode()
     probar('ve sus propias citas', f'/citas/{propia.pk}/' in cuerpo_propia)
-cuerpo_todos = c2.get(url, {'odontologo': ''}).content.decode()
+cuerpo_todos = c2.get(url, {'odontologo': '',
+                            'semana': semana.isoformat()}).content.decode()
 probar('puede ver las de toda la clínica', f'/citas/{cita.pk}/' in cuerpo_todos)
 cuerpo_ro_det = c2.get(reverse('agenda:detalle', args=[cita.pk])).content.decode()
 probar('el detalle explica que es solo consulta',

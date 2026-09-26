@@ -4,6 +4,8 @@ import os
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS',
+                      'testserver,localhost,127.0.0.1')
 django.setup()
 
 from django.test import Client                                    # noqa: E402

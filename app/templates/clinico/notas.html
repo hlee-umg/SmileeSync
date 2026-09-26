@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block titulo %}Evolución de {{ paciente.nombres }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h6 class="mb-0"><i class="bi bi-journal-text"></i> Evolución clínica</h6>
+    <span class="small text-secondary">
+      {{ notas|length }} visita{{ notas|length|pluralize }} documentada{{ notas|length|pluralize }}
+      {% if con_complicacion %}· {{ con_complicacion }} con complicación{% endif %}
+    </span>
+  </div>
+  {% if escritura.clinico %}
+  <a href="{% url 'clinico:nota_nueva' paciente.pk %}" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg"></i> Nueva nota
+  </a>
+  {% endif %}
+</div>
+
+{% for n in notas %}
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div>
+        <span class="fw-semibold">{{ n.fecha|date:"l j \d\e F \d\e Y" }}</span>
+        <div class="small text-secondary">{{ n.odontologo }}</div>
+      </div>
+      <div class="text-end">
+        {% if n.complicacion %}
+          <span class="badge bg-warning text-dark">Con complicación</span>
+        {% endif %}
+        {% if n.anestesia %}<span class="badge bg-light text-dark border">Anestesia</span>{% endif %}
+        {% if n.cita %}
+          <a href="{% url 'agenda:detalle' n.cita.pk %}"
+             class="badge bg-light text-dark border text-decoration-none">
+            <i class="bi bi-calendar-check"></i> Cita del {{ n.cita.fecha|date:"d/m" }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <table class="table table-sm mb-0">
+      <tr><th style="width:190px;" class="small fw-semibold">Motivo</th>
+          <td class="small">{{ n.motivo }}</td></tr>
+      {% if n.hallazgos_clinicos %}
+      <tr><th class="small fw-semibold">Hallazgos</th>
+          <td class="small">{{ n.hallazgos_clinicos|linebreaksbr }}</td></tr>
+      {% endif %}
+      <tr><th class="small fw-semibold">Procedimiento realizado</th>
+          <td class="small">{{ n.procedimiento_realizado|linebreaksbr }}</td></tr>
+      <tr><th class="small fw-semibold">Piezas tratadas</th>
+          <td class="small">
+            {% if n.piezas_tratadas %}{{ n.piezas_tratadas }}
+              <span class="text-secondary">({{ n.num_piezas }})</span>
+            {% else %}<span class="text-secondary">{{ n.num_piezas }} pieza{{ n.num_piezas|pluralize }}</span>{% endif %}
+          </td></tr>
+      {% if n.materiales %}
+      <tr><th class="small fw-semibold">Materiales</th>
+          <td class="small">{{ n.materiales }}</td></tr>
+      {% endif %}
+      {% if n.complicacion %}
+      <tr><th class="small fw-semibold text-danger">Complicación</th>
+          <td class="small text-danger">{{ n.detalle_complicacion }}</td></tr>
+      {% endif %}
+      {% if n.indicaciones %}
+      <tr><th class="small fw-semibold">Indicaciones</th>
+          <td class="small">{{ n.indicaciones|linebreaksbr }}</td></tr>
+      {% endif %}
+      {% if n.cita.duracion_real_min %}
+      <tr><th class="small fw-semibold">Duración</th>
+          <td class="small">
+            {{ n.cita.duracion_real_min }} min reales frente a
+            {{ n.cita.duracion_asignada_min }} asignados
+          </td></tr>
+      {% endif %}
+    </table>
+
+    <div class="small text-secondary mt-2">
+      Registrada por {{ n.registrado_por|default:"—" }} el {{ n.creado|date:"d/m/Y H:i" }}
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="card border-0 shadow-sm">
+  <div class="card-body text-center py-5">
+    <i class="bi bi-journal-text" style="font-size:2rem; color:#cbd5e1;"></i>
+    <p class="small text-secondary mt-2 mb-0">
+      Este paciente no tiene visitas documentadas.
+      {% if escritura.clinico %}
+        Las notas de evolución aportan al modelo predictivo las variables que la
+        cita no conoce: piezas tratadas, anestesia y complicaciones.
+      {% endif %}
+    </p>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -9,6 +9,11 @@
     <a href="{% url 'pacientes:lista' %}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-arrow-left"></i> Volver al listado
     </a>
+    {% if user.rol.puede_clinico or user.es_admin %}
+    <a href="{% url 'clinico:expediente' paciente.pk %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-file-medical"></i> Expediente clínico
+    </a>
+    {% endif %}
     {% if escritura.pacientes %}<a href="{% url 'pacientes:editar' paciente.pk %}" class="btn btn-sm btn-primary">
       <i class="bi bi-pencil"></i> Editar datos
     </a>{% endif %}

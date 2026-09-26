@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block titulo %}Planes de tratamiento — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">Planes de tratamiento</h5>
+    <span class="small text-secondary">
+      {{ minutos_comprometidos }} minutos de sillón comprometidos en planes vigentes
+    </span>
+  </div>
+  <a href="{% url 'clinico:lista' %}" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-file-medical"></i> Ir a expedientes
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form class="row g-2 mb-3">
+      <div class="col-md-5">
+        <input type="search" name="q" value="{{ q }}" class="form-control"
+               placeholder="Buscar por código o paciente…">
+      </div>
+      <div class="col-md-4">
+        <select name="estado_plan" class="form-select">
+          <option value="">Todos los estados</option>
+          {% for valor, etiqueta in estados %}
+            <option value="{{ valor }}" {% if estado_plan == valor %}selected{% endif %}>
+              {{ etiqueta }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrar</button>
+      </div>
+      {% if q or estado_plan %}
+      <div class="col-auto">
+        <a href="{% url 'clinico:planes' %}" class="btn btn-outline-secondary">Limpiar</a>
+      </div>
+      {% endif %}
+    </form>
+
+    <table class="table table-sm align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Código</th><th>Paciente</th><th>Odontólogo</th>
+          <th class="text-center">Avance</th>
+          <th class="text-center">Min pendientes</th>
+          <th class="text-end">Total</th><th class="text-end">Saldo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in planes %}
+        <tr>
+          <td class="small">
+            <a href="{% url 'clinico:plan_detalle' p.pk %}" class="text-decoration-none fw-semibold">
+              {{ p.codigo }}
+            </a>
+          </td>
+          <td class="small">{{ p.paciente.nombres }} {{ p.paciente.apellidos }}</td>
+          <td class="small">{{ p.odontologo }}</td>
+          <td class="small text-center" style="min-width:110px;">
+            <div class="progress barra-avance">
+              <div class="progress-bar" style="width:{{ p.avance }}%"></div>
+            </div>
+            <span class="text-secondary" style="font-size:.7rem;">
+              {{ p.renglones_completados }}/{{ p.total_renglones }}
+            </span>
+          </td>
+          <td class="small text-center">{{ p.minutos_pendientes }}</td>
+          <td class="small text-end">Q{{ p.total|floatformat:2 }}</td>
+          <td class="small text-end {% if p.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
+            Q{{ p.saldo|floatformat:2 }}
+          </td>
+          <td>
+            {% if p.estado_plan == 'FINALIZADO' %}<span class="badge bg-success">Finalizado</span>
+            {% elif p.estado_plan == 'EN_CURSO' %}<span class="badge bg-primary">En curso</span>
+            {% elif p.estado_plan == 'APROBADO' %}<span class="badge bg-info text-dark">Aprobado</span>
+            {% elif p.estado_plan == 'RECHAZADO' %}<span class="badge bg-danger">Rechazado</span>
+            {% else %}<span class="badge bg-secondary">Borrador</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-secondary small py-3">
+          No hay planes que coincidan con el filtro.
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

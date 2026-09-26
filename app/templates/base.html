@@ -59,6 +59,36 @@
     /* --- Panel de recomendación del modelo --- */
     .recomendacion { background:#eef4fc; border-radius:.5rem; }
     .estimacion-valor { font-size:2.2rem; font-weight:700; color:var(--smilee); }
+
+    /* --- Odontograma --- */
+    /* Cada pieza es un botón cuadrado con su número debajo. El color resume el
+       hallazgo vigente de la pieza, de modo que el estado de la boca se lee de
+       un vistazo antes de entrar al detalle. */
+    .arcada { display:flex; gap:.9rem; flex-wrap:wrap; }
+    .cuadrante { flex:1 1 260px; }
+    .cuadrante-rotulo { font-size:.68rem; text-transform:uppercase;
+                        letter-spacing:.04em; color:#94a3b8; margin-bottom:.3rem; }
+    .piezas { display:flex; gap:.22rem; }
+    .pieza { flex:1 1 0; min-width:0; text-align:center; text-decoration:none;
+             border:1px solid #cbd5e1; border-radius:.3rem; background:#fff;
+             padding:.3rem .1rem .2rem; color:#334155; transition:box-shadow .12s; }
+    .pieza:hover { box-shadow:0 0 0 2px var(--smilee2); color:#334155; }
+    .pieza .num { display:block; font-size:.66rem; color:#64748b; }
+    .pieza .marca { display:block; height:16px; line-height:16px; font-size:.7rem;
+                    font-weight:700; border-radius:.2rem; }
+    .pieza.seleccionada { box-shadow:0 0 0 2px var(--smilee); border-color:var(--smilee); }
+    .pieza-sana      .marca { background:#f1f5f9; color:#64748b; }
+    .pieza-tratada   .marca { background:#dbeafe; color:#1e40af; }
+    .pieza-patologica .marca { background:#fee2e2; color:#991b1b; }
+    .pieza-ausente   .marca { background:#334155; color:#fff; }
+    .pieza-ausente   .num   { text-decoration:line-through; }
+    .leyenda-pieza { display:inline-block; width:14px; height:14px; border-radius:3px;
+                     vertical-align:-2px; border:1px solid #cbd5e1; }
+
+    /* --- Fases y sesiones del plan --- */
+    .fase-sesion { border-left:3px solid var(--smilee2); background:#f8fafc;
+                   border-radius:.35rem; }
+    .barra-avance { height:8px; }
   </style>
 </head>
 <body>
@@ -85,6 +115,15 @@
 
         {% if user.rol.puede_agenda or user.es_admin %}
         <li class="nav-item"><a class="nav-link {% if 'citas' in request.path %}active{% endif %}" href="{% url 'agenda:lista' %}"><i class="bi bi-calendar-week"></i> Agenda y Citas</a></li>
+        {% endif %}
+
+        {% if user.rol.puede_clinico or user.es_admin %}
+        <li class="nav-item"><a class="nav-link {% if '/expedientes' in request.path %}active{% endif %}" href="{% url 'clinico:lista' %}"><i class="bi bi-file-medical"></i> Expedientes</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/planes' in request.path %}active{% endif %}" href="{% url 'clinico:planes' %}"><i class="bi bi-list-check"></i> Tratamientos</a></li>
+        {% endif %}
+
+        {% if user.rol.puede_finanzas or user.es_admin %}
+        <li class="nav-item"><a class="nav-link {% if '/cobros' in request.path %}active{% endif %}" href="{% url 'clinico:cobros' %}"><i class="bi bi-cash-coin"></i> Cobros</a></li>
         {% endif %}
 
         {% if user.rol.puede_inteligencia or user.es_admin %}

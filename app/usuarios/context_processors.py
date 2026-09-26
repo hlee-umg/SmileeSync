@@ -4,7 +4,8 @@ Permite escribir en las plantillas condiciones como {% if escritura.agenda %}
 para ocultar los botones de acción a los roles de solo consulta. La seguridad
 efectiva la aplica el decorador `escritura_requerida`; esto es solo interfaz.
 """
-MODULOS = ['usuarios', 'pacientes', 'catalogos', 'agenda', 'inteligencia', 'reportes']
+MODULOS = ['usuarios', 'pacientes', 'catalogos', 'agenda', 'clinico',
+           'finanzas', 'inteligencia', 'reportes']
 
 
 def permisos(request):

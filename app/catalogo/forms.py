@@ -43,23 +43,35 @@ class ProcedimientoForm(forms.ModelForm):
     class Meta:
         model = Procedimiento
         fields = ['codigo', 'nombre', 'especialidad', 'nivel_complejidad',
-                  'duracion_promedio_min', 'descripcion']
+                  'duracion_promedio_min', 'precio', 'descripcion']
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 3}),
             'duracion_promedio_min': forms.NumberInput(attrs={'min': 5, 'step': 5}),
+            'precio': forms.NumberInput(attrs={'min': 0, 'step': '0.01'}),
         }
-        labels = {'duracion_promedio_min': 'Duración promedio (minutos)'}
+        labels = {'duracion_promedio_min': 'Duración promedio (minutos)',
+                  'precio': 'Precio de lista (Q)'}
         help_texts = {
             'duracion_promedio_min':
                 'Valor de referencia inicial. El modelo predictivo lo ajusta '
                 'conforme se acumulan atenciones reales.',
+            'precio': 'Tarifa con que se presupuestan los planes de tratamiento.',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['especialidad'].queryset = Especialidad.objects.filter(estado=True)
         self.fields['descripcion'].required = False
+        self.fields['precio'].required = False
         _estilizar(self.fields)
+
+    def clean_precio(self):
+        precio = self.cleaned_data.get('precio')
+        if precio is None:
+            return 0
+        if precio < 0:
+            raise forms.ValidationError('El precio no puede ser negativo.')
+        return precio
 
     def clean_codigo(self):
         codigo = validar_codigo(self.cleaned_data.get('codigo'), 'código del procedimiento')

@@ -29,6 +29,11 @@ class Procedimiento(models.Model):
     nivel_complejidad = models.CharField('nivel de complejidad', max_length=5,
                                          choices=COMPLEJIDAD, default='MEDIA')
     duracion_promedio_min = models.PositiveIntegerField('duración promedio (min)', default=30)
+    # Precio de lista con que se presupuestan los planes de tratamiento. El
+    # renglón del plan guarda su propia copia, de modo que un cambio de tarifa
+    # no altera un presupuesto ya entregado al paciente.
+    precio = models.DecimalField('precio de lista (Q)', max_digits=10,
+                                 decimal_places=2, default=0)
     descripcion = models.TextField('descripción', blank=True)
     estado = models.BooleanField('activo', default=True)
     creado = models.DateTimeField(auto_now_add=True)

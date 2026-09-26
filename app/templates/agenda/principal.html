@@ -112,7 +112,7 @@
               {% include 'agenda/_opciones_odontologo.html' %}
             </select>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-4">
             <label class="form-label small text-secondary mb-1">Procedimiento</label>
             <select name="procedimiento" class="form-select form-select-sm">
               <option value="">Seleccione un procedimiento…</option>
@@ -123,42 +123,67 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-6 col-md-1">
+          <div class="col-6 col-md-2">
             <label class="form-label small text-secondary mb-1">Piezas</label>
             <input type="number" name="piezas" min="1" max="32" value="{{ piezas }}"
                    class="form-control form-control-sm">
           </div>
-          <div class="col-6 col-md-2">
+          <div class="col-6 col-md-3">
             <button class="btn btn-sm btn-outline-primary w-100">
               <i class="bi bi-search"></i> Buscar espacio
             </button>
           </div>
-          <div class="col-md-4">
+
+          {% comment %}
+          El resultado ocupa su propia fila completa. Antes iba en una columna
+          al final de la misma fila, que además hacía sumar más de doce: se
+          partía en tres renglones de texto gris y la cifra —que es la respuesta
+          del modelo, lo más importante de la pantalla— se leía como un pie de
+          página.
+          {% endcomment %}
+          <div class="col-12">
             {% if estimacion %}
-              <div class="small">
-                <span class="badge bg-primary">{{ estimacion.duracion_min }} min estimados</span>
-                <span class="text-secondary">
-                  bloque {{ estimacion.bloque_min }}–{{ estimacion.bloque_max }} min ·
-                  {{ estimacion.etiqueta_origen }}
-                </span><br>
-                <span class="text-secondary">
-                  {{ total_sugeridos }} espacio{{ total_sugeridos|pluralize:"s" }}
-                  disponible{{ total_sugeridos|pluralize:"s" }} para {{ odontologo_sug }}
-                  en el período mostrado.
-                </span>
+              <div class="resultado-estimacion d-flex flex-wrap align-items-center gap-3 mt-1">
+                <div class="d-flex align-items-baseline gap-1">
+                  <span class="cifra-estimacion">{{ estimacion.duracion_min }}</span>
+                  <span class="small text-secondary">min estimados</span>
+                </div>
+                <div class="vr d-none d-md-block"></div>
+                <div class="small">
+                  <span class="text-secondary">Bloque recomendado</span>
+                  <strong>{{ estimacion.bloque_min }} – {{ estimacion.bloque_max }} min</strong>
+                </div>
+                <div class="vr d-none d-md-block"></div>
+                <div class="small">
+                  <span class="text-secondary">Origen</span>
+                  <span class="badge {% if estimacion.origen == 'modelo' %}bg-dark{% elif estimacion.origen == 'historico' %}bg-primary{% else %}bg-secondary{% endif %}">
+                    {{ estimacion.etiqueta_origen }}
+                  </span>
+                </div>
+                <div class="vr d-none d-md-block"></div>
+                <div class="small">
+                  <strong class="text-success">{{ total_sugeridos }}</strong>
+                  <span class="text-secondary">
+                    espacio{{ total_sugeridos|pluralize:"s" }}
+                    disponible{{ total_sugeridos|pluralize:"s" }} para
+                    {{ odontologo_sug }} en el período mostrado,
+                    marcado{{ total_sugeridos|pluralize:"s" }} en verde abajo.
+                  </span>
+                </div>
               </div>
             {% elif procedimiento_sug and not filtro_odontologo %}
-              <div class="small text-danger">
-                Falta el odontólogo: la duración depende de quién atiende, porque
-                el modelo aprende del ritmo real de cada profesional.
+              <div class="small text-danger mt-1">
+                <i class="bi bi-exclamation-circle"></i>
+                Falta el odontólogo: la duración depende de quién atiende, porque el
+                modelo aprende del ritmo real de cada profesional.
               </div>
             {% elif filtro_odontologo and not procedimiento_sug %}
-              <div class="small text-secondary">
+              <div class="small text-secondary mt-1">
                 Falta el procedimiento: elíjalo para ver la duración estimada y los
                 espacios donde cabe.
               </div>
             {% else %}
-              <div class="small text-secondary">
+              <div class="small text-secondary mt-1">
                 Elija <strong>odontólogo y procedimiento</strong>: el sistema estima la
                 duración y marca en el calendario los espacios donde la cita cabe
                 completa.

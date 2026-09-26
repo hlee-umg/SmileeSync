@@ -133,11 +133,13 @@ class CitaForm(forms.ModelForm):
             libre = asignar_unidad(fecha, inicio, fin,
                                    excluir_cita=self.instance.pk)
             if libre is None:
+                cuantas = ('La única unidad dental está ocupada'
+                           if len(unidades) == 1
+                           else f'Las {len(unidades)} unidades dentales están ocupadas')
                 self.add_error(
                     'hora_inicio_programada',
-                    f'Las {len(unidades)} unidades dentales están ocupadas en ese '
-                    f'horario. Elija otro espacio o consulte la recomendación del '
-                    f'calendario.')
+                    f'{cuantas} en ese horario. Elija otro espacio o consulte la '
+                    f'recomendación del calendario.')
             else:
                 limpio['unidad'] = libre
 

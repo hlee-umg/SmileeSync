@@ -69,20 +69,14 @@
         <form method="get" class="d-flex gap-2">
           <input type="hidden" name="vista" value="{{ vista }}">
           <input type="hidden" name="{{ parametro_periodo }}" value="{{ inicio|date:'Y-m-d' }}">
+          {# Se conserva la consulta de recomendación en curso: cambiar de
+             odontólogo aquí no debe borrar el procedimiento que se estaba
+             consultando en el panel de abajo. #}
+          <input type="hidden" name="procedimiento" value="{{ procedimiento_sug }}">
+          <input type="hidden" name="piezas" value="{{ piezas }}">
           <select name="odontologo" class="form-select form-select-sm" style="width:auto;"
                   onchange="this.form.submit()">
-            <option value="">Todos los odontólogos</option>
-            {% if ficha_propia %}<option value="{{ ficha_propia.id }}"
-              {% if filtro_odontologo == ficha_propia.id|stringformat:"s" %}selected{% endif %}>
-              Mi agenda ({{ ficha_propia }})
-            </option>{% endif %}
-            {% for o in odontologos %}
-              {% if o != ficha_propia %}
-              <option value="{{ o.id }}" {% if filtro_odontologo == o.id|stringformat:"s" %}selected{% endif %}>
-                {{ o }}
-              </option>
-              {% endif %}
-            {% endfor %}
+            {% include 'agenda/_opciones_odontologo.html' %}
           </select>
         </form>
 
@@ -100,11 +94,22 @@
         <form method="get" class="row g-2 align-items-end">
           <input type="hidden" name="vista" value="{{ vista }}">
           <input type="hidden" name="{{ parametro_periodo }}" value="{{ inicio|date:'Y-m-d' }}">
-          <input type="hidden" name="odontologo" value="{{ filtro_odontologo }}">
-          <div class="col-md-4">
+          <div class="col-12">
             <label class="form-label small fw-semibold mb-1">
               <i class="bi bi-magic"></i> ¿Dónde cabe este procedimiento?
             </label>
+          </div>
+          {# El odontólogo se pide aquí mismo: la estimación depende de quién
+             atiende, así que dejarlo solo en el filtro de arriba obligaba a
+             adivinar que hacían falta los dos campos. #}
+          <div class="col-md-3">
+            <label class="form-label small text-secondary mb-1">Odontólogo</label>
+            <select name="odontologo" class="form-select form-select-sm">
+              {% include 'agenda/_opciones_odontologo.html' %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-secondary mb-1">Procedimiento</label>
             <select name="procedimiento" class="form-select form-select-sm">
               <option value="">Seleccione un procedimiento…</option>
               {% for p in procedimientos %}
@@ -114,8 +119,8 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-6 col-md-2">
-            <label class="form-label small fw-semibold mb-1">Piezas</label>
+          <div class="col-6 col-md-1">
+            <label class="form-label small text-secondary mb-1">Piezas</label>
             <input type="number" name="piezas" min="1" max="32" value="{{ piezas }}"
                    class="form-control form-control-sm">
           </div>
@@ -140,13 +145,19 @@
               </div>
             {% elif procedimiento_sug and not filtro_odontologo %}
               <div class="small text-danger">
-                Elija también un odontólogo en el filtro de arriba: la estimación
-                depende de quién atiende.
+                Falta el odontólogo: la duración depende de quién atiende, porque
+                el modelo aprende del ritmo real de cada profesional.
+              </div>
+            {% elif filtro_odontologo and not procedimiento_sug %}
+              <div class="small text-secondary">
+                Falta el procedimiento: elíjalo para ver la duración estimada y los
+                espacios donde cabe.
               </div>
             {% else %}
               <div class="small text-secondary">
-                El sistema estima la duración y marca en el calendario los espacios
-                donde la cita cabe completa.
+                Elija <strong>odontólogo y procedimiento</strong>: el sistema estima la
+                duración y marca en el calendario los espacios donde la cita cabe
+                completa.
               </div>
             {% endif %}
           </div>

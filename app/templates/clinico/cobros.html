@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block titulo %}Cobros — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Cobros{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">Estado de cuenta de los tratamientos</h5>
+    <span class="small text-secondary">
+      Planes aprobados y en curso, ordenados por saldo
+    </span>
+  </div>
+  <a href="?pendientes={% if solo_pendientes %}0{% else %}1{% endif %}"
+     class="btn btn-sm btn-outline-secondary">
+    {% if solo_pendientes %}Incluir los liquidados{% else %}Solo con saldo{% endif %}
+  </a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor text-danger">Q{{ total_por_cobrar|floatformat:2 }}</div>
+      <div class="etiqueta">Por cobrar</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">Q{{ cobrado_mes|floatformat:2 }}</div>
+      <div class="etiqueta">Cobrado este mes</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">Q{{ presupuestado|floatformat:2 }}</div>
+      <div class="etiqueta">Presupuestado vigente</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <table class="table table-sm align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Plan</th><th>Paciente</th><th>Teléfono</th>
+          <th class="text-end">Total</th><th class="text-end">Pagado</th>
+          <th class="text-end">Saldo</th><th class="text-center">Avance</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in planes %}
+        <tr>
+          <td class="small"><code>{{ p.codigo }}</code></td>
+          <td class="small">{{ p.paciente.nombres }} {{ p.paciente.apellidos }}</td>
+          <td class="small text-secondary">{{ p.paciente.telefono|default:"—" }}</td>
+          <td class="small text-end">Q{{ p.total|floatformat:2 }}</td>
+          <td class="small text-end">Q{{ p.pagado|floatformat:2 }}</td>
+          <td class="text-end fw-semibold {% if p.saldo > 0 %}text-danger{% else %}text-success{% endif %}">
+            Q{{ p.saldo|floatformat:2 }}
+          </td>
+          <td class="small text-center">{{ p.avance }}%</td>
+          <td class="text-end">
+            <a href="{% url 'clinico:plan_detalle' p.pk %}" class="btn btn-sm btn-outline-primary">
+              {% if escritura.finanzas %}<i class="bi bi-cash"></i> Abonar
+              {% else %}<i class="bi bi-eye"></i> Ver{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-secondary small py-3">
+          No hay tratamientos con saldo pendiente.
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

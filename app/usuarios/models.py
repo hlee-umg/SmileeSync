@@ -13,6 +13,8 @@ class Rol(models.Model):
     puede_pacientes = models.BooleanField('módulo pacientes', default=False)
     puede_catalogos = models.BooleanField('módulo catálogos', default=False)
     puede_agenda = models.BooleanField('módulo agenda', default=False)
+    puede_clinico = models.BooleanField('módulo expediente clínico', default=False)
+    puede_finanzas = models.BooleanField('módulo cobros', default=False)
     puede_inteligencia = models.BooleanField('módulo inteligencia', default=False)
     puede_reportes = models.BooleanField('módulo reportes', default=False)
 
@@ -22,6 +24,16 @@ class Rol(models.Model):
     solo_lectura = models.BooleanField(
         'solo consulta', default=False,
         help_text='Permite ver los módulos asignados, sin crear ni modificar registros.')
+
+    # El expediente clínico es un acto profesional, no una tarea
+    # administrativa: quien lo escribe es el odontólogo, aunque su rol sea de
+    # solo consulta para la agenda, y no lo escribe la recepción, aunque sí
+    # modifique otros módulos. Por eso la escritura del expediente se declara
+    # aparte en lugar de derivarse de `solo_lectura`.
+    escritura_clinica = models.BooleanField(
+        'puede registrar en el expediente', default=False,
+        help_text='Permite registrar odontograma, notas clínicas y planes de '
+                  'tratamiento. Corresponde al personal odontológico.')
 
     estado = models.BooleanField('activo', default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
@@ -81,8 +93,19 @@ class Usuario(AbstractUser):
         return bool(self.rol and self.rol.solo_lectura)
 
     def puede_escribir(self, modulo):
-        """Acceso de escritura: exige el módulo y que el rol no sea de consulta."""
-        return self.puede(modulo) and not self.es_solo_consulta
+        """Acceso de escritura: exige el módulo y que el rol no sea de consulta.
+
+        El módulo clínico es la excepción y se rige por `escritura_clinica`: el
+        expediente lo escribe quien tiene competencia profesional declarada,
+        con independencia de sus privilegios administrativos.
+        """
+        if self.es_admin:
+            return True
+        if not self.puede(modulo):
+            return False
+        if modulo == 'clinico':
+            return bool(self.rol and self.rol.escritura_clinica)
+        return not self.es_solo_consulta
 
     def set_respuesta_secreta(self, texto):
         """Guarda la respuesta secreta cifrada (normalizada a minúsculas)."""

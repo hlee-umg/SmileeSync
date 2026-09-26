@@ -22,6 +22,7 @@
           <tr>
             <th>Código</th><th>Procedimiento</th><th>Especialidad</th>
             <th>Complejidad</th><th class="text-center">Duración</th>
+            <th class="text-end">Precio</th>
             <th>Estado</th><th class="text-end">Acciones</th>
           </tr>
         </thead>
@@ -37,6 +38,10 @@
               {% else %}<span class="badge bg-warning text-dark">Media</span>{% endif %}
             </td>
             <td class="text-center">{{ p.duracion_promedio_min }} min</td>
+            <td class="text-end">
+              {% if p.precio %}Q{{ p.precio|floatformat:2 }}
+              {% else %}<span class="text-secondary small">sin tarifa</span>{% endif %}
+            </td>
             <td>
               {% if p.estado %}<span class="badge bg-success">Activo</span>
               {% else %}<span class="badge bg-danger">Inactivo</span>{% endif %}
@@ -55,7 +60,7 @@
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="7" class="text-center text-secondary py-4">
+          <tr><td colspan="8" class="text-center text-secondary py-4">
             No hay procedimientos que coincidan con la búsqueda.
           </td></tr>
           {% endfor %}
@@ -66,7 +71,8 @@
     <p class="small text-secondary mb-0">
       <i class="bi bi-info-circle"></i>
       La duración es el valor de referencia inicial; el modelo predictivo la ajusta
-      según el historial real de cada procedimiento.
+      según el historial real de cada procedimiento. El precio es la tarifa con que
+      se presupuestan los planes de tratamiento.
     </p>
   </div>
 </div>

@@ -1,0 +1,49 @@
+{% comment %}
+Pestañas del expediente de un paciente. Se incluye pasando `paciente` y
+`seccion` (resumen | odontograma | notas | planes).
+{% endcomment %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">{{ paciente.nombres }} {{ paciente.apellidos }}</h5>
+    <span class="small text-secondary">
+      <code>{{ paciente.codigo }}</code>
+      {% if paciente.fecha_nacimiento %}· {{ paciente.fecha_nacimiento|date:"d/m/Y" }}{% endif %}
+      {% if paciente.telefono %}· {{ paciente.telefono }}{% endif %}
+    </span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'pacientes:ficha' paciente.pk %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-person-vcard"></i> Datos personales
+    </a>
+    <a href="{% url 'clinico:lista' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Expedientes
+    </a>
+  </div>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if seccion == 'resumen' %}active{% endif %}"
+       href="{% url 'clinico:expediente' paciente.pk %}">
+      <i class="bi bi-file-medical"></i> Resumen
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if seccion == 'odontograma' %}active{% endif %}"
+       href="{% url 'clinico:odontograma' paciente.pk %}">
+      <i class="bi bi-grid-3x3"></i> Odontograma
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if seccion == 'notas' %}active{% endif %}"
+       href="{% url 'clinico:notas' paciente.pk %}">
+      <i class="bi bi-journal-text"></i> Evolución
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if seccion == 'planes' %}active{% endif %}"
+       href="{% url 'clinico:expediente' paciente.pk %}#planes">
+      <i class="bi bi-list-check"></i> Tratamientos
+    </a>
+  </li>
+</ul>

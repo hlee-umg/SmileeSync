@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ titulo }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-clipboard-plus"></i> {{ titulo }}</h6>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 small">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for campo in form %}
+            <div class="{% if campo.name == 'diagnostico' or campo.name == 'observaciones' %}col-12{% else %}col-md-6{% endif %}">
+              <label class="form-label small fw-semibold">{{ campo.label }}</label>
+              {{ campo }}
+              {% if campo.errors %}
+                <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary">
+              <i class="bi bi-save"></i> Crear plan y agregar renglones
+            </button>
+            <a href="{% url 'clinico:expediente' paciente.pk %}"
+               class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-info-circle"></i> Cómo funciona el plan</h6>
+        <ol class="small text-secondary mb-0 ps-3">
+          <li>Se crea con el diagnóstico que lo justifica; nace en borrador y no
+              reserva nada.</li>
+          <li>Se agregan los renglones: procedimiento, pieza y precio. Cada uno
+              recibe su duración estimada del modelo predictivo.</li>
+          <li>El sistema reparte los renglones en sesiones de sillón, así se sabe
+              cuántas citas hará falta antes de agendar la primera.</li>
+          <li>Al aprobarlo, el plan pasa a ser un compromiso y sus renglones se
+              pueden agendar uno por uno.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

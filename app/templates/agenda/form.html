@@ -13,8 +13,20 @@
           <div class="alert alert-danger py-2 small">{{ form.non_field_errors|striptags }}</div>
         {% endif %}
 
+        {% if renglon %}
+        <div class="alert alert-light border small">
+          <i class="bi bi-list-check"></i> Esta cita atiende el renglón
+          <strong>{{ renglon }}</strong> (fase {{ renglon.fase }}) del plan
+          <a href="{% url 'clinico:plan_detalle' renglon.plan.pk %}"
+             class="text-decoration-none">{{ renglon.plan.codigo }}</a>.
+          La duración viene de la estimación con que se presupuestó el plan
+          ({{ renglon.duracion_estimada_min }} min, {{ renglon.etiqueta_origen|lower }}).
+        </div>
+        {% endif %}
+
         <form method="post">
           {% csrf_token %}
+          {% if renglon %}<input type="hidden" name="renglon" value="{{ renglon.pk }}">{% endif %}
           <div class="row g-3">
             {% for campo in form %}
               <div class="{% if campo.name == 'observaciones' or campo.name == 'paciente' %}col-12{% else %}col-md-6{% endif %}">

@@ -5,6 +5,8 @@ from datetime import time, timedelta
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS',
+                      'testserver,localhost,127.0.0.1')
 django.setup()
 
 from django.test import Client                                    # noqa: E402
@@ -32,8 +34,11 @@ def probar(t, c, d=''):
 
 
 hoy = timezone.localdate()
+# Se busca un día hábil futuro que el seed no haya ocupado: la prueba llena las
+# dos unidades a propósito, de modo que una cita sembrada a la misma hora
+# falsearía el resultado.
 futuro = hoy + timedelta(days=1)
-while futuro.weekday() > 4:
+while futuro.weekday() > 4 or Cita.objects.filter(fecha=futuro, estado=True).exists():
     futuro += timedelta(days=1)
 
 admin = Usuario.objects.get(email='admin@smileesync.local')

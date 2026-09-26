@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'catalogo',
     'pacientes',
     'agenda',
+    'clinico',
     'inteligencia',
     'reportes',
 ]
@@ -121,6 +122,12 @@ LANGUAGE_CODE = 'es-gt'
 TIME_ZONE = 'America/Guatemala'
 USE_I18N = True
 USE_TZ = True
+
+# Django no trae configuración regional para es-GT y recae en la de España
+# (1.750,00). Guatemala usa punto decimal y coma de millar, así que los
+# separadores numéricos se redefinen en config/formats/es/formats.py.
+FORMAT_MODULE_PATH = ['config.formats']
+USE_THOUSAND_SEPARATOR = True
 
 # --- Archivos estáticos ----------------------------------------------------
 STATIC_URL = 'static/'

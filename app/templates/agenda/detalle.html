@@ -61,6 +61,57 @@
         </table>
       </div>
     </div>
+
+    {% if renglones %}
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-list-check"></i> Plan de tratamiento</h6>
+        {% for r in renglones %}
+        <div class="small">
+          Atiende el renglón <strong>{{ r }}</strong> (fase {{ r.fase }}) del plan
+          <a href="{% url 'clinico:plan_detalle' r.plan.pk %}"
+             class="text-decoration-none">{{ r.plan.codigo }}</a> —
+          {{ r.get_estado_detalle_display|lower }}.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-journal-text"></i> Nota clínica de la visita</h6>
+        {% if nota %}
+          <div class="small mb-1"><strong>{{ nota.motivo }}</strong></div>
+          <div class="small text-secondary">
+            {{ nota.procedimiento_realizado|truncatechars:180 }}
+          </div>
+          <div class="small text-secondary mt-1">
+            {% if nota.piezas_tratadas %}Piezas {{ nota.piezas_tratadas }} · {% endif %}
+            {% if nota.anestesia %}con anestesia · {% endif %}
+            {% if nota.complicacion %}
+              <span class="text-danger">complicación: {{ nota.detalle_complicacion }}</span>
+            {% else %}sin complicaciones{% endif %}
+          </div>
+          <a href="{% url 'clinico:notas' cita.paciente.pk %}"
+             class="small text-decoration-none">Ver la evolución completa</a>
+        {% elif cita.estado_cita == 'ATENDIDA' %}
+          <p class="small text-secondary mb-2">
+            Esta atención todavía no está documentada en el expediente.
+          </p>
+          {% if escritura.clinico %}
+          <a href="{% url 'clinico:nota_nueva' cita.paciente.pk %}?cita={{ cita.pk }}"
+             class="btn btn-sm btn-warning">
+            <i class="bi bi-journal-plus"></i> Escribir la nota
+          </a>
+          {% endif %}
+        {% else %}
+          <p class="small text-secondary mb-0">
+            La nota se redacta al registrar la atención.
+          </p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 
   <div class="col-lg-5">

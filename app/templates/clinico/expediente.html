@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block titulo %}Expediente de {{ paciente.nombres }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ resumen.piezas_registradas }}</div>
+      <div class="etiqueta">Piezas con registro</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor text-danger">{{ resumen.patologicos }}</div>
+      <div class="etiqueta">Hallazgos por atender</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ total_notas }}</div>
+      <div class="etiqueta">Visitas documentadas</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">Q{{ saldo|floatformat:2 }}</div>
+      <div class="etiqueta">Saldo de tratamientos</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-3" id="planes">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0"><i class="bi bi-list-check"></i> Planes de tratamiento</h6>
+          {% if escritura.clinico %}
+          <a href="{% url 'clinico:plan_nuevo' paciente.pk %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo plan
+          </a>
+          {% endif %}
+        </div>
+
+        {% for plan in planes %}
+        <div class="border rounded p-3 mb-2">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <a href="{% url 'clinico:plan_detalle' plan.pk %}"
+                 class="fw-semibold text-decoration-none">{{ plan.codigo }}</a>
+              <div class="small text-secondary">
+                {{ plan.fecha|date:"d/m/Y" }} · {{ plan.odontologo }} ·
+                {{ plan.total_renglones }} renglón{{ plan.total_renglones|pluralize:"es" }}
+              </div>
+            </div>
+            <div class="text-end">
+              {% if plan.estado_plan == 'FINALIZADO' %}<span class="badge bg-success">Finalizado</span>
+              {% elif plan.estado_plan == 'EN_CURSO' %}<span class="badge bg-primary">En curso</span>
+              {% elif plan.estado_plan == 'APROBADO' %}<span class="badge bg-info text-dark">Aprobado</span>
+              {% elif plan.estado_plan == 'RECHAZADO' %}<span class="badge bg-danger">Rechazado</span>
+              {% else %}<span class="badge bg-secondary">Borrador</span>{% endif %}
+              <div class="small text-secondary mt-1">
+                Q{{ plan.total|floatformat:2 }}
+                {% if plan.saldo > 0 %}
+                  · <span class="text-danger">saldo Q{{ plan.saldo|floatformat:2 }}</span>
+                {% else %}
+                  · <span class="text-success">pagado</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="progress barra-avance mt-2">
+            <div class="progress-bar" style="width:{{ plan.avance }}%"></div>
+          </div>
+          <div class="small text-secondary mt-1">
+            {{ plan.avance }}% ejecutado · {{ plan.minutos_pendientes }} min de sillón
+            pendientes
+          </div>
+        </div>
+        {% empty %}
+        <p class="small text-secondary mb-0">
+          Este paciente no tiene planes de tratamiento registrados.
+          {% if escritura.clinico %}Cree uno para presupuestar el trabajo y repartirlo
+          en sesiones.{% endif %}
+        </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0"><i class="bi bi-journal-text"></i> Últimas visitas</h6>
+          <a href="{% url 'clinico:notas' paciente.pk %}"
+             class="small text-decoration-none">Ver evolución completa</a>
+        </div>
+        <ul class="list-unstyled mb-0">
+          {% for n in notas %}
+          <li class="border-start border-3 ps-3 pb-3 mb-0">
+            <div class="small fw-semibold">
+              {{ n.fecha|date:"d/m/Y" }} — {{ n.motivo }}
+              {% if n.complicacion %}
+                <span class="badge bg-warning text-dark">Con complicación</span>
+              {% endif %}
+            </div>
+            <div class="small text-secondary">
+              {{ n.procedimiento_realizado|truncatechars:140 }}
+            </div>
+            <div class="small text-secondary">
+              {{ n.odontologo }}
+              {% if n.piezas_tratadas %}· piezas {{ n.piezas_tratadas }}{% endif %}
+              {% if n.anestesia %}· con anestesia{% endif %}
+            </div>
+          </li>
+          {% empty %}
+          <li class="small text-secondary">Sin visitas documentadas todavía.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0"><i class="bi bi-grid-3x3"></i> Odontograma</h6>
+          <a href="{% url 'clinico:odontograma' paciente.pk %}"
+             class="small text-decoration-none">Abrir</a>
+        </div>
+        <table class="table table-sm mb-0">
+          <tr><th class="small fw-semibold">Piezas con registro</th>
+              <td class="small text-end">{{ resumen.piezas_registradas }} de 32</td></tr>
+          <tr><th class="small fw-semibold">Hallazgos por atender</th>
+              <td class="small text-end text-danger">{{ resumen.patologicos }}</td></tr>
+          <tr><th class="small fw-semibold">Piezas tratadas</th>
+              <td class="small text-end">{{ resumen.tratadas }}</td></tr>
+          <tr><th class="small fw-semibold">Piezas ausentes</th>
+              <td class="small text-end">{{ resumen.ausentes }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-exclamation-triangle"></i> Antecedentes médicos</h6>
+        {% for a in antecedentes %}
+          <div class="small mb-1">
+            <span class="badge bg-warning text-dark">{{ a.tipo }}</span>
+            {{ a.descripcion }}
+          </div>
+        {% empty %}
+          <p class="small text-secondary mb-0">Sin antecedentes registrados.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-calendar-check"></i> Citas recientes</h6>
+        <table class="table table-sm mb-0">
+          {% for c in citas %}
+          <tr>
+            <td class="small">
+              <a href="{% url 'agenda:detalle' c.pk %}" class="text-decoration-none">
+                {{ c.fecha|date:"d/m/Y" }}
+              </a>
+            </td>
+            <td class="small">{{ c.procedimiento.nombre|truncatechars:26 }}</td>
+            <td class="small text-end">
+              {% if c.estado_cita == 'ATENDIDA' %}
+                {% if c.nota %}
+                  <span class="badge bg-success">Documentada</span>
+                {% elif escritura.clinico %}
+                  <a href="{% url 'clinico:nota_nueva' paciente.pk %}?cita={{ c.pk }}"
+                     class="badge bg-warning text-dark text-decoration-none">
+                    Falta la nota
+                  </a>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Falta la nota</span>
+                {% endif %}
+              {% else %}
+                <span class="text-secondary">{{ c.get_estado_cita_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td class="small text-secondary">Sin citas registradas.</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

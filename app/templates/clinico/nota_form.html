@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block titulo %}Nueva nota clínica — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-journal-plus"></i> Nota de evolución</h6>
+
+        {% if cita %}
+        <div class="alert alert-light border small">
+          <i class="bi bi-calendar-check"></i> Ligada a la cita del
+          <strong>{{ cita.fecha|date:"d/m/Y" }}</strong> a las
+          {{ cita.hora_inicio_programada|time:"H:i" }}
+          ({{ cita.procedimiento.nombre }}{% if cita.duracion_real_min %},
+          {{ cita.duracion_real_min }} min reales{% endif %}).
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 small">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for campo in form %}
+            <div class="{% if campo.name in 'hallazgos_clinicos,procedimiento_realizado,indicaciones' %}col-12{% else %}col-md-6{% endif %}">
+              {% if campo.field.widget.input_type == 'checkbox' %}
+                <div class="form-check mt-4">
+                  {{ campo }}
+                  <label class="form-check-label small fw-semibold"
+                         for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                </div>
+              {% else %}
+                <label class="form-label small fw-semibold">{{ campo.label }}</label>
+                {{ campo }}
+              {% endif %}
+              {% if campo.help_text %}
+                <div class="form-text small">{{ campo.help_text }}</div>
+              {% endif %}
+              {% if campo.errors %}
+                <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary"><i class="bi bi-save"></i> Guardar nota</button>
+            <a href="{% url 'clinico:notas' paciente.pk %}"
+               class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm" style="border-top:4px solid var(--smilee2) !important;">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-cpu text-primary"></i> Por qué se piden estos datos</h6>
+        <p class="small text-secondary mb-2">
+          El registro de tiempos dice cuánto duró la atención, pero no por qué. Tres
+          campos de esta nota son las variables que lo explican y que el modelo usa
+          para estimar mejor la próxima vez:
+        </p>
+        <ul class="small text-secondary mb-0 ps-3">
+          <li><strong>Piezas tratadas</strong>: una resina en dos piezas no dura lo
+              mismo que en una.</li>
+          <li><strong>Anestesia</strong>: agrega tiempo de espera antes de trabajar.</li>
+          <li><strong>Complicación</strong>: es lo que separa una atención larga de
+              un error de estimación.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

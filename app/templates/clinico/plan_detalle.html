@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ plan.codigo }} — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Expediente Clínico{% endblock %}
+{% block contenido %}
+
+{% include 'clinico/_pestanas.html' %}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h6 class="mb-1">
+      <i class="bi bi-clipboard2-pulse"></i> {{ plan.codigo }}
+      {% if plan.estado_plan == 'FINALIZADO' %}<span class="badge bg-success">Finalizado</span>
+      {% elif plan.estado_plan == 'EN_CURSO' %}<span class="badge bg-primary">En curso</span>
+      {% elif plan.estado_plan == 'APROBADO' %}<span class="badge bg-info text-dark">Aprobado</span>
+      {% elif plan.estado_plan == 'RECHAZADO' %}<span class="badge bg-danger">Rechazado</span>
+      {% else %}<span class="badge bg-secondary">Borrador</span>{% endif %}
+    </h6>
+    <span class="small text-secondary">
+      {{ plan.fecha|date:"d/m/Y" }} · {{ plan.odontologo }}
+      {% if plan.fecha_aprobacion %}· aprobado el {{ plan.fecha_aprobacion|date:"d/m/Y" }}{% endif %}
+    </span>
+  </div>
+  {% if escritura.clinico %}
+  <div class="d-flex gap-2">
+    {% if plan.estado_plan == 'BORRADOR' %}
+      <form method="post" action="{% url 'clinico:plan_estado' plan.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="estado_plan" value="APROBADO">
+        <button class="btn btn-sm btn-success">
+          <i class="bi bi-check2-circle"></i> Marcar como aprobado
+        </button>
+      </form>
+      <form method="post" action="{% url 'clinico:plan_estado' plan.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="estado_plan" value="RECHAZADO">
+        <button class="btn btn-sm btn-outline-danger">El paciente no lo aceptó</button>
+      </form>
+    {% elif plan.estado_plan == 'EN_CURSO' or plan.estado_plan == 'APROBADO' %}
+      <form method="post" action="{% url 'clinico:plan_estado' plan.pk %}"
+            onsubmit="return confirm('¿Cerrar el plan? Los renglones pendientes quedarán sin atender.');">
+        {% csrf_token %}
+        <input type="hidden" name="estado_plan" value="FINALIZADO">
+        <button class="btn btn-sm btn-outline-success">
+          <i class="bi bi-flag"></i> Cerrar el plan
+        </button>
+      </form>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">Q{{ plan.total|floatformat:2 }}</div>
+      <div class="etiqueta">Total presupuestado</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor {% if plan.saldo > 0 %}text-danger{% else %}text-success{% endif %}">Q{{ plan.saldo|floatformat:2 }}</div>
+      <div class="etiqueta">Saldo pendiente</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ plan.minutos_pendientes }}</div>
+      <div class="etiqueta">Min de sillón pendientes</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ sesiones|length }}</div>
+      <div class="etiqueta">Sesiones estimadas</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-1"><i class="bi bi-list-ol"></i> Renglones del tratamiento</h6>
+        <p class="small text-secondary">
+          {{ plan.renglones_completados }} de {{ plan.total_renglones }} ejecutados
+          ({{ plan.avance }}%) · {{ plan.minutos_estimados }} min de sillón en total
+        </p>
+        <div class="progress barra-avance mb-3">
+          <div class="progress-bar" style="width:{{ plan.avance }}%"></div>
+        </div>
+
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width:48px;">Fase</th><th>Procedimiento</th>
+              <th class="text-center">Pieza</th>
+              <th class="text-center">Estimado</th>
+              <th class="text-end">Importe</th>
+              <th>Estado</th><th class="text-end"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in detalles %}
+            <tr {% if d.estado_detalle == 'ANULADO' %}class="text-secondary"{% endif %}>
+              <td class="small text-center">{{ d.fase }}</td>
+              <td class="small">
+                {{ d.procedimiento.nombre }}
+                {% if d.num_piezas > 1 %}
+                  <span class="text-secondary">× {{ d.num_piezas }}</span>
+                {% endif %}
+              </td>
+              <td class="small text-center">{{ d.pieza|default:"—" }}</td>
+              <td class="small text-center">
+                {{ d.duracion_estimada_min }} min
+                <div class="text-secondary" style="font-size:.68rem;">{{ d.etiqueta_origen }}</div>
+              </td>
+              <td class="small text-end">Q{{ d.importe|floatformat:2 }}</td>
+              <td>
+                {% if d.estado_detalle == 'COMPLETADO' %}
+                  <span class="badge bg-success">Completado</span>
+                {% elif d.estado_detalle == 'AGENDADO' %}
+                  {% if d.cita %}
+                    <a href="{% url 'agenda:detalle' d.cita.pk %}"
+                       class="badge bg-primary text-decoration-none">
+                      Agendado {{ d.cita.fecha|date:"d/m" }}
+                    </a>
+                  {% else %}<span class="badge bg-primary">Agendado</span>{% endif %}
+                {% elif d.estado_detalle == 'ANULADO' %}
+                  <span class="badge bg-light text-dark border">Anulado</span>
+                {% else %}
+                  <span class="badge bg-secondary">Pendiente</span>
+                {% endif %}
+              </td>
+              <td class="text-end text-nowrap">
+                {% if d.estado_detalle == 'PENDIENTE' %}
+                  {% if escritura.agenda %}
+                  <a href="{% url 'clinico:agendar_renglon' d.pk %}"
+                     class="btn btn-sm btn-outline-primary" title="Agendar">
+                    <i class="bi bi-calendar-plus"></i>
+                  </a>
+                  {% endif %}
+                  {% if escritura.clinico %}
+                  <form method="post" action="{% url 'clinico:quitar_renglon' d.pk %}"
+                        class="d-inline"
+                        onsubmit="return confirm('¿Anular este renglón del plan?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger" title="Anular">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-secondary small py-3">
+              El plan todavía no tiene renglones.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+          {% if plan.total_renglones %}
+          <tfoot>
+            <tr>
+              <th colspan="4" class="text-end small">Subtotal</th>
+              <th class="text-end small">Q{{ plan.subtotal|floatformat:2 }}</th>
+              <th colspan="2"></th>
+            </tr>
+            {% if plan.descuento %}
+            <tr>
+              <th colspan="4" class="text-end small">Descuento</th>
+              <th class="text-end small text-danger">− Q{{ plan.descuento|floatformat:2 }}</th>
+              <th colspan="2"></th>
+            </tr>
+            {% endif %}
+            <tr>
+              <th colspan="4" class="text-end">Total</th>
+              <th class="text-end">Q{{ plan.total|floatformat:2 }}</th>
+              <th colspan="2"></th>
+            </tr>
+          </tfoot>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-1"><i class="bi bi-calendar3-range"></i> Sesiones que hará falta reservar</h6>
+        <p class="small text-secondary">
+          El sistema reparte los renglones pendientes respetando el orden de las
+          fases y sin pasar de dos horas de sillón por sesión. Es una estimación
+          de planificación: agendar cada sesión sigue siendo decisión de la
+          recepción.
+        </p>
+        {% for s in sesiones %}
+        <div class="fase-sesion p-2 ps-3 mb-2">
+          <div class="d-flex justify-content-between">
+            <span class="small fw-semibold">
+              Sesión {{ forloop.counter }} <span class="text-secondary">· fase {{ s.fase }}</span>
+            </span>
+            <span class="small text-secondary">{{ s.minutos }} min</span>
+          </div>
+          <div class="small text-secondary">
+            {% for d in s.renglones %}
+              {{ d.procedimiento.nombre }}{% if d.pieza %} ({{ d.pieza }}){% endif %}{% if not forloop.last %} · {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="small text-secondary mb-0">
+          No hay renglones pendientes por agrupar.
+        </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-file-earmark-text"></i> Diagnóstico</h6>
+        <p class="small mb-2">{{ plan.diagnostico|linebreaksbr }}</p>
+        {% if plan.observaciones %}
+          <p class="small text-secondary mb-0">{{ plan.observaciones|linebreaksbr }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    {% if escritura.clinico and plan.estado_plan != 'FINALIZADO' and plan.estado_plan != 'RECHAZADO' %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-plus-circle"></i> Agregar un renglón</h6>
+        {% if form_detalle.non_field_errors %}
+          <div class="alert alert-danger py-2 small">{{ form_detalle.non_field_errors|striptags }}</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="accion" value="renglon">
+          {% for campo in form_detalle %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">{{ campo.label }}</label>
+            {{ campo }}
+            {% if campo.help_text %}<div class="form-text small">{{ campo.help_text }}</div>{% endif %}
+            {% if campo.errors %}
+              <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <div class="form-text small mb-2">
+            Al elegir el procedimiento se propone su tarifa de lista; puede cambiarla
+            o dejarla vacía para usar la del catálogo. La duración la estima el modelo
+            predictivo al guardar.
+          </div>
+          <button class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Agregar</button>
+        </form>
+      </div>
+    </div>
+
+    {{ precios|json_script:"tarifas" }}
+    <script>
+    // Propone la tarifa del catálogo al elegir el procedimiento. Solo la
+    // escribe mientras el usuario no haya puesto un precio propio: el
+    // presupuesto es un acuerdo con el paciente, no una cifra impuesta.
+    (function () {
+      const tarifas = JSON.parse(document.getElementById('tarifas').textContent);
+      const proc = document.querySelector('[name="procedimiento"]');
+      const precio = document.querySelector('[name="precio_unitario"]');
+      if (!proc || !precio) return;
+      let tocado = false;
+      precio.addEventListener('input', () => { tocado = precio.value !== ''; });
+      proc.addEventListener('change', () => {
+        if (!tocado && tarifas[proc.value] !== undefined) precio.value = tarifas[proc.value];
+      });
+    })();
+    </script>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3"><i class="bi bi-cash-coin"></i> Abonos</h6>
+        <table class="table table-sm mb-2">
+          <tbody>
+            {% for p in pagos %}
+            <tr>
+              <td class="small text-secondary">{{ p.fecha|date:"d/m/Y" }}</td>
+              <td class="small">{{ p.get_metodo_display }}
+                {% if p.referencia %}
+                  <span class="text-secondary" style="font-size:.7rem;">{{ p.referencia }}</span>
+                {% endif %}
+              </td>
+              <td class="small text-end fw-semibold">Q{{ p.monto|floatformat:2 }}</td>
+              <td class="text-end">
+                {% if escritura.finanzas %}
+                <form method="post" action="{% url 'clinico:anular_pago' p.pk %}"
+                      onsubmit="return confirm('¿Anular este abono?');">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Anular">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="small text-secondary">Sin abonos registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr><th colspan="2" class="small text-end">Pagado</th>
+                <th class="small text-end">Q{{ plan.pagado|floatformat:2 }}</th><th></th></tr>
+            <tr><th colspan="2" class="small text-end">Saldo</th>
+                <th class="small text-end {% if plan.saldo > 0 %}text-danger{% else %}text-success{% endif %}">Q{{ plan.saldo|floatformat:2 }}</th><th></th></tr>
+          </tfoot>
+        </table>
+
+        {% if pagos_anulados %}
+        <div class="small text-secondary mb-2">
+          Anulados:
+          {% for p in pagos_anulados %}
+            Q{{ p.monto|floatformat:2 }} ({{ p.fecha|date:"d/m/Y" }}){% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if escritura.finanzas %}
+          {% if plan.saldo > 0 %}
+          <form method="post" class="border-top pt-3">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="pago">
+            {% for campo in form_pago %}
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">{{ campo.label }}</label>
+              {{ campo }}
+              {% if campo.errors %}
+                <div class="text-danger small mt-1">{{ campo.errors|striptags }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+            <button class="btn btn-success w-100 btn-sm">
+              <i class="bi bi-cash"></i> Registrar abono
+            </button>
+          </form>
+          {% else %}
+          <p class="small text-success mb-0 border-top pt-3">
+            <i class="bi bi-check2-circle"></i> El plan está liquidado.
+          </p>
+          {% endif %}
+        {% elif plan.saldo > 0 %}
+          <p class="small text-secondary mb-0 border-top pt-3">
+            Los abonos los registra la recepción.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if historial %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-clock-history"></i> Auditoría</h6>
+        <ul class="list-unstyled small text-secondary mb-0">
+          {% for h in historial %}
+          <li class="mb-1">
+            {{ h.fecha|date:"d/m/Y H:i" }} — {{ h.get_accion_display }}
+            {% if h.detalle %}<br><span style="font-size:.72rem;">{{ h.detalle }}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

@@ -5,6 +5,8 @@ from datetime import timedelta
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS',
+                      'testserver,localhost,127.0.0.1')
 django.setup()
 
 from django.test import Client                                    # noqa: E402
@@ -70,14 +72,18 @@ c.force_login(admin)
 odo = Odontologo.objects.filter(estado=True, horarios__estado=True).distinct().first()
 proc = Procedimiento.objects.filter(estado=True).order_by('duracion_promedio_min').first()
 pac = Paciente.objects.filter(estado=True).first()
-r = c.get(reverse('agenda:principal'), {'odontologo': odo.pk, 'procedimiento': proc.pk})
+siguiente = hoy + timedelta(days=1)
+while siguiente.weekday() > 4:
+    siguiente += timedelta(days=1)
+# Se pide la semana del próximo día hábil: la semana en curso puede no tener
+# ninguno (un sábado) y entonces no hay espacios libres que proponer.
+semana = siguiente - timedelta(days=siguiente.weekday())
+r = c.get(reverse('agenda:principal'), {'odontologo': odo.pk, 'procedimiento': proc.pk,
+                                        'semana': semana.isoformat()})
 cuerpo = r.content.decode()
 probar('el calendario marca espacios disponibles', 'class="hueco-sugerido' in cuerpo)
 probar('muestra la duración estimada', 'min estimados' in cuerpo)
 
-siguiente = hoy + timedelta(days=1)
-while siguiente.weekday() > 4:
-    siguiente += timedelta(days=1)
 r = c.get(reverse('agenda:crear'), {'fecha': siguiente.isoformat(), 'hora': '10:00',
                                     'odontologo': odo.pk, 'procedimiento': proc.pk})
 probar('el formulario abre precargado', r.status_code == 200 and

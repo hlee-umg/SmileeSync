@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_ALLOWED_HOSTS',
+                      'testserver,localhost,127.0.0.1')
 django.setup()
 
 from django.test import Client                                    # noqa: E402
@@ -33,7 +35,13 @@ c = Client()
 c.force_login(Usuario.objects.get(email='admin@smileesync.local'))
 url = reverse('agenda:principal')
 hoy = timezone.localdate()
-lunes = hoy - timedelta(days=hoy.weekday())
+# La semana que se examina es la que contiene el próximo día hábil completo: la
+# semana en curso puede no tener ninguno (un sábado, por ejemplo), y sin días
+# futuros no hay espacios que sugerir.
+_habil = hoy + timedelta(days=1)
+while _habil.weekday() > 4:
+    _habil += timedelta(days=1)
+lunes = _habil - timedelta(days=_habil.weekday())
 
 odo = Odontologo.objects.filter(estado=True, horarios__estado=True).distinct().first()
 largo = Procedimiento.objects.filter(estado=True).order_by('-duracion_promedio_min').first()

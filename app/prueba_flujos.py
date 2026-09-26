@@ -1,5 +1,6 @@
 """Recorre de punta a punta los flujos candidatos para la presentación."""
 import os
+import re
 from datetime import timedelta
 
 import django
@@ -194,5 +195,54 @@ if creado:
            HistorialUsuario.objects.filter(usuario_ref=creado.pk).exists())
     cuerpo = c.get(reverse('usuarios:historial')).content.decode()
     probar('el historial es consultable en pantalla', 'demo@correo.com' in cuerpo)
+
+print('\nFLUJO 7 — Ninguna pantalla filtra sintaxis de plantilla')
+# Un comentario {# #} de varias líneas no es un comentario para Django: se
+# imprime tal cual en la página. Igual ocurre con una etiqueta mal cerrada. Se
+# recorren las pantallas principales para que eso no llegue a una demostración.
+from clinico.models import PlanTratamiento                          # noqa: E402
+
+plan = PlanTratamiento.objects.filter(estado=True).first()
+pac = Paciente.objects.filter(estado=True).first()
+cita_v = Cita.objects.filter(estado=True).first()
+odo_v = Odontologo.objects.filter(estado=True).first()
+
+pantallas = [
+    ('inicio', reverse('agenda:principal'), {}),
+    ('inicio con recomendación', reverse('agenda:principal'),
+     {'odontologo': odo_v.pk, 'procedimiento': proc.pk}),
+    ('inicio vista diaria', reverse('agenda:principal'), {'vista': 'dia'}),
+    ('listado de citas', reverse('agenda:lista'), {}),
+    ('detalle de cita', reverse('agenda:detalle', args=[cita_v.pk]), {}),
+    ('nueva cita', reverse('agenda:crear'), {}),
+    ('horarios', reverse('agenda:horarios', args=[odo_v.pk]), {}),
+    ('ausencias', reverse('agenda:ausencias', args=[odo_v.pk]), {}),
+    ('pacientes', reverse('pacientes:lista'), {}),
+    ('ficha de paciente', reverse('pacientes:ficha', args=[pac.pk]), {}),
+    ('catálogo', reverse('catalogo:lista', args=['procedimientos']), {}),
+    ('unidades dentales', reverse('catalogo:lista', args=['unidades']), {}),
+    ('usuarios', reverse('usuarios:lista'), {}),
+    ('expedientes', reverse('clinico:lista'), {}),
+    ('expediente', reverse('clinico:expediente', args=[pac.pk]), {}),
+    ('odontograma', reverse('clinico:odontograma', args=[pac.pk]), {'pieza': 16}),
+    ('evolución', reverse('clinico:notas', args=[pac.pk]), {}),
+    ('nueva nota', reverse('clinico:nota_nueva', args=[pac.pk]), {}),
+    ('tratamientos', reverse('clinico:planes'), {}),
+    ('plan de tratamiento', reverse('clinico:plan_detalle', args=[plan.pk]), {}),
+    ('nuevo plan', reverse('clinico:plan_nuevo', args=[pac.pk]), {}),
+    ('cobros', reverse('clinico:cobros'), {}),
+]
+
+sucias = []
+for nombre, ruta, parametros in pantallas:
+    texto = c.get(ruta, parametros).content.decode()
+    # Se ignora el bloque <script>, donde `${...}` y las llaves de JavaScript
+    # son legítimas.
+    sin_script = re.sub(r'<script.*?</script>', '', texto, flags=re.S)
+    if '{#' in sin_script or '{%' in sin_script or '{{' in sin_script:
+        sucias.append(nombre)
+
+probar('ninguna de las 22 pantallas imprime sintaxis de plantilla',
+       not sucias, sucias)
 
 print(f'\n=== {ok} correctas, {fallo} fallidas ===')

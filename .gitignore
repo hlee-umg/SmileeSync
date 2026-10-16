@@ -34,3 +34,7 @@ infra/.venv/
 
 # Modelos entrenados por "manage.py entrenar": se regeneran y pesan varios MB.
 app/modelos/
+
+# PDF de las entregas: se regeneran desde el .docx con LibreOffice y pesan
+# varios MB cada uno. El .docx es el entregable; el PDF solo sirve para revisar.
+docs/*.pdf

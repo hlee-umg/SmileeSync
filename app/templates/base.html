@@ -10,7 +10,14 @@
   <style>
     :root { --smilee: #1f3a5f; --smilee2: #2e6cb5; }
     body { background:#f4f6fa; }
-    .sidebar { min-height:100vh; background:var(--smilee); }
+    /* En escritorio el menú ocupa toda la altura de la ventana; en teléfono es
+       un panel deslizante y su alto lo decide el contenido. */
+    .sidebar { background:var(--smilee); --bs-offcanvas-width:16rem; }
+    /* Desde 768 px Bootstrap desactiva el panel deslizante y le impone fondo
+       transparente, así que el color y la altura los pone la columna. */
+    @media (min-width: 768px) {
+      .columna-menu { background:var(--smilee); min-height:100vh; }
+    }
     .sidebar .nav-link { color:#cdd8e8; border-radius:.4rem; margin:2px 8px; }
     .sidebar .nav-link:hover { background:rgba(255,255,255,.08); color:#fff; }
     .sidebar .nav-link.active { background:var(--smilee2); color:#fff; }
@@ -105,9 +112,26 @@
 {% if user.is_authenticated %}
 <div class="container-fluid">
   <div class="row">
-    <!-- Menú lateral: se adapta al rol del usuario -->
-    <nav class="col-md-3 col-lg-2 d-md-block sidebar p-0">
-      <div class="p-3 brand fs-5"><i class="bi bi-heart-pulse"></i> SmileeSync</div>
+    {% comment %}
+    Menú lateral: se adapta al rol del usuario y, en pantallas menores a 768 px,
+    se repliega en un panel deslizante que se abre con el botón de la barra
+    superior. Sin eso, en un teléfono el menú ocupa la primera pantalla completa
+    y obliga a desplazarse hasta el final para llegar al contenido.
+    {% endcomment %}
+    <nav class="col-md-3 col-lg-2 p-0 columna-menu">
+      <div class="offcanvas-md offcanvas-start sidebar" tabindex="-1"
+           id="menuLateral" aria-labelledby="menuLateralTitulo">
+        <div class="offcanvas-header d-md-none pb-0">
+          <span class="brand fs-5" id="menuLateralTitulo">
+            <i class="bi bi-heart-pulse"></i> SmileeSync
+          </span>
+          <button type="button" class="btn-close btn-close-white"
+                  data-bs-dismiss="offcanvas" data-bs-target="#menuLateral"
+                  aria-label="Cerrar el menú"></button>
+        </div>
+        <div class="p-3 brand fs-5 d-none d-md-block">
+          <i class="bi bi-heart-pulse"></i> SmileeSync
+        </div>
       <ul class="nav flex-column py-2">
         <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'principal' %}active{% endif %}" href="{% url 'agenda:principal' %}"><i class="bi bi-speedometer2"></i> Inicio</a></li>
 
@@ -144,12 +168,20 @@
         <li class="nav-item"><a class="nav-link {% if '/reportes' in request.path %}active{% endif %}" href="{% url 'reportes:panel' %}"><i class="bi bi-bar-chart"></i> Reportes</a></li>
         {% endif %}
       </ul>
+      </div>
     </nav>
 
     <!-- Contenido -->
     <div class="col-md-9 col-lg-10 px-0">
-      <nav class="navbar navbar-top px-4 py-2 d-flex justify-content-between">
-        <span class="fw-semibold text-secondary">{% block encabezado %}{% endblock %}</span>
+      <nav class="navbar navbar-top px-3 px-md-4 py-2 d-flex justify-content-between">
+        <span class="fw-semibold text-secondary d-flex align-items-center gap-2">
+          <button class="btn btn-sm btn-light d-md-none" type="button"
+                  data-bs-toggle="offcanvas" data-bs-target="#menuLateral"
+                  aria-controls="menuLateral" aria-label="Abrir el menú">
+            <i class="bi bi-list"></i>
+          </button>
+          {% block encabezado %}{% endblock %}
+        </span>
         <div class="dropdown">
           <a class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" href="#">
             <i class="bi bi-person-circle"></i> {{ user.get_full_name|default:user.username }}
@@ -168,7 +200,7 @@
           </ul>
         </div>
       </nav>
-      <main class="p-4">
+      <main class="p-3 p-md-4">
         {% if messages %}{% for m in messages %}
           <div class="alert alert-{{ m.tags|default:'info' }} alert-dismissible fade show" role="alert">
             {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>

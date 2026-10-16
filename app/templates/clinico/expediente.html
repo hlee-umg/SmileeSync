@@ -131,6 +131,7 @@
           <a href="{% url 'clinico:odontograma' paciente.pk %}"
              class="small text-decoration-none">Abrir</a>
         </div>
+        <div class="table-responsive">
         <table class="table table-sm mb-0">
           <tr><th class="small fw-semibold">Piezas con registro</th>
               <td class="small text-end">{{ resumen.piezas_registradas }} de 32</td></tr>
@@ -141,6 +142,7 @@
           <tr><th class="small fw-semibold">Piezas ausentes</th>
               <td class="small text-end">{{ resumen.ausentes }}</td></tr>
         </table>
+        </div>
       </div>
     </div>
 
@@ -161,6 +163,7 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body">
         <h6 class="mb-2"><i class="bi bi-calendar-check"></i> Citas recientes</h6>
+        <div class="table-responsive">
         <table class="table table-sm mb-0">
           {% for c in citas %}
           <tr>
@@ -191,6 +194,7 @@
           <tr><td class="small text-secondary">Sin citas registradas.</td></tr>
           {% endfor %}
         </table>
+        </div>
       </div>
     </div>
   </div>

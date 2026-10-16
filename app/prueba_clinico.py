@@ -36,12 +36,14 @@ def probar(titulo, condicion, detalle=''):
 
 
 hoy = timezone.localdate()
+# Se busca un día hábil que la agenda sembrada no haya ocupado: dos meses
+# de citas de demostración dejan sin espacio las fechas cercanas.
 futuro = hoy + timedelta(days=1)
-while futuro.weekday() > 4:
+while futuro.weekday() > 4 or Cita.objects.filter(fecha=futuro).exists():
     futuro += timedelta(days=1)
 
 admin = Usuario.objects.get(email='admin@smileesync.local')
-odo_usuario = Usuario.objects.get(email='cgiron@smileesync.local')
+odo_usuario = Usuario.objects.get(email='hjlee@smileesync.local')
 recep = Usuario.objects.get(email='recepcion@smileesync.local')
 
 c_admin, c_odo, c_recep = Client(), Client(), Client()
@@ -50,7 +52,7 @@ c_odo.force_login(odo_usuario)
 c_recep.force_login(recep)
 
 paciente = Paciente.objects.get(codigo='PAC-0001')
-giron = Odontologo.objects.get(colegiado='CD-10245')
+giron = Odontologo.objects.get(colegiado='CD-20451')
 
 print('1. Quién escribe el expediente y quién cobra')
 probar('el administrador escribe el expediente', admin.puede_escribir('clinico'))

@@ -30,7 +30,7 @@ def probar(titulo, condicion, detalle=''):
 
 
 admin = Usuario.objects.get(email='admin@smileesync.local')
-odontologo_usuario = Usuario.objects.get(email='cgiron@smileesync.local')
+odontologo_usuario = Usuario.objects.get(email='hjlee@smileesync.local')
 c = Client()
 c.force_login(admin)
 hoy = timezone.localdate()

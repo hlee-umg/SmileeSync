@@ -1,0 +1,62 @@
+@startuml
+title Proceso de mantenimiento de usuarios
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Administrador|
+start
+:Abrir el módulo de usuarios;
+:Seleccionar la opción
+de nuevo usuario;
+:Capturar nombres, apellidos,
+correo, teléfono y rol;
+:Definir la pregunta secreta
+y su respuesta;
+|Sistema|
+:Validar el formato
+de los datos capturados;
+if (¿El correo ya está registrado?) then (sí)
+  |Administrador|
+  :Corregir el correo electrónico;
+  detach
+else (no)
+endif
+|Sistema|
+if (¿La contraseña cumple
+las reglas de seguridad?) then (no)
+  |Administrador|
+  :Corregir la contraseña;
+  detach
+else (sí)
+endif
+|Sistema|
+:Cifrar la contraseña
+y la respuesta secreta;
+:Guardar el usuario
+con estado activo;
+:Registrar la creación
+en el historial de auditoría;
+|Administrador|
+:Visualizar la confirmación
+del registro;
+stop
+@enduml

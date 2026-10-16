@@ -145,7 +145,12 @@ from datetime import timedelta                                   # noqa: E402
 from django.utils import timezone as tz                          # noqa: E402
 pac = Paciente.objects.filter(estado=True).first()
 proc = Procedimiento.objects.filter(estado=True).first()
+# Se elige un lunes que la agenda sembrada no haya ocupado: con dos meses de
+# citas de demostración las dos unidades dentales quedan tomadas en las fechas
+# cercanas, y el rechazo sería por falta de sillón y no por el horario.
 prox_lunes = tz.localdate() + timedelta(days=(7 - tz.localdate().weekday()) % 7 or 7)
+while Cita.objects.filter(fecha=prox_lunes).exists():
+    prox_lunes += timedelta(days=7)
 r = c.post(reverse('agenda:crear'), {
     'paciente': pac.pk, 'odontologo': nuevo.pk, 'procedimiento': proc.pk,
     'fecha': prox_lunes.isoformat(), 'hora_inicio_programada': '15:00',

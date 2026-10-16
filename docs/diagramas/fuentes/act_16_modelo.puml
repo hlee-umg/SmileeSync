@@ -1,0 +1,76 @@
+@startuml
+title Proceso de entrenamiento y versionado del modelo predictivo
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Administrador|
+start
+:Solicitar el entrenamiento
+de una versión nueva;
+|Sistema|
+:Reunir el conjunto de
+entrenamiento acumulado;
+if (¿Hay registros suficientes
+para entrenar?) then (no)
+  |Administrador|
+  :Visualizar que se requieren
+  más atenciones registradas;
+  stop
+else (sí)
+endif
+|Sistema|
+:Depurar los registros
+atípicos e incompletos;
+:Dividir los datos en
+entrenamiento y prueba;
+|Componente predictivo|
+:Entrenar el algoritmo
+de regresión;
+:Calcular el error absoluto medio,
+la raíz del error cuadrático medio
+y el coeficiente de determinación;
+|Sistema|
+:Registrar la versión del modelo
+con su algoritmo, su fecha
+y sus métricas;
+|Administrador|
+:Comparar las métricas con las
+de la versión en producción;
+if (¿La versión nueva reduce
+el error de forma apreciable?) then (sí)
+  :Activar la versión nueva;
+  |Sistema|
+  :Desactivar la versión anterior
+  conservando su registro;
+  :Dirigir las estimaciones
+  siguientes al modelo nuevo;
+else (no)
+  |Sistema|
+  :Conservar la versión nueva
+  como histórico sin activarla;
+endif
+|Administrador|
+|Administrador|
+:Visualizar el comparativo
+de versiones del modelo;
+stop
+@enduml

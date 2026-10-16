@@ -1,0 +1,68 @@
+@startuml
+title Proceso de registro de paciente y antecedentes médicos
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el módulo de pacientes;
+:Buscar al paciente
+por código o nombre;
+if (¿El paciente ya existe?) then (sí)
+  :Abrir la ficha clínica
+  existente;
+  detach
+else (no)
+endif
+:Capturar código, nombres,
+apellidos, fecha de nacimiento,
+sexo, teléfono y dirección;
+|Sistema|
+:Validar el formato
+de los datos capturados;
+if (¿El código ya está asignado?) then (sí)
+  |Recepcionista|
+  :Corregir el código
+  del paciente;
+  detach
+else (no)
+endif
+|Sistema|
+:Guardar al paciente
+con estado activo;
+:Registrar la creación
+en el historial de auditoría;
+|Recepcionista|
+:Abrir la ficha clínica
+del paciente;
+while (¿Registrar un antecedente médico?) is (sí)
+  :Capturar el tipo
+  y la descripción;
+  |Sistema|
+  :Asociar el antecedente
+  a la ficha del paciente;
+  |Recepcionista|
+endwhile (no)
+:Visualizar la ficha
+clínica completa;
+stop
+@enduml

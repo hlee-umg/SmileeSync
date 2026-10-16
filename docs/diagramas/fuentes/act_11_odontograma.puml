@@ -1,0 +1,87 @@
+@startuml
+title Proceso de registro del odontograma
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Odontólogo|
+start
+:Abrir el expediente
+clínico del paciente;
+:Seleccionar la pestaña
+del odontograma;
+|Sistema|
+:Recuperar el hallazgo vigente
+de cada pieza y cara;
+:Dibujar la arcada completa
+con la nomenclatura FDI;
+|Odontólogo|
+:Seleccionar la pieza
+a registrar;
+|Sistema|
+:Mostrar el estado vigente
+y el historial de la pieza;
+|Odontólogo|
+:Seleccionar la cara,
+el tipo de hallazgo,
+la fecha y la observación;
+|Sistema|
+if (¿La pieza pertenece a la
+nomenclatura FDI permanente?) then (no)
+  |Odontólogo|
+  :Corregir la pieza;
+  detach
+else (sí)
+endif
+|Sistema|
+if (¿La fecha es posterior
+a hoy?) then (sí)
+  |Odontólogo|
+  :Corregir la fecha;
+  detach
+else (no)
+endif
+|Sistema|
+if (¿El hallazgo describe la
+pieza completa registrado
+sobre una cara?) then (sí)
+  |Odontólogo|
+  :Corregir la cara
+  a toda la pieza;
+  detach
+else (no)
+endif
+|Sistema|
+:Agregar el hallazgo
+sin modificar los anteriores;
+note right
+  La tabla es de solo agregado:
+  la pieza conserva su historia
+  y el odontograma muestra
+  el registro más reciente.
+end note
+:Recalcular el hallazgo vigente
+de esa pieza y cara;
+|Odontólogo|
+:Visualizar la arcada
+con el estado actualizado;
+stop
+@enduml

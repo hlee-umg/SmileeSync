@@ -1,0 +1,90 @@
+@startuml
+title Casos de uso — agenda, expediente clínico, cobros e inteligencia
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam backgroundColor white
+skinparam actorStyle awesome
+skinparam dpi 150
+skinparam usecase {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+  ArrowColor #334155
+}
+skinparam package {
+  BackgroundColor #FAFAF9
+  BorderColor #94A3B8
+}
+
+actor "Recepcionista" as RECEP
+actor "Odontólogo" as ODONT
+actor "Asistente" as ASIST
+actor "Administrador" as ADMIN
+actor "Motor predictivo" as ML
+
+rectangle "Sistema SmileeSync" {
+  package "Agenda y Citas" {
+    usecase "Consultar calendario" as UC13
+    usecase "Programar cita" as UC12
+    usecase "Reprogramar o\ncancelar cita" as UC14
+    usecase "Registrar tiempos reales\nde atención" as UC15
+    usecase "Definir horarios\nde disponibilidad" as UC16
+    usecase "Registrar ausencias\npuntuales" as UC23
+  }
+  package "Expediente Clínico" {
+    usecase "Consultar expediente\ndel paciente" as UC24
+    usecase "Registrar hallazgos\ndel odontograma" as UC25
+    usecase "Redactar nota clínica\nde evolución" as UC26
+    usecase "Elaborar plan\nde tratamiento" as UC27
+    usecase "Aprobar o rechazar\nel plan" as UC28
+    usecase "Agendar un renglón\ndel plan" as UC29
+  }
+  package "Cobros" {
+    usecase "Consultar estado\nde cuenta" as UC30
+    usecase "Registrar abono" as UC31
+    usecase "Anular abono" as UC32
+  }
+  package "Inteligencia" {
+    usecase "Estimar duración\ndel procedimiento" as UC17
+    usecase "Recomendar bloque\nde tiempo" as UC18
+    usecase "Entrenar modelo\npredictivo" as UC19
+  }
+}
+
+RECEP --> UC13
+RECEP --> UC12
+RECEP --> UC14
+RECEP --> UC15
+RECEP --> UC16
+RECEP --> UC23
+RECEP --> UC24
+RECEP --> UC29
+RECEP --> UC30
+RECEP --> UC31
+RECEP --> UC32
+
+ODONT --> UC13
+ODONT --> UC23
+ODONT --> UC24
+ODONT --> UC25
+ODONT --> UC26
+ODONT --> UC27
+ODONT --> UC28
+
+ASIST --> UC13
+ASIST --> UC24
+
+ADMIN --> UC19
+
+UC17 --> ML
+UC19 --> ML
+
+UC12 ..> UC17 : <<include>>
+UC17 ..> UC18 : <<include>>
+UC29 ..> UC12 : <<include>>
+UC27 ..> UC17 : <<include>>
+UC31 ..> UC30 : <<include>>
+UC15 ..> UC19 : <<extend>>
+UC15 ..> UC26 : <<extend>>
+UC25 ..> UC27 : <<extend>>
+@enduml

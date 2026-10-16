@@ -44,7 +44,7 @@ RUTAS_ESCRITURA = [
 PERFILES = [
     ('admin@smileesync.local', 'Administrador', False),
     ('recepcion@smileesync.local', 'Recepcionista', False),
-    ('cgiron@smileesync.local', 'Odontólogo', True),
+    ('hjlee@smileesync.local', 'Odontólogo', True),
 ]
 
 for correo, etiqueta, esperado_solo_consulta in PERFILES:

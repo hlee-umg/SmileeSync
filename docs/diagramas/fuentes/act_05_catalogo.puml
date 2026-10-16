@@ -1,0 +1,73 @@
+@startuml
+title Proceso de mantenimiento del catálogo odontológico
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Administrador|
+start
+:Abrir el módulo de catálogos;
+:Seleccionar la entidad a administrar
+(especialidad, procedimiento,
+odontólogo o unidad dental);
+if (¿Qué operación se requiere?) then (alta)
+  :Capturar los datos
+  de la entidad;
+  |Sistema|
+  :Validar el código único
+  y los campos obligatorios;
+  if (¿Los datos son válidos?) then (no)
+    |Administrador|
+    :Corregir los datos;
+    detach
+  else (sí)
+  endif
+|Sistema|
+  :Guardar el registro
+  con estado activo;
+elseif (modificación) then
+  |Administrador|
+  :Seleccionar el registro
+  y editar sus datos;
+  |Sistema|
+  :Validar que el código
+  no duplique otro registro;
+  :Actualizar el registro;
+else (baja)
+  |Administrador|
+  :Seleccionar el registro
+  a dar de baja;
+  |Sistema|
+  :Cambiar el estado a inactivo
+  sin eliminar el registro;
+  note right
+    Borrado lógico: el registro
+    deja de ofrecerse al programar,
+    pero conserva su vínculo con
+    las citas históricas.
+  end note
+endif
+|Administrador|
+|Administrador|
+:Visualizar el catálogo
+actualizado;
+stop
+@enduml

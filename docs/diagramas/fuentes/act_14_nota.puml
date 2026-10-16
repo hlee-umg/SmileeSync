@@ -1,0 +1,91 @@
+@startuml
+title Proceso de registro de la nota clínica de evolución
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Odontólogo|
+start
+:Abrir la cita atendida
+desde el expediente
+o desde el calendario;
+|Sistema|
+if (¿La cita ya tiene
+nota clínica?) then (sí)
+  |Odontólogo|
+  :Consultar la nota
+  existente;
+  stop
+else (no)
+endif
+|Sistema|
+:Precargar el odontólogo,
+la fecha y el procedimiento
+de la cita;
+|Odontólogo|
+:Capturar el motivo
+de la consulta;
+:Describir los hallazgos
+clínicos observados;
+:Describir el procedimiento
+realizado;
+:Enumerar las piezas tratadas
+e indicar su número;
+:Indicar si se aplicó anestesia;
+:Indicar si hubo complicación;
+:Registrar los materiales
+y las indicaciones al paciente;
+|Sistema|
+if (¿Las piezas enumeradas
+coinciden con el número
+indicado?) then (no)
+  |Odontólogo|
+  :Corregir el número
+  de piezas;
+  detach
+else (sí)
+endif
+|Sistema|
+if (¿Se marcó complicación
+sin describirla?) then (sí)
+  |Odontólogo|
+  :Describir la complicación;
+  detach
+else (no)
+endif
+|Sistema|
+:Guardar la nota y vincularla
+a la cita atendida;
+|Componente predictivo|
+:Incorporar el número de piezas,
+el uso de anestesia y la
+complicación como variables
+explicativas de la duración;
+note right
+  Son las variables que el
+  registro de tiempos no puede
+  conocer por sí solo.
+end note
+|Odontólogo|
+:Visualizar la evolución
+del paciente actualizada;
+stop
+@enduml

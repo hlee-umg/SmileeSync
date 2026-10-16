@@ -1,0 +1,89 @@
+@startuml
+title Proceso de registro de abonos y control de saldo
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el módulo de cobros;
+|Sistema|
+:Listar los planes aprobados
+y en curso, ordenados por saldo;
+:Calcular el total presupuestado,
+lo abonado y el saldo de cada plan;
+|Recepcionista|
+:Seleccionar el plan a cobrar;
+:Capturar la fecha, el monto,
+la forma de pago y la referencia;
+|Sistema|
+if (¿El monto es mayor
+que cero?) then (no)
+  |Recepcionista|
+  :Corregir el monto;
+  detach
+else (sí)
+endif
+|Sistema|
+if (¿El monto excede
+el saldo pendiente?) then (sí)
+  |Recepcionista|
+  :Corregir el monto;
+  detach
+else (no)
+endif
+|Sistema|
+if (¿La fecha es posterior
+a hoy?) then (sí)
+  |Recepcionista|
+  :Corregir la fecha;
+  detach
+else (no)
+endif
+|Sistema|
+:Guardar el abono
+como vigente;
+:Recalcular el saldo del plan;
+:Registrar el abono
+en el historial;
+|Recepcionista|
+if (¿El abono se capturó
+con un error?) then (sí)
+  :Solicitar la anulación
+  del abono;
+  |Sistema|
+  :Marcar el abono como anulado
+  sin eliminarlo;
+  :Devolver el saldo
+  a su valor anterior;
+  note right
+    Anulación lógica: el estado
+    de cuenta conserva la traza
+    de la operación.
+  end note
+else (no)
+endif
+|Recepcionista|
+|Recepcionista|
+:Visualizar el estado
+de cuenta actualizado;
+stop
+@enduml

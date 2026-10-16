@@ -3,3 +3,10 @@ Django>=5.0,<5.1
 whitenoise>=6.6
 gunicorn>=22.0
 psycopg2-binary>=2.9   # PostgreSQL en producción
+
+# Componente predictivo. Se cargan únicamente en el comando de
+# entrenamiento y al realizar una estimación; el resto del sistema opera
+# sin ellas y recae en el promedio histórico o en el catálogo.
+scikit-learn>=1.4
+pandas>=2.2
+joblib>=1.3

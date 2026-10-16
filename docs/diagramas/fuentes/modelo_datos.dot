@@ -1,0 +1,97 @@
+digraph modelo {
+  rankdir=LR;
+  bgcolor="white";
+  splines=spline;
+  nodesep=0.30; ranksep=0.85; pad=0.3;
+  fontname="Arial"; fontsize=11;
+  node [shape=box style="rounded,filled" fontname="Arial" fontsize=11 margin="0.14,0.09" penwidth=1.2];
+  edge [fontname="Arial" fontsize=9 color="#475569" arrowsize=0.7 penwidth=1.0];
+  subgraph cluster_0 {
+    label="Seguridad y Usuarios"; labelloc=t; fontsize=12.5;
+    fontcolor="#4F46E5"; color="#4F46E5"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "ROL" [fillcolor="#EEF2FF" color="#4F46E5" fontcolor="#0F172A"];
+    "USUARIO" [fillcolor="#EEF2FF" color="#4F46E5" fontcolor="#0F172A"];
+    "HISTORIAL_USUARIO" [fillcolor="#EEF2FF" color="#4F46E5" fontcolor="#0F172A"];
+  }
+  subgraph cluster_1 {
+    label="Catálogo Odontológico"; labelloc=t; fontsize=12.5;
+    fontcolor="#059669"; color="#059669"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "ESPECIALIDAD" [fillcolor="#F0FDF4" color="#059669" fontcolor="#0F172A"];
+    "PROCEDIMIENTO" [fillcolor="#F0FDF4" color="#059669" fontcolor="#0F172A"];
+    "ODONTOLOGO" [fillcolor="#F0FDF4" color="#059669" fontcolor="#0F172A"];
+    "UNIDAD_DENTAL" [fillcolor="#F0FDF4" color="#059669" fontcolor="#0F172A"];
+  }
+  subgraph cluster_2 {
+    label="Pacientes"; labelloc=t; fontsize=12.5;
+    fontcolor="#D97706"; color="#D97706"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "PACIENTE" [fillcolor="#FEF3C7" color="#D97706" fontcolor="#0F172A"];
+    "ANTECEDENTE_MEDICO" [fillcolor="#FEF3C7" color="#D97706" fontcolor="#0F172A"];
+    "HISTORIAL_PACIENTE" [fillcolor="#FEF3C7" color="#D97706" fontcolor="#0F172A"];
+  }
+  subgraph cluster_3 {
+    label="Agenda y Citas"; labelloc=t; fontsize=12.5;
+    fontcolor="#DC2626"; color="#DC2626"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "HORARIO_DISPONIBILIDAD" [fillcolor="#FEE2E2" color="#DC2626" fontcolor="#0F172A"];
+    "CITA" [fillcolor="#FEE2E2" color="#DC2626" fontcolor="#0F172A"];
+    "HISTORIAL_CITA" [fillcolor="#FEE2E2" color="#DC2626" fontcolor="#0F172A"];
+    "AUSENCIA_ODONTOLOGO" [fillcolor="#FEE2E2" color="#DC2626" fontcolor="#0F172A"];
+  }
+  subgraph cluster_4 {
+    label="Expediente Clínico y Cobros"; labelloc=t; fontsize=12.5;
+    fontcolor="#7C3AED"; color="#7C3AED"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "HALLAZGO" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+    "NOTA_CLINICA" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+    "PLAN_TRATAMIENTO" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+    "DETALLE_PLAN" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+    "PAGO" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+    "HISTORIAL_PLAN" [fillcolor="#F3E8FF" color="#7C3AED" fontcolor="#0F172A"];
+  }
+  subgraph cluster_5 {
+    label="Inteligencia"; labelloc=t; fontsize=12.5;
+    fontcolor="#0284C7"; color="#0284C7"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "MODELO_VERSION" [fillcolor="#E0F2FE" color="#0284C7" fontcolor="#0F172A"];
+    "DATO_ENTRENAMIENTO" [fillcolor="#E0F2FE" color="#0284C7" fontcolor="#0F172A"];
+    "PREDICCION" [fillcolor="#E0F2FE" color="#0284C7" fontcolor="#0F172A"];
+  }
+  subgraph cluster_6 {
+    label="Reportes"; labelloc=t; fontsize=12.5;
+    fontcolor="#64748B"; color="#64748B"; penwidth=1.4;
+    style="rounded"; margin=12;
+    "INDICADOR_DESEMPENO" [fillcolor="#F1F5F9" color="#64748B" fontcolor="#0F172A"];
+  }
+  "ROL" -> "USUARIO" [label="asigna permisos a" style=dashed];
+  "ESPECIALIDAD" -> "PROCEDIMIENTO" [label="clasifica" style=solid];
+  "USUARIO" -> "ODONTOLOGO" [label="es cuenta de" style=dashed];
+  "ESPECIALIDAD" -> "ODONTOLOGO" [label="define perfil de" style=solid];
+  "PACIENTE" -> "ANTECEDENTE_MEDICO" [label="presenta" style=solid];
+  "ODONTOLOGO" -> "HORARIO_DISPONIBILIDAD" [label="declara" style=solid];
+  "PACIENTE" -> "CITA" [label="solicita" style=solid];
+  "ODONTOLOGO" -> "CITA" [label="atiende" style=solid];
+  "PROCEDIMIENTO" -> "CITA" [label="se aplica en" style=solid];
+  "UNIDAD_DENTAL" -> "CITA" [label="se ocupa en" style=dashed];
+  "ODONTOLOGO" -> "AUSENCIA_ODONTOLOGO" [label="registra" style=solid];
+  "PACIENTE" -> "HALLAZGO" [label="presenta en su odontograma" style=solid];
+  "NOTA_CLINICA" -> "HALLAZGO" [label="documenta" style=dashed];
+  "CITA" -> "NOTA_CLINICA" [label="se documenta en" style=dashed];
+  "PACIENTE" -> "NOTA_CLINICA" [label="acumula" style=solid];
+  "ODONTOLOGO" -> "NOTA_CLINICA" [label="redacta" style=solid];
+  "PACIENTE" -> "PLAN_TRATAMIENTO" [label="acuerda" style=solid];
+  "ODONTOLOGO" -> "PLAN_TRATAMIENTO" [label="responde por" style=solid];
+  "PLAN_TRATAMIENTO" -> "DETALLE_PLAN" [label="se desglosa en" style=solid];
+  "PROCEDIMIENTO" -> "DETALLE_PLAN" [label="se presupuesta en" style=solid];
+  "CITA" -> "DETALLE_PLAN" [label="ejecuta" style=dashed];
+  "PLAN_TRATAMIENTO" -> "PAGO" [label="se abona con" style=solid];
+  "CITA" -> "DATO_ENTRENAMIENTO" [label="genera dataset" style=dashed];
+  "CITA" -> "PREDICCION" [label="recibe" style=solid];
+  "MODELO_VERSION" -> "PREDICCION" [label="produce" style=solid];
+  "USUARIO" -> "HISTORIAL_USUARIO" [label="auditado por" style=dotted color="#94A3B8"];
+  "PACIENTE" -> "HISTORIAL_PACIENTE" [label="auditado por" style=dotted color="#94A3B8"];
+  "CITA" -> "HISTORIAL_CITA" [label="auditado por" style=dotted color="#94A3B8"];
+  "PLAN_TRATAMIENTO" -> "HISTORIAL_PLAN" [label="auditado por" style=dotted color="#94A3B8"];
+}

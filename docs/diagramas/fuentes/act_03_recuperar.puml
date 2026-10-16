@@ -1,0 +1,75 @@
+@startuml
+title Proceso de recuperación de contraseña
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Usuario|
+start
+:Seleccionar la opción
+de contraseña olvidada;
+:Ingresar el correo electrónico;
+|Sistema|
+if (¿El correo está registrado
+y activo?) then (no)
+  |Usuario|
+  :Visualizar el mensaje
+  de correo no encontrado;
+  stop
+else (sí)
+endif
+|Sistema|
+:Recuperar la pregunta secreta
+del usuario;
+|Usuario|
+:Responder la pregunta secreta;
+|Sistema|
+:Comparar la respuesta
+con el valor cifrado;
+if (¿La respuesta es correcta?) then (no)
+  |Usuario|
+  :Visualizar el mensaje
+  de respuesta incorrecta;
+  stop
+else (sí)
+endif
+|Sistema|
+|Usuario|
+:Capturar la contraseña nueva
+y su confirmación;
+|Sistema|
+if (¿Las contraseñas coinciden
+y cumplen las reglas?) then (no)
+  |Usuario|
+  :Corregir la contraseña;
+  detach
+else (sí)
+endif
+|Sistema|
+:Cifrar y actualizar
+la contraseña;
+:Registrar el cambio
+en el historial;
+|Usuario|
+:Iniciar sesión con
+la contraseña nueva;
+stop
+@enduml

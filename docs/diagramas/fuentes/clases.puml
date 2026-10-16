@@ -1,0 +1,322 @@
+@startuml
+title Diagrama de clases del sistema SmileeSync
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam dpi 150
+skinparam ArrowColor #334155
+skinparam classAttributeIconSize 0
+skinparam package {
+  BorderColor #94A3B8
+  BackgroundColor #FCFCFD
+  FontStyle bold
+}
+hide empty members
+
+package "Seguridad y Usuarios" {
+  class Rol #EEF2FF {
+    +nombre: str
+    +descripcion: str
+    +puede_usuarios: bool
+    +puede_pacientes: bool
+    +puede_catalogos: bool
+    +puede_agenda: bool
+    +puede_clinico: bool
+    +puede_finanzas: bool
+    ...
+    --
+  }
+  class Usuario #EEF2FF {
+    +email: str
+    +telefono: str
+    +estado: bool
+    +pregunta_secreta: str
+    +respuesta_secreta: str
+    --
+    +es_admin «propiedad»
+    +es_solo_consulta «propiedad»
+    +check_respuesta_secreta(texto)
+    +puede(modulo)
+    +puede_escribir(modulo)
+    +set_respuesta_secreta(texto)
+  }
+  class HistorialUsuario #EEF2FF {
+    +usuario_ref: int
+    +nombre_completo: str
+    +email: str
+    +rol: str
+    +estado_anterior: bool
+    +accion: str
+    +realizado_por: str
+    +fecha: datetime
+    --
+    +registrar(usuario, accion, realizado_por) [clase]
+  }
+}
+
+package "Catálogo Odontológico" {
+  class Especialidad #F0FDF4 {
+    +nombre: str
+    +descripcion: str
+    +estado: bool
+    --
+  }
+  class Procedimiento #F0FDF4 {
+    +codigo: str
+    +nombre: str
+    +nivel_complejidad: str
+    +duracion_promedio_min: int
+    +precio: Decimal
+    +descripcion: str
+    +estado: bool
+    --
+  }
+  class Odontologo #F0FDF4 {
+    +nombres: str
+    +apellidos: str
+    +colegiado: str
+    +telefono: str
+    +estado: bool
+    --
+  }
+  class UnidadDental #F0FDF4 {
+    +codigo: str
+    +nombre: str
+    +ubicacion: str
+    +observaciones: str
+    +estado: bool
+    --
+  }
+}
+
+package "Pacientes" {
+  class Paciente #FEF3C7 {
+    +codigo: str
+    +nombres: str
+    +apellidos: str
+    +fecha_nacimiento: date
+    +sexo: str
+    +telefono: str
+    +email: str
+    +direccion: str
+    ...
+    --
+  }
+  class AntecedenteMedico #FEF3C7 {
+    +tipo: str
+    +descripcion: str
+    +estado: bool
+    --
+  }
+  class HistorialPaciente #FEF3C7 {
+    +paciente_ref: int
+    +codigo: str
+    +nombre_completo: str
+    +estado_anterior: bool
+    +accion: str
+    +realizado_por: str
+    +fecha: datetime
+  }
+}
+
+package "Agenda y Citas" {
+  class HorarioDisponibilidad #FEE2E2 {
+    +dia_semana: str
+    +hora_inicio: time
+    +hora_fin: time
+    +estado: bool
+  }
+  class Cita #FEE2E2 {
+    +fecha: date
+    +hora_inicio_programada: time
+    +hora_fin_programada: time
+    +hora_inicio_real: time
+    +hora_fin_real: time
+    +duracion_asignada_min: int
+    +duracion_real_min: int
+    +estado_cita: str
+    ...
+    --
+  }
+  class HistorialCita #FEE2E2 {
+    +cita_ref: int
+    +paciente: str
+    +odontologo: str
+    +fecha_cita: date
+    +estado_cita_anterior: str
+    +accion: str
+    +realizado_por: str
+    +fecha: datetime
+  }
+  class AusenciaOdontologo #FEE2E2 {
+    +fecha: date
+    +todo_el_dia: bool
+    +hora_inicio: time
+    +hora_fin: time
+    +motivo: str
+    +registrada_por: str
+    +estado: bool
+    --
+  }
+}
+
+package "Expediente Clínico y Cobros" {
+  class Hallazgo #F3E8FF {
+    +pieza: int
+    +cara: str
+    +tipo: str
+    +observacion: str
+    +fecha: date
+    +registrado_por: str
+    +estado: bool
+    --
+    +clase_css «propiedad»
+    +es_patologico «propiedad»
+    +simbolo «propiedad»
+  }
+  class NotaClinica #F3E8FF {
+    +fecha: date
+    +motivo: str
+    +hallazgos_clinicos: str
+    +procedimiento_realizado: str
+    +piezas_tratadas: str
+    +num_piezas: int
+    +anestesia: bool
+    +materiales: str
+    ...
+    --
+    +lista_piezas «propiedad»
+  }
+  class PlanTratamiento #F3E8FF {
+    +codigo: str
+    +diagnostico: str
+    +observaciones: str
+    +estado_plan: str
+    +fecha: date
+    +fecha_aprobacion: date
+    +descuento: Decimal
+    +creado_por: str
+    ...
+    --
+    +avance «propiedad»
+    +esta_pagado «propiedad»
+    +minutos_estimados «propiedad»
+    +minutos_pendientes «propiedad»
+    +pagado «propiedad»
+    +renglones «propiedad»
+    +renglones_completados «propiedad»
+    +saldo «propiedad»
+    +subtotal «propiedad»
+    +total «propiedad»
+    +total_renglones «propiedad»
+    +actualizar_avance()
+    +sesiones_sugeridas()
+    +siguiente_codigo() [clase]
+  }
+  class DetallePlan #F3E8FF {
+    +fase: int
+    +orden: int
+    +pieza: int
+    +num_piezas: int
+    +precio_unitario: Decimal
+    +duracion_estimada_min: int
+    +origen_estimacion: str
+    +estado_detalle: str
+    ...
+    --
+    +etiqueta_origen «propiedad»
+    +importe «propiedad»
+  }
+  class Pago #F3E8FF {
+    +fecha: date
+    +monto: Decimal
+    +metodo: str
+    +referencia: str
+    +observaciones: str
+    +recibido_por: str
+    +estado: bool
+    --
+  }
+  class HistorialPlan #F3E8FF {
+    +plan_ref: int
+    +codigo: str
+    +paciente: str
+    +estado_anterior: str
+    +accion: str
+    +detalle: str
+    +realizado_por: str
+    +fecha: datetime
+    --
+    +registrar(plan, accion, realizado_por, detalle, estado_anterior) [clase]
+  }
+}
+
+package "Inteligencia" {
+  class ModeloVersion #E0F2FE {
+    +nombre: str
+    +algoritmo: str
+    +mae: float
+    +rmse: float
+    +r2: float
+    +fecha_entrenamiento: datetime
+    +ruta_archivo: str
+    +activo: bool
+    ...
+    --
+  }
+  class DatoEntrenamiento #E0F2FE {
+    +tipo_procedimiento: str
+    +odontologo: str
+    +dia_semana: str
+    +hora_inicio: int
+    +num_piezas: int
+    +duracion_real_min: int
+  }
+  class Prediccion #E0F2FE {
+    +duracion_estimada_min: int
+    +bloque_min_recomendado: int
+    +bloque_max_recomendado: int
+    +fecha: datetime
+  }
+}
+
+package "Reportes" {
+  class IndicadorDesempeno #F1F5F9 {
+    +fecha: date
+    +citas_atendidas: int
+    +utilizacion_pct: float
+    +tiempo_espera_prom_min: float
+    +mae_actual: float
+    +rmse_actual: float
+    +r2_actual: float
+  }
+}
+
+Cita "1" --> "0..*" DatoEntrenamiento : cita
+Cita "1" --> "0..*" DetallePlan : cita
+Cita "1" --> "0..*" Prediccion : cita
+Cita "1" --> "0..1" NotaClinica : cita
+Especialidad "1" --> "0..*" Odontologo : especialidad
+Especialidad "1" --> "0..*" Procedimiento : especialidad
+ModeloVersion "1" --> "0..*" Prediccion : modelo
+NotaClinica "1" --> "0..*" Hallazgo : nota
+Odontologo "1" --> "0..*" AusenciaOdontologo : odontologo
+Odontologo "1" --> "0..*" Cita : odontologo
+Odontologo "1" --> "0..*" HorarioDisponibilidad : odontologo
+Odontologo "1" --> "0..*" NotaClinica : odontologo
+Odontologo "1" --> "0..*" PlanTratamiento : odontologo
+Paciente "1" --> "0..*" AntecedenteMedico : paciente
+Paciente "1" --> "0..*" Cita : paciente
+Paciente "1" --> "0..*" Hallazgo : paciente
+Paciente "1" --> "0..*" NotaClinica : paciente
+Paciente "1" --> "0..*" PlanTratamiento : paciente
+PlanTratamiento "1" --> "0..*" DetallePlan : plan
+PlanTratamiento "1" --> "0..*" Pago : plan
+Procedimiento "1" --> "0..*" Cita : procedimiento
+Procedimiento "1" --> "0..*" DetallePlan : procedimiento
+Rol "1" --> "0..*" Usuario : rol
+UnidadDental "1" --> "0..*" Cita : unidad
+Usuario "1" --> "0..*" Odontologo : usuario
+@enduml

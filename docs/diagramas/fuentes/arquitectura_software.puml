@@ -1,0 +1,76 @@
+@startuml
+title Arquitectura de software de SmileeSync — vista por capas
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam nodesep 14
+skinparam ranksep 26
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #64748B
+  FontStyle bold
+  FontColor #0F172A
+  FontSize 13
+}
+skinparam component {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+  FontColor #1E1B4B
+  FontStyle plain
+  FontSize 12
+}
+skinparam database {
+  BackgroundColor #ECFDF5
+  BorderColor #059669
+  FontColor #064E3B
+}
+skinparam ArrowColor #334155
+skinparam ArrowFontColor #334155
+skinparam ArrowFontSize 11
+
+rectangle "CLIENTE" as L0 {
+  component "Navegador del usuario\nHTML + Bootstrap 5" as UI
+}
+
+rectangle "CAPA DE PRESENTACIÓN" as L1 {
+  component "Plantillas Django" as TPL
+  component "Procesador de contexto\nde permisos" as CTX
+}
+
+rectangle "CAPA DE APLICACIÓN" as L2 {
+  component "Enrutador URL" as URL
+  component "Vistas\n(controladores)" as VIEW
+  component "Formularios y\nvalidaciones" as FORM
+  component "Decoradores de\ncontrol de acceso" as DEC
+}
+
+rectangle "CAPA DE DOMINIO" as L3 {
+  component "Disponibilidad\nhorarios, ausencias,\nunidades, capacidad" as DISP
+  component "Servicio de estimación\ncascada de tres niveles" as EST
+  component "Reglas del plan\nde tratamiento" as PLAN
+}
+
+rectangle "CAPA DE PERSISTENCIA" as L4 {
+  component "Modelos ORM de Django" as ORM
+  database "PostgreSQL" as DB
+}
+
+rectangle "COMPONENTE PREDICTIVO" as L5 {
+  component "Modelo entrenado\n(.joblib)" as ML
+  component "Conjunto de\nentrenamiento" as DS
+}
+
+UI   -down-> L1 : solicitud HTTPS
+L1   -down-> L2 : petición enrutada
+L2   -down-> L3 : reglas de negocio
+L3   -down-> L4 : consultas y escrituras
+ORM  -down-> DB : SQL
+
+L3 -right-> L5 : solicita la predicción
+L5 -up->    L3 : duración estimada
+L4 -right-> L5 : citas atendidas\n(realimentación)
+
+@enduml

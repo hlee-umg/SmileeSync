@@ -164,7 +164,7 @@ probar('no propone espacios en un día de ausencia total',
        'class="hueco-sugerido' not in cuerpo)
 
 print('\n10. El odontólogo puede marcar sus propias ausencias')
-usuario_odo = Usuario.objects.get(email='cgiron@smileesync.local')
+usuario_odo = Usuario.objects.get(email='hjlee@smileesync.local')
 ficha = Odontologo.objects.filter(usuario=usuario_odo).first()
 probar('su usuario está vinculado a una ficha', ficha is not None)
 co = Client()

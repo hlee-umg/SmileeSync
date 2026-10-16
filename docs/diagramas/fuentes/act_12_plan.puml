@@ -1,0 +1,96 @@
+@startuml
+title Proceso de elaboración del plan de tratamiento
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Odontólogo|
+start
+:Abrir el expediente
+del paciente;
+:Revisar los hallazgos
+por atender del odontograma;
+:Crear un plan de tratamiento
+y capturar el diagnóstico;
+|Sistema|
+:Generar el código del plan
+y guardarlo como borrador;
+:Registrar la creación
+en el historial;
+|Odontólogo|
+repeat
+:Agregar un renglón indicando
+la fase, el procedimiento,
+la pieza y el número de piezas;
+  |Sistema|
+  :Proponer el precio de lista
+  del catálogo;
+  |Componente predictivo|
+  :Estimar la duración del renglón
+  y devolver el origen
+  de la estimación;
+  |Sistema|
+  :Guardar el renglón con su precio,
+  su duración estimada
+  y su orden dentro de la fase;
+  :Recalcular el subtotal,
+  el descuento y el total;
+  :Repartir los renglones pendientes
+  en sesiones, respetando el orden
+  de las fases y un máximo de
+  ciento veinte minutos por sesión;
+  |Odontólogo|
+repeat while (¿Falta algún renglón?) is (sí)
+:Revisar el presupuesto
+y las sesiones estimadas
+con el paciente;
+if (¿El paciente acepta
+el tratamiento?) then (sí)
+  :Marcar el plan
+  como aprobado;
+  |Sistema|
+  if (¿El plan tiene al menos
+  un renglón?) then (no)
+    |Odontólogo|
+    :Agregar los renglones
+    faltantes;
+    detach
+  else (sí)
+  endif
+|Sistema|
+  :Registrar la fecha
+  de aprobación;
+  :Habilitar el agendado
+  de sus renglones;
+else (no)
+  |Odontólogo|
+  :Marcar el plan
+  como rechazado;
+  |Sistema|
+  :Conservar el plan
+  para consulta posterior;
+endif
+|Odontólogo|
+|Odontólogo|
+:Visualizar el plan
+con su estado definitivo;
+stop
+@enduml

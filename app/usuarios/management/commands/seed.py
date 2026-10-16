@@ -1,3 +1,6 @@
+import random
+from datetime import date, datetime, time, timedelta
+
 from django.core.management.base import BaseCommand
 from usuarios.models import Rol, Usuario
 
@@ -34,7 +37,41 @@ class Command(BaseCommand):
         'PROC-004': 400,
         'PROC-005': 4500,
         'PROC-006': 100,
+        'PROC-007': 250,
+        'PROC-008': 800,
+        'PROC-009': 180,
+        'PROC-010': 450,
     }
+
+    # Padrón de pacientes de demostración. Dos meses de agenda requieren un
+    # padrón suficientemente amplio para que las citas no se concentren en unas
+    # pocas personas.
+    PACIENTES = [
+        ('Sofía Alejandra', 'Castillo Ruano', date(1998, 3, 14), 'F', '5544 1122'),
+        ('Roberto Antonio', 'Méndez Solórzano', date(1981, 7, 2), 'M', '4411 8890'),
+        ('Lucía Fernanda', 'Aguilar Pineda', date(1993, 11, 25), 'F', '3398 7744'),
+        ('Diego Armando', 'Ruiz Barrientos', date(2007, 1, 9), 'M', '5566 2211'),
+        ('Carmen Elena', 'Ortiz Marroquín', date(1974, 5, 30), 'F', '4477 3300'),
+        ('Andrea Michelle', 'Hernández Solís', date(1995, 4, 17), 'F', '5533 9911'),
+        ('José Manuel', 'Villatoro Cruz', date(1988, 9, 23), 'M', '4455 6677'),
+        ('María José', 'Figueroa Lemus', date(2001, 2, 11), 'F', '5588 2244'),
+        ('Luis Eduardo', 'Morales Chacón', date(1979, 12, 5), 'M', '3366 1199'),
+        ('Gabriela Isabel', 'Sandoval Ponce', date(1992, 6, 28), 'F', '4422 7755'),
+        ('Marco Vinicio', 'Estrada Juárez', date(1985, 8, 16), 'M', '5511 3388'),
+        ('Paola Andrea', 'Recinos Alvarado', date(2004, 10, 3), 'F', '4433 9900'),
+        ('Carlos Humberto', 'Barrios Monzón', date(1968, 1, 21), 'M', '3377 4466'),
+        ('Ana Lucía', 'Guzmán Herrera', date(1997, 7, 8), 'F', '5599 1177'),
+        ('Fernando José', 'Orellana Pérez', date(2010, 3, 30), 'M', '4466 2288'),
+        ('Claudia Patricia', 'Mejía Rodas', date(1983, 11, 12), 'F', '3322 8855'),
+        ('Rodrigo Alberto', 'Paiz Contreras', date(1990, 5, 19), 'M', '5577 6633'),
+        ('Mónica Alejandra', 'Castañeda Rivas', date(1999, 9, 7), 'F', '4499 5522'),
+        ('Pablo Andrés', 'Quiñónez Galindo', date(2006, 4, 26), 'M', '3344 7711'),
+        ('Silvia Mercedes', 'Arriaga Bonilla', date(1972, 2, 14), 'F', '5522 4499'),
+        ('Daniel Alejandro', 'Cabrera Soto', date(1994, 12, 1), 'M', '4488 3366'),
+        ('Karla Vanessa', 'Ixcot Ramírez', date(2002, 8, 9), 'F', '3355 9922'),
+        ('Óscar Emilio', 'Zamora Letona', date(1977, 6, 22), 'M', '5566 7744'),
+        ('Jennifer Nicole', 'Dubón Escobar', date(2012, 1, 15), 'F', '4411 2299'),
+    ]
 
     def handle(self, *args, **options):
         roles = {
@@ -93,23 +130,26 @@ class Command(BaseCommand):
         recep.save()
 
         # --- Odontólogos con cuenta de usuario ---
-        odontologa = Usuario.objects.filter(email__iexact='gpaz@smileesync.local').first()
-        if not odontologa:
-            odontologa = Usuario.objects.create_user(
-                'gpaz@smileesync.local', 'gpaz@smileesync.local', '***REMOVED***',
-                first_name='Gabriela', last_name='Paz')
-        odontologa.rol = objetos['Odontólogo']
-        odontologa.save()
+        # La clínica cuenta con dos profesionales: el odontólogo principal, con
+        # especialidad en ortodoncia, y una odontóloga general.
+        cuentas = {}
+        for correo, nombres, apellidos in [
+            ('hjlee@smileesync.local', 'Hee Joon', 'Lee'),
+            ('rgiron@smileesync.local', 'Rachelle', 'Girón'),
+        ]:
+            cuenta = Usuario.objects.filter(email__iexact=correo).first()
+            if not cuenta:
+                cuenta = Usuario.objects.create_user(
+                    correo, correo, '***REMOVED***',
+                    first_name=nombres, last_name=apellidos)
+                self.stdout.write(self.style.SUCCESS(
+                    f'Usuario creado: {correo} / ***REMOVED***'))
+            cuenta.rol = objetos['Odontólogo']
+            cuenta.save()
+            cuentas[correo] = cuenta
 
-        odontologo = Usuario.objects.filter(email__iexact='cgiron@smileesync.local').first()
-        if not odontologo:
-            odontologo = Usuario.objects.create_user(
-                'cgiron@smileesync.local', 'cgiron@smileesync.local', '***REMOVED***',
-                first_name='Carlos', last_name='Girón')
-        odontologo.rol = objetos['Odontólogo']
-        odontologo.save()
-
-        self.sembrar_clinica(odontologo, odontologa)
+        self.sembrar_clinica(cuentas['hjlee@smileesync.local'],
+                             cuentas['rgiron@smileesync.local'])
         self.normalizar()
         self.sembrar_expediente()
 
@@ -117,13 +157,12 @@ class Command(BaseCommand):
                                              'Pregunta secreta admin: mascota=firulais; recepcion: ciudad=guatemala'))
 
     # ==================================================================
-    def sembrar_clinica(self, usuario_giron, usuario_paz):
+    def sembrar_clinica(self, usuario_lee, usuario_giron):
         """Datos operativos de la clínica: catálogo, pacientes, horarios y citas.
 
         Permite que el módulo Principal y la agenda tengan contenido real desde
         el primer arranque. Es idempotente: se puede ejecutar varias veces.
         """
-        from datetime import date, time, timedelta
         from django.utils import timezone
 
         from agenda.models import Cita, HorarioDisponibilidad
@@ -165,6 +204,11 @@ class Command(BaseCommand):
             ('PROC-004', 'Extracción simple', 'Cirugía oral', 'MEDIA', 40),
             ('PROC-005', 'Colocación de brackets', 'Ortodoncia', 'ALTA', 120),
             ('PROC-006', 'Aplicación de flúor', 'Odontopediatría', 'BAJA', 20),
+            ('PROC-007', 'Control de ortodoncia', 'Ortodoncia', 'BAJA', 30),
+            ('PROC-008', 'Retiro de brackets', 'Ortodoncia', 'MEDIA', 60),
+            ('PROC-009', 'Sellante de fosas y fisuras', 'Odontopediatría', 'BAJA', 25),
+            ('PROC-010', 'Limpieza profunda por cuadrante', 'Odontología general',
+             'MEDIA', 50),
         ]:
             obj, _ = Procedimiento.objects.get_or_create(
                 codigo=codigo,
@@ -174,19 +218,35 @@ class Command(BaseCommand):
             procedimientos[codigo] = obj
 
         # --- Odontólogos ---
+        # La clínica opera con dos profesionales: el odontólogo principal, con
+        # especialidad en ortodoncia, y una odontóloga general.
+        lee, _ = Odontologo.objects.get_or_create(
+            colegiado='CD-20451',
+            defaults={'nombres': 'Hee Joon', 'apellidos': 'Lee',
+                      'especialidad': especialidades['Ortodoncia'],
+                      'telefono': '3312 4590', 'usuario': usuario_lee})
         giron, _ = Odontologo.objects.get_or_create(
-            colegiado='CD-10245',
-            defaults={'nombres': 'Carlos Enrique', 'apellidos': 'Girón Mejía',
+            colegiado='CD-19877',
+            defaults={'nombres': 'Rachelle', 'apellidos': 'Girón',
                       'especialidad': especialidades['Odontología general'],
-                      'telefono': '3321 7788', 'usuario': usuario_giron})
-        paz, _ = Odontologo.objects.get_or_create(
-            colegiado='CD-14892',
-            defaults={'nombres': 'Gabriela María', 'apellidos': 'Paz Hernández',
-                      'especialidad': especialidades['Endodoncia'],
-                      'telefono': '3321 4455', 'usuario': usuario_paz})
+                      'telefono': '3345 7712', 'usuario': usuario_giron})
+
+        # Los odontólogos de demostración de versiones anteriores se dan de baja
+        # para que no aparezcan en el filtro de la agenda. No se eliminan: sus
+        # citas históricas conservan la referencia.
+        retirados = (Odontologo.objects
+                     .filter(colegiado__in=['CD-10245', 'CD-14892'], estado=True)
+                     .update(estado=False))
+        Usuario.objects.filter(
+            email__in=['cgiron@smileesync.local', 'gpaz@smileesync.local'],
+            estado=True).update(estado=False, is_active=False)
+        if retirados:
+            self.stdout.write(self.style.WARNING(
+                f'  {retirados} odontólogo(s) de demostración anteriores fueron '
+                f'desactivados.'))
 
         # --- Horarios de disponibilidad (lunes a viernes) ---
-        for odo in (giron, paz):
+        for odo in (lee, giron):
             for dia in ('LUN', 'MAR', 'MIE', 'JUE', 'VIE'):
                 HorarioDisponibilidad.objects.get_or_create(
                     odontologo=odo, dia_semana=dia, hora_inicio=time(8, 0),
@@ -197,14 +257,8 @@ class Command(BaseCommand):
 
         # --- Pacientes ---
         pacientes = {}
-        for codigo, nombres, apellidos, nac, sexo, tel in [
-            ('PAC-0001', 'Sofía Alejandra', 'Castillo Ruano', date(1998, 3, 14), 'F', '5544 1122'),
-            ('PAC-0002', 'Roberto Antonio', 'Méndez Solórzano', date(1981, 7, 2), 'M', '4411 8890'),
-            ('PAC-0003', 'Lucía Fernanda', 'Aguilar Pineda', date(1993, 11, 25), 'F', '3398 7744'),
-            ('PAC-0004', 'Diego Armando', 'Ruiz Barrientos', date(2007, 1, 9), 'M', '5566 2211'),
-            ('PAC-0005', 'Carmen Elena', 'Ortiz Marroquín', date(1974, 5, 30), 'F', '4477 3300'),
-            ('PAC-0006', 'Andrea Michelle', 'Hernández Solís', date(1995, 4, 17), 'F', '5533 9911'),
-        ]:
+        for i, (nombres, apellidos, nac, sexo, tel) in enumerate(self.PACIENTES, 1):
+            codigo = f'PAC-{i:04d}'
             obj, _ = Paciente.objects.get_or_create(
                 codigo=codigo,
                 defaults={'nombres': nombres, 'apellidos': apellidos,
@@ -218,82 +272,246 @@ class Command(BaseCommand):
         AntecedenteMedico.objects.get_or_create(
             paciente=pacientes['PAC-0002'], tipo='Condición',
             defaults={'descripcion': 'Bruxismo nocturno en tratamiento'})
+        AntecedenteMedico.objects.get_or_create(
+            paciente=pacientes['PAC-0004'], tipo='Condición',
+            defaults={'descripcion': 'Hipertensión arterial controlada'})
 
-        # --- Citas: atendidas en el pasado (alimentan el historial y el
-        #     promedio del modelo) y programadas en los próximos días hábiles
-        #     (llenan el calendario) ---
-        # Las programadas no se anclan al lunes de la semana en curso: si se
-        # hiciera, el sábado quedarían todas en el pasado y el calendario
-        # aparecería vacío. Se colocan en los siguientes días hábiles, de modo
-        # que la demostración sirva cualquier día del año.
-        hoy = timezone.localdate()
-        lunes = hoy - timedelta(days=hoy.weekday())
-
-        habiles, dia = [], hoy
-        while len(habiles) < 5:
-            if dia.weekday() < 5:
-                habiles.append(dia)
-            dia += timedelta(days=1)
-
-        plan = [
-            # Desplazamiento negativo: días contados desde el lunes de esta
-            # semana (quedan en el pasado). Desplazamiento 0 a 4: el n-ésimo
-            # día hábil a partir de hoy.
-            # (desplazamiento, hora, paciente, procedimiento, odontólogo, estado, duración real)
-            (-7, time(8, 0), 'PAC-0001', 'PROC-001', giron, 'ATENDIDA', 28),
-            (-7, time(9, 0), 'PAC-0002', 'PROC-003', paz, 'ATENDIDA', 118),
-            (-6, time(8, 0), 'PAC-0003', 'PROC-002', giron, 'ATENDIDA', 51),
-            (-6, time(14, 0), 'PAC-0004', 'PROC-006', giron, 'ATENDIDA', 22),
-            (-5, time(9, 0), 'PAC-0005', 'PROC-004', paz, 'ATENDIDA', 47),
-            (-5, time(15, 0), 'PAC-0001', 'PROC-002', giron, 'ATENDIDA', 43),
-            (-4, time(8, 0), 'PAC-0006', 'PROC-001', giron, 'ATENDIDA', 33),
-            (-4, time(10, 0), 'PAC-0002', 'PROC-001', giron, 'ATENDIDA', 31),
-            (0, time(8, 0), 'PAC-0001', 'PROC-001', giron, 'PROGRAMADA', None),
-            (0, time(9, 0), 'PAC-0002', 'PROC-003', paz, 'PROGRAMADA', None),
-            (1, time(8, 0), 'PAC-0004', 'PROC-002', giron, 'PROGRAMADA', None),
-            # Simultánea con la anterior: ocupa el segundo sillón y deja la
-            # clínica sin unidades libres a esa hora, para poder mostrar la
-            # restricción de capacidad.
-            (1, time(8, 0), 'PAC-0005', 'PROC-001', paz, 'PROGRAMADA', None),
-            (1, time(10, 0), 'PAC-0003', 'PROC-005', paz, 'PROGRAMADA', None),
-            (1, time(14, 30), 'PAC-0006', 'PROC-001', giron, 'PROGRAMADA', None),
-            (2, time(9, 0), 'PAC-0005', 'PROC-004', paz, 'PROGRAMADA', None),
-            (2, time(11, 0), 'PAC-0003', 'PROC-001', giron, 'CANCELADA', None),
-            (3, time(8, 0), 'PAC-0002', 'PROC-002', giron, 'PROGRAMADA', None),
-            (3, time(15, 0), 'PAC-0001', 'PROC-006', giron, 'PROGRAMADA', None),
-            (4, time(9, 0), 'PAC-0006', 'PROC-003', paz, 'PROGRAMADA', None),
-        ]
-
-        creadas = 0
-        for desplazamiento, hora, cod_paciente, cod_proc, odo, estado_cita, real in plan:
-            fecha = (lunes + timedelta(days=desplazamiento) if desplazamiento < 0
-                     else habiles[desplazamiento])
-            procedimiento = procedimientos[cod_proc]
-            duracion = procedimiento.duracion_promedio_min
-            fin_dt = (timezone.datetime.combine(fecha, hora) + timedelta(minutes=duracion))
-            if Cita.objects.filter(paciente=pacientes[cod_paciente], fecha=fecha,
-                                   hora_inicio_programada=hora).exists():
-                continue
-            # Se asigna la primera unidad libre, igual que hace el sistema al
-            # programar desde la pantalla.
-            unidad = asignar_unidad(fecha, hora, fin_dt.time())
-            Cita.objects.create(
-                paciente=pacientes[cod_paciente], odontologo=odo,
-                procedimiento=procedimiento, unidad=unidad, fecha=fecha,
-                hora_inicio_programada=hora, hora_fin_programada=fin_dt.time(),
-                duracion_asignada_min=duracion,
-                hora_inicio_real=hora if real else None,
-                hora_fin_real=((timezone.datetime.combine(fecha, hora) +
-                                timedelta(minutes=real)).time() if real else None),
-                duracion_real_min=real, estado_cita=estado_cita)
-            creadas += 1
+        creadas = self.sembrar_agenda(lee, giron, pacientes, procedimientos)
 
         self.stdout.write(self.style.SUCCESS(
             f'Datos de la clínica: {Especialidad.objects.count()} especialidades, '
             f'{Procedimiento.objects.count()} procedimientos, '
-            f'{Odontologo.objects.count()} odontólogos, '
+            f'{Odontologo.objects.filter(estado=True).count()} odontólogos activos, '
             f'{Paciente.objects.count()} pacientes, '
             f'{Cita.objects.count()} citas ({creadas} nuevas).'))
+
+    # ==================================================================
+    # Generación de la agenda de demostración
+    # ==================================================================
+    # Semilla fija: la agenda resultante es aleatoria pero reproducible, de modo
+    # que una demostración repetida muestre siempre los mismos datos.
+    SEMILLA = 20261016
+
+    # Reparto de procedimientos según la especialidad del profesional. El peso
+    # refleja la frecuencia con que la clínica los realiza.
+    CARGA = {
+        'CD-20451': [  # ortodoncia
+            ('PROC-007', 34), ('PROC-005', 8), ('PROC-008', 5),
+            ('PROC-001', 16), ('PROC-002', 12), ('PROC-010', 8),
+            ('PROC-004', 6), ('PROC-009', 5), ('PROC-003', 3), ('PROC-006', 3),
+        ],
+        'CD-19877': [  # odontología general
+            ('PROC-001', 26), ('PROC-002', 22), ('PROC-010', 12),
+            ('PROC-004', 11), ('PROC-006', 9), ('PROC-009', 8),
+            ('PROC-003', 7), ('PROC-007', 5),
+        ],
+    }
+
+    # Factor de ritmo de cada profesional. Es la señal que el modelo debe
+    # aprender: el mismo procedimiento no dura lo mismo en manos distintas.
+    RITMO = {'CD-20451': 0.93, 'CD-19877': 1.07}
+
+    # Procedimientos cuya duración crece con el número de piezas tratadas.
+    ADITIVOS = {'PROC-002', 'PROC-009', 'PROC-010'}
+
+    # Semanas de historia y de agenda futura que se siembran.
+    SEMANAS_ATRAS = 6
+    SEMANAS_ADELANTE = 2
+
+    # Material e indicaciones habituales de cada procedimiento, para que la nota
+    # de evolución describa la atención con el detalle que el expediente exige.
+    DETALLE_CLINICO = {
+        'PROC-001': ('Pasta profiláctica, copa de hule, flúor en barniz',
+                     'Mantener la higiene habitual; se cita a control en seis meses.',
+                     False),
+        'PROC-002': ('Resina compuesta, adhesivo de séptima generación, ácido grabador',
+                     'Evitar alimentos duros durante veinticuatro horas.', True),
+        'PROC-003': ('Limas rotatorias, hipoclorito de sodio, gutapercha, cemento sellador',
+                     'Tomar el analgésico indicado; se cita para la restauración definitiva.',
+                     True),
+        'PROC-004': ('Lidocaína al dos por ciento con epinefrina, sutura de seda',
+                     'Morder la gasa durante treinta minutos; dieta blanda y fría por un día.',
+                     True),
+        'PROC-005': ('Brackets metálicos de prescripción Roth, arco de níquel-titanio 014',
+                     'Dieta blanda la primera semana; se cita a control en cuatro semanas.',
+                     False),
+        'PROC-006': ('Barniz fluorado al cinco por ciento',
+                     'No ingerir alimentos durante treinta minutos.', False),
+        'PROC-007': ('Arco de acero, ligaduras elásticas',
+                     'Se cita a control en cuatro semanas.', False),
+        'PROC-008': ('Alicate de retiro, fresa de pulido, retenedor termoformado',
+                     'Uso del retenedor durante veintidós horas al día.', False),
+        'PROC-009': ('Sellante fotopolimerizable, ácido grabador',
+                     'No ingerir alimentos duros durante el resto del día.', False),
+        'PROC-010': ('Ultrasonido, curetas Gracey, clorhexidina al cero coma doce',
+                     'Enjuague con clorhexidina durante siete días.', True),
+    }
+
+    COMPLICACIONES = [
+        'Sangrado que obligó a prolongar la hemostasia.',
+        'Anestesia de efecto tardío; se requirió refuerzo.',
+        'Paciente con reflejo nauseoso acentuado; se trabajó en intervalos.',
+        'Conducto con anatomía atípica que demandó instrumentación adicional.',
+        'Pieza con mayor profundidad de caries que la observada en el diagnóstico.',
+    ]
+
+    def documentar(self, cita, piezas, complicacion, rng):
+        """Redacta la nota de evolución de una cita atendida.
+
+        Las variables que la nota registra son las mismas que determinaron la
+        duración real de la atención, de modo que el conjunto de entrenamiento
+        quede internamente coherente.
+        """
+        from clinico.models import NotaClinica
+
+        materiales, indicaciones, anestesia = self.DETALLE_CLINICO.get(
+            cita.procedimiento.codigo, ('', 'Control en seis meses.', False))
+        NotaClinica.objects.create(
+            cita=cita, paciente=cita.paciente, odontologo=cita.odontologo,
+            fecha=cita.fecha, motivo=cita.procedimiento.nombre,
+            hallazgos_clinicos='Tejidos blandos sin alteraciones aparentes. '
+                               'Higiene oral aceptable.',
+            procedimiento_realizado=(
+                f'{cita.procedimiento.nombre} concluido según lo planificado'
+                + (f' en {piezas} piezas.' if piezas > 1 else '.')),
+            num_piezas=piezas, anestesia=anestesia, materiales=materiales,
+            complicacion=complicacion,
+            detalle_complicacion=rng.choice(self.COMPLICACIONES) if complicacion else '',
+            indicaciones=indicaciones, registrado_por='seed')
+
+    def sembrar_agenda(self, lee, giron, pacientes, procedimientos):
+        """Genera dos meses de agenda: historia atendida y citas por atender.
+
+        La historia es la que alimenta al modelo predictivo, de modo que no se
+        construye con duraciones iguales a las del catálogo: la duración real de
+        cada atención se obtiene de un procedimiento base afectado por el ritmo
+        del profesional, el número de piezas tratadas y la aparición de
+        complicaciones, más una dispersión aleatoria. Así el promedio histórico
+        y el modelo tienen señal real que recuperar.
+        """
+        from django.utils import timezone
+
+        from agenda.models import Cita
+        from agenda.disponibilidad import asignar_unidad, franjas_efectivas
+
+        rng = random.Random(self.SEMILLA)
+        hoy = timezone.localdate()
+        lunes = hoy - timedelta(days=hoy.weekday())
+        inicio = lunes - timedelta(weeks=self.SEMANAS_ATRAS)
+        fin = lunes + timedelta(weeks=self.SEMANAS_ADELANTE, days=4)
+
+        lista_pacientes = list(pacientes.values())
+        odontologos = [lee, giron]
+        # Pacientes en tratamiento de ortodoncia: vuelven cada mes a control.
+        en_ortodoncia = rng.sample(lista_pacientes, 7)
+
+        def elegir_procedimiento(odo):
+            opciones = self.CARGA[odo.colegiado]
+            codigos = [c for c, _ in opciones]
+            pesos = [p for _, p in opciones]
+            return procedimientos[rng.choices(codigos, weights=pesos)[0]]
+
+        def piezas_de(codigo):
+            if codigo == 'PROC-005':
+                return rng.choice([10, 12, 14])
+            if codigo in ('PROC-002', 'PROC-009'):
+                return rng.choices([1, 2, 3], weights=[62, 28, 10])[0]
+            if codigo == 'PROC-010':
+                return rng.choice([1, 2])
+            return 1
+
+        creadas = 0
+        fecha = inicio
+        while fecha <= fin:
+            if fecha.weekday() > 4:
+                fecha += timedelta(days=1)
+                continue
+
+            for odo in odontologos:
+                # La ocupación no es uniforme: los lunes y los viernes la
+                # clínica agenda menos que a media semana.
+                ocupacion = {0: 0.62, 1: 0.80, 2: 0.84, 3: 0.78, 4: 0.58}[fecha.weekday()]
+                for f_ini, f_fin in franjas_efectivas(odo, fecha):
+                    momento = datetime.combine(fecha, f_ini)
+                    limite = datetime.combine(fecha, f_fin)
+                    while momento < limite:
+                        if rng.random() > ocupacion:
+                            momento += timedelta(minutes=rng.choice([15, 30]))
+                            continue
+
+                        proc = elegir_procedimiento(odo)
+                        piezas = piezas_de(proc.codigo)
+                        duracion = proc.duracion_promedio_min
+                        # El tiempo crece con el número de piezas solo donde el
+                        # trabajo es aditivo. La colocación de brackets abarca la
+                        # arcada completa en una sola sesión, de modo que su
+                        # duración no se multiplica por cada bracket.
+                        if piezas > 1 and proc.codigo in self.ADITIVOS:
+                            duracion += int(proc.duracion_promedio_min * 0.4 * (piezas - 1))
+                        duracion = max(15, int(round(duracion / 5) * 5))
+                        fin_dt = momento + timedelta(minutes=duracion)
+                        if fin_dt > limite:
+                            break
+
+                        inicio_h, fin_h = momento.time(), fin_dt.time()
+                        if Cita.objects.filter(odontologo=odo, fecha=fecha,
+                                               hora_inicio_programada=inicio_h).exists():
+                            momento = fin_dt + timedelta(minutes=rng.choice([0, 5, 10]))
+                            continue
+
+                        unidad = asignar_unidad(fecha, inicio_h, fin_h)
+                        if unidad is None:        # ambos sillones ocupados
+                            momento += timedelta(minutes=15)
+                            continue
+
+                        # Los pacientes en ortodoncia regresan a control; el
+                        # resto se reparte sobre el padrón completo.
+                        if proc.codigo in ('PROC-005', 'PROC-007', 'PROC-008'):
+                            paciente = rng.choice(en_ortodoncia)
+                        else:
+                            paciente = rng.choice(lista_pacientes)
+
+                        if fecha < hoy:
+                            estado = 'CANCELADA' if rng.random() < 0.07 else 'ATENDIDA'
+                        elif fecha == hoy and fin_h < timezone.localtime().time():
+                            estado = 'ATENDIDA'
+                        else:
+                            estado = 'CANCELADA' if rng.random() < 0.04 else 'PROGRAMADA'
+
+                        real = inicio_real = fin_real = None
+                        complicacion = False
+                        if estado == 'ATENDIDA':
+                            complicacion = rng.random() < 0.12
+                            factor = (self.RITMO[odo.colegiado]
+                                      * (1.28 if complicacion else 1.0)
+                                      * rng.gauss(1.0, 0.09))
+                            real = max(10, int(round(duracion * factor)))
+                            retraso = rng.choice([0, 0, 0, 5, 5, 10])
+                            inicio_real = (momento + timedelta(minutes=retraso)).time()
+                            fin_real = (momento + timedelta(minutes=retraso + real)).time()
+
+                        cita = Cita.objects.create(
+                            paciente=paciente, odontologo=odo, procedimiento=proc,
+                            unidad=unidad, fecha=fecha,
+                            hora_inicio_programada=inicio_h,
+                            hora_fin_programada=fin_h,
+                            duracion_asignada_min=duracion,
+                            hora_inicio_real=inicio_real, hora_fin_real=fin_real,
+                            duracion_real_min=real, estado_cita=estado,
+                            observaciones=f'Piezas por tratar: {piezas}.' if piezas > 1 else '')
+                        creadas += 1
+                        if estado == 'ATENDIDA':
+                            self.documentar(cita, piezas, complicacion, rng)
+                        momento = fin_dt + timedelta(minutes=rng.choice([0, 5, 10, 15]))
+            fecha += timedelta(days=1)
+
+        atendidas = Cita.objects.filter(estado_cita='ATENDIDA').count()
+        programadas = Cita.objects.filter(estado_cita='PROGRAMADA').count()
+        self.stdout.write(self.style.SUCCESS(
+            f'Agenda sembrada del {inicio:%d/%m/%Y} al {fin:%d/%m/%Y}: '
+            f'{atendidas} atendidas (historial del modelo) y '
+            f'{programadas} programadas.'))
+        return creadas
 
     # ==================================================================
     def normalizar(self):
@@ -361,7 +579,6 @@ class Command(BaseCommand):
         inicio las variables que solo la nota clínica aporta: piezas tratadas,
         anestesia y complicaciones.
         """
-        from datetime import time, timedelta
         from decimal import Decimal
 
         from django.utils import timezone
@@ -415,50 +632,9 @@ class Command(BaseCommand):
                               'registrado_por': 'seed'})
                 nuevos_hallazgos += 1 if creado else 0
 
-        # -------------------------------------------------------- notas clínicas
-        # Una nota por cada cita ya atendida. Los valores de piezas, anestesia y
-        # complicación varían a propósito: son las variables que explican por qué
-        # dos citas del mismo procedimiento no duran lo mismo.
-        perfiles = {
-            'PROC-001': dict(piezas=1, anestesia=False, materiales='Pasta profiláctica, flúor'),
-            'PROC-002': dict(piezas=2, anestesia=True, materiales='Resina compuesta A2, adhesivo'),
-            'PROC-003': dict(piezas=1, anestesia=True, materiales='Limas, gutapercha, cemento'),
-            'PROC-004': dict(piezas=1, anestesia=True, materiales='Lidocaína al 2%, sutura'),
-            'PROC-005': dict(piezas=14, anestesia=False, materiales='Brackets metálicos, arco 014'),
-            'PROC-006': dict(piezas=1, anestesia=False, materiales='Barniz fluorado'),
-        }
-        nuevas_notas = 0
-        atendidas = (Cita.objects
-                     .filter(estado_cita='ATENDIDA', estado=True)
-                     .select_related('paciente', 'odontologo', 'procedimiento')
-                     .order_by('fecha'))
-        for indice, cita in enumerate(atendidas):
-            if NotaClinica.objects.filter(cita=cita).exists():
-                continue
-            perfil = perfiles.get(cita.procedimiento.codigo,
-                                  dict(piezas=1, anestesia=False, materiales=''))
-            # Una de cada cuatro atenciones se documenta con complicación, que es
-            # el orden de magnitud que la clínica reporta y lo que permite ver el
-            # efecto de esa variable en la duración real.
-            complicacion = (indice % 4 == 3)
-            NotaClinica.objects.create(
-                cita=cita, paciente=cita.paciente, odontologo=cita.odontologo,
-                fecha=cita.fecha, motivo=cita.procedimiento.nombre,
-                hallazgos_clinicos='Tejidos blandos sin alteraciones aparentes.',
-                procedimiento_realizado=f'{cita.procedimiento.nombre} concluido '
-                                        f'según lo planificado.',
-                num_piezas=perfil['piezas'], anestesia=perfil['anestesia'],
-                materiales=perfil['materiales'],
-                complicacion=complicacion,
-                detalle_complicacion=('Sangrado que obligó a prolongar la '
-                                      'hemostasia.' if complicacion else ''),
-                indicaciones='Evitar alimentos duros durante 24 horas.',
-                registrado_por='seed')
-            nuevas_notas += 1
-
         # ------------------------------------------------- planes de tratamiento
-        giron = Odontologo.objects.filter(colegiado='CD-10245').first()
-        paz = Odontologo.objects.filter(colegiado='CD-14892').first()
+        lee = Odontologo.objects.filter(colegiado='CD-20451').first()
+        giron = Odontologo.objects.filter(colegiado='CD-19877').first()
 
         def procedimiento(codigo):
             return Procedimiento.objects.filter(codigo=codigo).first()
@@ -473,7 +649,7 @@ class Command(BaseCommand):
               (2, 'PROC-002', 16, 1),
               (2, 'PROC-002', 26, 1),
               (2, 'PROC-006', None, 1)]),
-            ('PLAN-0002', 'PAC-0002', paz, 'BORRADOR', Decimal('0.00'),
+            ('PLAN-0002', 'PAC-0002', lee, 'BORRADOR', Decimal('0.00'),
              'Fractura del ángulo vestibular en pieza 27 y tercer molar 48 '
              'retenido con indicación quirúrgica.',
              [(1, 'PROC-004', 48, 1),
@@ -527,5 +703,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f'Expediente clínico: {Hallazgo.objects.count()} hallazgos '
             f'({nuevos_hallazgos} nuevos), {NotaClinica.objects.count()} notas '
-            f'({nuevas_notas} nuevas), {PlanTratamiento.objects.count()} planes '
+            f'de evolución, {PlanTratamiento.objects.count()} planes '
             f'({nuevos_planes} nuevos), {Pago.objects.count()} pagos.'))

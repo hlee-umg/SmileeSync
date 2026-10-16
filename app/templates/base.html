@@ -91,6 +91,10 @@
     .leyenda-pieza { display:inline-block; width:14px; height:14px; border-radius:3px;
                      vertical-align:-2px; border:1px solid #cbd5e1; }
 
+    /* --- Lienzos de las gráficas del módulo de reportes --- */
+    .lienzo { position:relative; height:260px; }
+    .lienzo-alto { height:400px; }
+
     /* --- Fases y sesiones del plan --- */
     .fase-sesion { border-left:3px solid var(--smilee2); background:#f8fafc;
                    border-radius:.35rem; }
@@ -133,11 +137,11 @@
         {% endif %}
 
         {% if user.rol.puede_inteligencia or user.es_admin %}
-        <li class="nav-item"><a class="nav-link muted-link" href="#" title="Módulo en desarrollo"><i class="bi bi-cpu"></i> Inteligencia</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/inteligencia' in request.path %}active{% endif %}" href="{% url 'inteligencia:panel' %}"><i class="bi bi-cpu"></i> Inteligencia</a></li>
         {% endif %}
 
         {% if user.rol.puede_reportes or user.es_admin %}
-        <li class="nav-item"><a class="nav-link muted-link" href="#" title="Módulo en desarrollo"><i class="bi bi-bar-chart"></i> Reportes</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/reportes' in request.path %}active{% endif %}" href="{% url 'reportes:panel' %}"><i class="bi bi-bar-chart"></i> Reportes</a></li>
         {% endif %}
       </ul>
     </nav>

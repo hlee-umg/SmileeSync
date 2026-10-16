@@ -1,0 +1,24 @@
+[Unit]
+Description=SmileeSync — entrenamiento del modelo de estimación de duraciones
+Documentation=https://github.com/hlee-umg/SmileeSync
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/smileesync/app
+EnvironmentFile=/home/ubuntu/smileesync/app/.env
+# --solo-si-mejora deja en producción la versión nueva únicamente cuando reduce
+# el error de la vigente; un reentrenamiento con datos de mala calidad no
+# degrada la estimación, solo queda registrado como histórico.
+ExecStart=/home/ubuntu/smileesync/app/.venv/bin/python manage.py entrenar \
+    --algoritmo RF --solo-si-mejora
+# El entrenamiento carga scikit-learn y pandas (~140 MB). El límite evita que,
+# si el conjunto crece mucho, el proceso compita por memoria con Gunicorn y
+# PostgreSQL en una instancia de 2 GB: prefiere fallar y reintentar el mes
+# siguiente antes que dejar sin memoria al servidor web.
+MemoryMax=600M
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

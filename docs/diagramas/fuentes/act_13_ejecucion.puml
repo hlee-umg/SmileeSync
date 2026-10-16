@@ -1,0 +1,84 @@
+@startuml
+title Proceso de ejecución del plan de tratamiento
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el plan de tratamiento
+aprobado;
+|Sistema|
+if (¿El plan está aprobado
+o en curso?) then (no)
+  |Recepcionista|
+  :Visualizar que solo se agendan
+  renglones de un plan vigente;
+  stop
+else (sí)
+endif
+|Sistema|
+|Recepcionista|
+repeat
+:Seleccionar un renglón pendiente
+y solicitar su agendado;
+  |Sistema|
+  :Abrir el formulario de cita
+  con el paciente, el odontólogo,
+  el procedimiento y la duración
+  estimada del renglón;
+  |Recepcionista|
+  :Elegir la fecha y la hora
+  entre los espacios disponibles;
+  |Sistema|
+  :Aplicar las validaciones
+  de la agenda;
+  :Crear la cita y vincularla
+  al renglón del plan;
+  :Marcar el renglón
+  como agendado;
+  |Odontólogo|
+  :Atender al paciente
+  en la fecha programada;
+  |Recepcionista|
+  :Registrar los tiempos reales
+  de la atención;
+  |Sistema|
+  :Marcar el renglón
+  como completado;
+  :Recalcular el avance y los
+  minutos de sillón pendientes;
+  |Recepcionista|
+repeat while (¿Quedan renglones
+pendientes?) is (sí)
+|Sistema|
+:Cerrar el plan
+como finalizado;
+if (¿El plan conserva saldo
+pendiente?) then (sí)
+  |Recepcionista|
+  :Visualizar el aviso
+  de saldo por cobrar;
+else (no)
+endif
+|Sistema|
+stop
+@enduml

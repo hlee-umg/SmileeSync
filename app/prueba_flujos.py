@@ -73,8 +73,10 @@ c.force_login(admin)
 odo = Odontologo.objects.filter(estado=True, horarios__estado=True).distinct().first()
 proc = Procedimiento.objects.filter(estado=True).order_by('duracion_promedio_min').first()
 pac = Paciente.objects.filter(estado=True).first()
+# Se busca un día hábil que la agenda sembrada no haya ocupado: dos meses
+# de citas de demostración dejan sin espacio las fechas cercanas.
 siguiente = hoy + timedelta(days=1)
-while siguiente.weekday() > 4:
+while siguiente.weekday() > 4 or Cita.objects.filter(fecha=siguiente).exists():
     siguiente += timedelta(days=1)
 # Se pide la semana del próximo día hábil: la semana en curso puede no tener
 # ninguno (un sábado) y entonces no hay espacios libres que proponer.

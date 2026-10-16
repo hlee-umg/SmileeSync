@@ -31,3 +31,6 @@ infra/.venv/
 *.pem
 *.key
 *.ppk
+
+# Modelos entrenados por "manage.py entrenar": se regeneran y pesan varios MB.
+app/modelos/

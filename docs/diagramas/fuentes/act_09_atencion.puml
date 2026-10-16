@@ -1,0 +1,86 @@
+@startuml
+title Proceso de registro de la atención y realimentación del modelo
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el detalle de la cita
+desde el calendario;
+if (¿La cita está vigente?) then (no)
+  :Visualizar que la cita
+  no admite cambios;
+  stop
+else (sí)
+endif
+:Seleccionar la opción
+de registrar la atención;
+:Capturar la hora real
+de inicio y de finalización;
+|Sistema|
+if (¿La hora de fin es posterior
+a la de inicio?) then (no)
+  |Recepcionista|
+  :Corregir las horas;
+  detach
+else (sí)
+endif
+|Sistema|
+:Calcular la duración real
+en minutos;
+:Cambiar el estado de la cita
+a atendida;
+:Registrar la atención
+en el historial de la agenda;
+|Componente predictivo|
+:Incorporar la cita al conjunto
+de entrenamiento con su
+procedimiento, odontólogo, día,
+hora y duración real;
+|Sistema|
+if (¿La cita atiende un renglón
+de un plan de tratamiento?) then (sí)
+  :Marcar el renglón
+  como completado;
+  :Recalcular el avance del plan;
+  if (¿Se completaron todos
+  los renglones?) then (sí)
+    :Cerrar el plan
+    como finalizado;
+  else (no)
+    :Mantener el plan
+    en curso;
+  endif
+else (no)
+endif
+|Recepcionista|
+:Visualizar la desviación entre
+la duración estimada y la real;
+|Odontólogo|
+if (¿Tiene competencia para
+registrar el expediente?) then (sí)
+  :Redactar la nota clínica
+  de la visita;
+else (no)
+endif
+stop
+@enduml

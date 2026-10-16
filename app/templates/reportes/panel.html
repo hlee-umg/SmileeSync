@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% block titulo %}Reportes e indicadores — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Reportes e Indicadores{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">Desempeño de la clínica</h5>
+    <span class="small text-secondary">
+      Del {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }} ·
+      generado el {{ generado|date:"d/m/Y H:i" }}
+    </span>
+  </div>
+  <form class="d-flex gap-2 align-items-center">
+    <label class="small text-secondary mb-0">Período</label>
+    <select name="semanas" class="form-select form-select-sm" style="width:auto;"
+            onchange="this.form.submit()">
+      {% for o in opciones %}
+        <option value="{{ o }}" {% if semanas == o %}selected{% endif %}>
+          Últimas {{ o }} semanas
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ resumen.atendidas }}</div>
+      <div class="etiqueta">Atenciones realizadas</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ resumen.horas_sillon|floatformat:1 }}</div>
+      <div class="etiqueta">Horas de sillón ocupadas</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ resumen.utilizacion|floatformat:1 }}%</div>
+      <div class="etiqueta">Utilización de la agenda</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">
+        {% if resumen.mae %}{{ resumen.mae|floatformat:1 }}{% else %}—{% endif %}
+      </div>
+      <div class="etiqueta">Error medio absoluto (min)</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-1">Atenciones por semana</h6>
+        <p class="small text-secondary mb-3">
+          Citas cerradas frente a citas canceladas en cada semana del período.
+          La tasa de cancelación del período fue de
+          {{ resumen.tasa_cancelacion|floatformat:1 }}%.
+        </p>
+        <div class="lienzo"><canvas id="g-semanal"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3" style="border-top:4px solid var(--smilee2) !important;">
+      <div class="card-body">
+        <h6 class="mb-1">
+          <i class="bi bi-cpu text-primary"></i>
+          Duración de referencia frente a duración real
+        </h6>
+        <p class="small text-secondary mb-3">
+          Contraste entre los minutos que el catálogo declara para cada
+          procedimiento y los que la clínica tarda realmente. La distancia entre
+          ambas barras es lo que el modelo predictivo corrige: donde la barra
+          naranja supera a la azul, el bloque reservado se queda corto.
+        </p>
+        <div class="lienzo lienzo-alto"><canvas id="g-precision"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-1">Distribución de la jornada</h6>
+        <p class="small text-secondary mb-3">
+          Número de atenciones iniciadas en cada hora del día.
+        </p>
+        <div class="lienzo"><canvas id="g-horas"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3">Carga por odontólogo</h6>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Profesional</th><th class="text-center">Atenciones</th>
+                <th class="text-center">Horas</th><th class="text-center">Utilización</th></tr>
+          </thead>
+          <tbody>
+            {% for c in carga %}
+            <tr>
+              <td class="small">{{ c.odontologo }}
+                <div class="text-secondary" style="font-size:.7rem;">{{ c.especialidad }}</div>
+              </td>
+              <td class="text-center small">{{ c.atenciones }}</td>
+              <td class="text-center small">{{ c.horas|floatformat:1 }}</td>
+              <td class="text-center small">{{ c.utilizacion|floatformat:1 }}%</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="small text-secondary py-3">Sin atenciones en el período.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-3">Procedimientos más frecuentes</h6>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Procedimiento</th><th class="text-center">Veces</th>
+                <th class="text-center">Horas</th></tr>
+          </thead>
+          <tbody>
+            {% for p in frecuentes %}
+            <tr>
+              <td class="small">{{ p.nombre }}</td>
+              <td class="text-center small">{{ p.veces }}</td>
+              <td class="text-center small">{{ p.horas|floatformat:1 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="small text-secondary py-3">Sin datos en el período.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-1">Desviación por procedimiento</h6>
+        <p class="small text-secondary mb-2">
+          Mismos datos de la gráfica, en tabla. Se incluyen únicamente los
+          procedimientos con al menos tres atenciones registradas.
+        </p>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Procedimiento</th><th class="text-center">Catálogo</th>
+                <th class="text-center">Real</th><th class="text-center">Desvío</th>
+                <th class="text-center">n</th></tr>
+          </thead>
+          <tbody>
+            {% for f in precision %}
+            <tr>
+              <td class="small">{{ f.nombre }}</td>
+              <td class="text-center small">{{ f.catalogo }} min</td>
+              <td class="text-center small">{{ f.real|floatformat:1 }} min</td>
+              <td class="text-center small {% if f.desvio > 0 %}text-danger{% elif f.desvio < 0 %}text-success{% endif %}">
+                {% if f.desvio > 0 %}+{% endif %}{{ f.desvio_pct|floatformat:1 }}%
+              </td>
+              <td class="text-center small text-secondary">{{ f.atenciones }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="small text-secondary py-3">
+              Aún no hay suficientes atenciones registradas.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ serie_semanal|json_script:"d-semanal" }}
+{{ serie_precision|json_script:"d-precision" }}
+{{ serie_horas|json_script:"d-horas" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === 'undefined') return;   // sin red, las tablas siguen sirviendo
+
+  // Paleta categórica verificada: la separación entre ambos tonos se mantiene
+  // bajo protanopia y deuteranopia, de modo que las series no dependen del color
+  // para distinguirse.
+  const SERIE_1 = '#2a78d6';
+  const SERIE_2 = '#eb6834';
+  const TINTA = '#334155';
+  const TENUE = '#64748b';
+  const REJILLA = '#e8ecf2';
+
+  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = TENUE;
+
+  const leer = (id) => JSON.parse(JSON.parse(document.getElementById(id).textContent));
+
+  const ejes = (titulo) => ({
+    x: { grid: { display: false }, border: { color: REJILLA },
+         ticks: { color: TENUE } },
+    y: { beginAtZero: true, grid: { color: REJILLA, drawTicks: false },
+         border: { display: false },
+         ticks: { color: TENUE, padding: 8 },
+         title: { display: !!titulo, text: titulo, color: TENUE } },
+  });
+
+  const comunes = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10,
+                usePointStyle: true, pointStyle: 'rectRounded', color: TINTA,
+                padding: 14 } },
+      tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 6,
+                 titleFont: { weight: '600' }, displayColors: true,
+                 boxWidth: 10, boxHeight: 10, boxPadding: 4 },
+    },
+  };
+
+  // ── Atenciones por semana ────────────────────────────────────────────────
+  const semanal = leer('d-semanal');
+  new Chart(document.getElementById('g-semanal'), {
+    type: 'bar',
+    data: {
+      labels: semanal.etiquetas,
+      datasets: [
+        { label: 'Atendidas', data: semanal.atendidas, backgroundColor: SERIE_1,
+          borderRadius: 4, borderSkipped: 'bottom', maxBarThickness: 22 },
+        { label: 'Canceladas', data: semanal.canceladas, backgroundColor: SERIE_2,
+          borderRadius: 4, borderSkipped: 'bottom', maxBarThickness: 22 },
+      ],
+    },
+    options: Object.assign({}, comunes, {
+      scales: ejes('Citas'),
+      datasets: { bar: { barPercentage: 0.82, categoryPercentage: 0.74 } },
+    }),
+  });
+
+  // ── Catálogo contra duración real ────────────────────────────────────────
+  const precision = leer('d-precision');
+  new Chart(document.getElementById('g-precision'), {
+    type: 'bar',
+    data: {
+      labels: precision.etiquetas,
+      datasets: [
+        { label: 'Duración del catálogo', data: precision.catalogo,
+          backgroundColor: SERIE_1, borderRadius: 4, borderSkipped: 'start',
+          maxBarThickness: 14 },
+        { label: 'Duración real promedio', data: precision.real,
+          backgroundColor: SERIE_2, borderRadius: 4, borderSkipped: 'start',
+          maxBarThickness: 14 },
+      ],
+    },
+    options: Object.assign({}, comunes, {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, grid: { color: REJILLA, drawTicks: false },
+             border: { display: false },
+             title: { display: true, text: 'Minutos', color: TENUE } },
+        y: { grid: { display: false }, border: { color: REJILLA },
+             ticks: { color: TINTA, autoSkip: false } },
+      },
+      datasets: { bar: { barPercentage: 0.84, categoryPercentage: 0.76 } },
+    }),
+  });
+
+  // ── Distribución de la jornada (serie única: sin leyenda) ────────────────
+  const horas = leer('d-horas');
+  new Chart(document.getElementById('g-horas'), {
+    type: 'bar',
+    data: {
+      labels: horas.etiquetas,
+      datasets: [{ label: 'Atenciones iniciadas', data: horas.valores,
+                   backgroundColor: SERIE_1, borderRadius: 4,
+                   borderSkipped: 'bottom', maxBarThickness: 26 }],
+    },
+    options: Object.assign({}, comunes, {
+      plugins: Object.assign({}, comunes.plugins, { legend: { display: false } }),
+      scales: ejes('Atenciones'),
+    }),
+  });
+})();
+</script>
+
+{% endblock %}

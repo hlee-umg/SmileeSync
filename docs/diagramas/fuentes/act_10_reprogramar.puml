@@ -1,0 +1,80 @@
+@startuml
+title Proceso de reprogramación y cancelación de citas
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el detalle de la cita;
+if (¿La cita está programada
+o reprogramada?) then (no)
+  :Visualizar que la cita
+  ya está cerrada;
+  stop
+else (sí)
+endif
+if (¿Qué acción se requiere?) then (reprogramar)
+  :Modificar la fecha,
+  la hora o la duración;
+  |Sistema|
+  :Aplicar las mismas validaciones
+  de horario, traslape y
+  unidad dental;
+  if (¿Las validaciones
+  se cumplen?) then (no)
+    |Recepcionista|
+    :Corregir los datos;
+    detach
+  else (sí)
+  endif
+|Sistema|
+  :Guardar el estado anterior
+  en el historial;
+  :Actualizar la cita y marcarla
+  como reprogramada;
+  :Liberar la unidad anterior
+  y asignar la que corresponda;
+else (cancelar)
+  |Recepcionista|
+  :Confirmar la cancelación
+  e indicar el motivo;
+  |Sistema|
+  :Guardar el estado anterior
+  en el historial;
+  :Cambiar el estado
+  a cancelada;
+  :Agregar el motivo
+  a las observaciones;
+  :Liberar la unidad dental
+  y el espacio en la agenda;
+  note right
+    La cita no se elimina:
+    conserva su registro para
+    el análisis posterior.
+  end note
+endif
+|Recepcionista|
+|Recepcionista|
+:Visualizar el calendario
+actualizado;
+stop
+@enduml

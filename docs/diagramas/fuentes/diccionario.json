@@ -1,0 +1,1694 @@
+[
+ {
+  "tabla": "rol",
+  "modulo": "Seguridad y Usuarios",
+  "verbose": "Rol",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "nombre",
+    "tipo": "varchar(50)",
+    "nulo": "No",
+    "descripcion": "Nombre. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "descripcion",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Descripción."
+   },
+   {
+    "nombre": "puede_usuarios",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo usuarios."
+   },
+   {
+    "nombre": "puede_pacientes",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo pacientes."
+   },
+   {
+    "nombre": "puede_catalogos",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo catálogos."
+   },
+   {
+    "nombre": "puede_agenda",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo agenda."
+   },
+   {
+    "nombre": "puede_clinico",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo expediente clínico."
+   },
+   {
+    "nombre": "puede_finanzas",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo cobros."
+   },
+   {
+    "nombre": "puede_inteligencia",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo inteligencia."
+   },
+   {
+    "nombre": "puede_reportes",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Módulo reportes."
+   },
+   {
+    "nombre": "solo_lectura",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Solo consulta. Permite ver los módulos asignados, sin crear ni modificar registros."
+   },
+   {
+    "nombre": "escritura_clinica",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Puede registrar en el expediente. Permite registrar odontograma, notas clínicas y planes de tratamiento. Corresponde al personal odontológico."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "usuario",
+  "modulo": "Seguridad y Usuarios",
+  "verbose": "Usuario",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "password",
+    "tipo": "varchar(128)",
+    "nulo": "No",
+    "descripcion": "Contraseña."
+   },
+   {
+    "nombre": "last_login",
+    "tipo": "timestamp",
+    "nulo": "Sí",
+    "descripcion": "Último inicio de sesión."
+   },
+   {
+    "nombre": "is_superuser",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Estado de superusuario. Indica que este usuario tiene todos los permisos sin asignárselos explícitamente."
+   },
+   {
+    "nombre": "username",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Nombre de usuario. El valor no puede repetirse en la tabla. Requerido. 150 carácteres como máximo. Únicamente letras, dígitos y @/./+/-/_"
+   },
+   {
+    "nombre": "first_name",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Nombre."
+   },
+   {
+    "nombre": "last_name",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Apellidos."
+   },
+   {
+    "nombre": "is_staff",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Es staff. Indica si el usuario puede entrar en este sitio de administración."
+   },
+   {
+    "nombre": "is_active",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Indica si el usuario debe ser tratado como activo. Desmarque esta opción en lugar de borrar la cuenta."
+   },
+   {
+    "nombre": "date_joined",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha de alta."
+   },
+   {
+    "nombre": "email",
+    "tipo": "varchar(254)",
+    "nulo": "No",
+    "descripcion": "Correo electrónico. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "rol_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Rol. Llave foránea hacia la tabla «rol»."
+   },
+   {
+    "nombre": "telefono",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Teléfono."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "pregunta_secreta",
+    "tipo": "varchar(10)",
+    "nulo": "No",
+    "descripcion": "Pregunta secreta. Valores admitidos: MASCOTA, CIUDAD, ESCUELA, MADRE, APODO."
+   },
+   {
+    "nombre": "respuesta_secreta",
+    "tipo": "varchar(128)",
+    "nulo": "No",
+    "descripcion": "Respuesta secreta (cifrada)."
+   }
+  ]
+ },
+ {
+  "tabla": "historial_usuario",
+  "modulo": "Seguridad y Usuarios",
+  "verbose": "Historial de usuario",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "usuario_ref",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Id de usuario."
+   },
+   {
+    "nombre": "username",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Username."
+   },
+   {
+    "nombre": "nombre_completo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Nombre completo."
+   },
+   {
+    "nombre": "email",
+    "tipo": "varchar(254)",
+    "nulo": "No",
+    "descripcion": "Email."
+   },
+   {
+    "nombre": "rol",
+    "tipo": "varchar(50)",
+    "nulo": "No",
+    "descripcion": "Rol."
+   },
+   {
+    "nombre": "estado_anterior",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Estado anterior."
+   },
+   {
+    "nombre": "accion",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Accion. Valores admitidos: CREACION, ACTUALIZACION, DESACTIVACION, ACTIVACION."
+   },
+   {
+    "nombre": "realizado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Realizado por."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   }
+  ]
+ },
+ {
+  "tabla": "especialidad",
+  "modulo": "Catálogo Odontológico",
+  "verbose": "Especialidad",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "nombre",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Nombre. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "descripcion",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Descripción."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "procedimiento",
+  "modulo": "Catálogo Odontológico",
+  "verbose": "Procedimiento",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Código. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "nombre",
+    "tipo": "varchar(120)",
+    "nulo": "No",
+    "descripcion": "Nombre."
+   },
+   {
+    "nombre": "especialidad_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Especialidad. Llave foránea hacia la tabla «especialidad»."
+   },
+   {
+    "nombre": "nivel_complejidad",
+    "tipo": "varchar(5)",
+    "nulo": "No",
+    "descripcion": "Nivel de complejidad. Valores admitidos: BAJA, MEDIA, ALTA."
+   },
+   {
+    "nombre": "duracion_promedio_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración promedio (min)."
+   },
+   {
+    "nombre": "precio",
+    "tipo": "numeric(10,2)",
+    "nulo": "No",
+    "descripcion": "Precio de lista (Q)."
+   },
+   {
+    "nombre": "descripcion",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Descripción."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "odontologo",
+  "modulo": "Catálogo Odontológico",
+  "verbose": "Odontólogo",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "usuario_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Usuario del sistema. Llave foránea hacia la tabla «usuario»."
+   },
+   {
+    "nombre": "nombres",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Nombres."
+   },
+   {
+    "nombre": "apellidos",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Apellidos."
+   },
+   {
+    "nombre": "colegiado",
+    "tipo": "varchar(30)",
+    "nulo": "No",
+    "descripcion": "Número de colegiado."
+   },
+   {
+    "nombre": "especialidad_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Especialidad. Llave foránea hacia la tabla «especialidad»."
+   },
+   {
+    "nombre": "telefono",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Teléfono."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "unidad_dental",
+  "modulo": "Catálogo Odontológico",
+  "verbose": "Unidad dental",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Código. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "nombre",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Nombre."
+   },
+   {
+    "nombre": "ubicacion",
+    "tipo": "varchar(120)",
+    "nulo": "No",
+    "descripcion": "Ubicación."
+   },
+   {
+    "nombre": "observaciones",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Observaciones."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "paciente",
+  "modulo": "Pacientes",
+  "verbose": "Paciente",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Código. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "nombres",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Nombres."
+   },
+   {
+    "nombre": "apellidos",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Apellidos."
+   },
+   {
+    "nombre": "fecha_nacimiento",
+    "tipo": "date",
+    "nulo": "Sí",
+    "descripcion": "Fecha de nacimiento."
+   },
+   {
+    "nombre": "sexo",
+    "tipo": "varchar(1)",
+    "nulo": "No",
+    "descripcion": "Sexo. Valores admitidos: M, F."
+   },
+   {
+    "nombre": "telefono",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Teléfono."
+   },
+   {
+    "nombre": "email",
+    "tipo": "varchar(254)",
+    "nulo": "No",
+    "descripcion": "Correo."
+   },
+   {
+    "nombre": "direccion",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Dirección."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "antecedente_medico",
+  "modulo": "Pacientes",
+  "verbose": "Antecedente médico",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "paciente_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Paciente. Llave foránea hacia la tabla «paciente»."
+   },
+   {
+    "nombre": "tipo",
+    "tipo": "varchar(60)",
+    "nulo": "No",
+    "descripcion": "Tipo."
+   },
+   {
+    "nombre": "descripcion",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Descripción."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "historial_paciente",
+  "modulo": "Pacientes",
+  "verbose": "Historial de paciente",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "paciente_ref",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Id de paciente."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Codigo."
+   },
+   {
+    "nombre": "nombre_completo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Nombre completo."
+   },
+   {
+    "nombre": "estado_anterior",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Estado anterior."
+   },
+   {
+    "nombre": "accion",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Accion. Valores admitidos: CREACION, ACTUALIZACION, DESACTIVACION, ACTIVACION."
+   },
+   {
+    "nombre": "realizado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Realizado por."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   }
+  ]
+ },
+ {
+  "tabla": "horario_disponibilidad",
+  "modulo": "Agenda y Citas",
+  "verbose": "Horario de disponibilidad",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "odontologo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Odontólogo. Llave foránea hacia la tabla «odontologo»."
+   },
+   {
+    "nombre": "dia_semana",
+    "tipo": "varchar(3)",
+    "nulo": "No",
+    "descripcion": "Día de la semana. Valores admitidos: LUN, MAR, MIE, JUE, VIE, SAB."
+   },
+   {
+    "nombre": "hora_inicio",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora de inicio."
+   },
+   {
+    "nombre": "hora_fin",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora de fin."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "cita",
+  "modulo": "Agenda y Citas",
+  "verbose": "Cita",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "paciente_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Paciente. Llave foránea hacia la tabla «paciente»."
+   },
+   {
+    "nombre": "odontologo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Odontólogo. Llave foránea hacia la tabla «odontologo»."
+   },
+   {
+    "nombre": "procedimiento_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Procedimiento. Llave foránea hacia la tabla «procedimiento»."
+   },
+   {
+    "nombre": "unidad_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Unidad dental. Llave foránea hacia la tabla «unidad_dental»."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   },
+   {
+    "nombre": "hora_inicio_programada",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora inicio programada."
+   },
+   {
+    "nombre": "hora_fin_programada",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora fin programada."
+   },
+   {
+    "nombre": "hora_inicio_real",
+    "tipo": "time",
+    "nulo": "Sí",
+    "descripcion": "Hora inicio real."
+   },
+   {
+    "nombre": "hora_fin_real",
+    "tipo": "time",
+    "nulo": "Sí",
+    "descripcion": "Hora fin real."
+   },
+   {
+    "nombre": "duracion_asignada_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración asignada (min)."
+   },
+   {
+    "nombre": "duracion_real_min",
+    "tipo": "integer",
+    "nulo": "Sí",
+    "descripcion": "Duración real (min)."
+   },
+   {
+    "nombre": "estado_cita",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Estado de la cita. Valores admitidos: PROGRAMADA, ATENDIDA, CANCELADA, REPROGRAMADA."
+   },
+   {
+    "nombre": "observaciones",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Observaciones."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "historial_cita",
+  "modulo": "Agenda y Citas",
+  "verbose": "Historial de cita",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "cita_ref",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Id de cita."
+   },
+   {
+    "nombre": "paciente",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Paciente."
+   },
+   {
+    "nombre": "odontologo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Odontologo."
+   },
+   {
+    "nombre": "fecha_cita",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha cita."
+   },
+   {
+    "nombre": "estado_cita_anterior",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Estado cita anterior."
+   },
+   {
+    "nombre": "accion",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Accion."
+   },
+   {
+    "nombre": "realizado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Realizado por."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   }
+  ]
+ },
+ {
+  "tabla": "ausencia_odontologo",
+  "modulo": "Agenda y Citas",
+  "verbose": "Ausencia de odontólogo",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "odontologo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Odontólogo. Llave foránea hacia la tabla «odontologo»."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   },
+   {
+    "nombre": "todo_el_dia",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Toda la jornada."
+   },
+   {
+    "nombre": "hora_inicio",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora de inicio."
+   },
+   {
+    "nombre": "hora_fin",
+    "tipo": "time",
+    "nulo": "No",
+    "descripcion": "Hora de finalización."
+   },
+   {
+    "nombre": "motivo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Motivo."
+   },
+   {
+    "nombre": "registrada_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Registrada por."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "hallazgo",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Hallazgo odontológico",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "paciente_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Paciente. Llave foránea hacia la tabla «paciente»."
+   },
+   {
+    "nombre": "pieza",
+    "tipo": "smallint",
+    "nulo": "No",
+    "descripcion": "Pieza dental (FDI). Valores admitidos: 18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38."
+   },
+   {
+    "nombre": "cara",
+    "tipo": "varchar(4)",
+    "nulo": "No",
+    "descripcion": "Cara. Valores admitidos: TODA, O, M, D, V, L."
+   },
+   {
+    "nombre": "tipo",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Hallazgo. Valores admitidos: SANA, CARIES, OBTURADA, SELLANTE, ENDODONCIA, CORONA, PROTESIS, IMPLANTE, FRACTURA, EXTRACCION, AUSENTE."
+   },
+   {
+    "nombre": "observacion",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Observación."
+   },
+   {
+    "nombre": "nota_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Visita en que se registró. Llave foránea hacia la tabla «nota_clinica»."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha del hallazgo."
+   },
+   {
+    "nombre": "registrado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Registrado por."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "nota_clinica",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Nota clínica",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "cita_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Cita atendida. Llave foránea hacia la tabla «cita»."
+   },
+   {
+    "nombre": "paciente_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Paciente. Llave foránea hacia la tabla «paciente»."
+   },
+   {
+    "nombre": "odontologo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Odontólogo. Llave foránea hacia la tabla «odontologo»."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha de la visita."
+   },
+   {
+    "nombre": "motivo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Motivo de la consulta."
+   },
+   {
+    "nombre": "hallazgos_clinicos",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Hallazgos clínicos."
+   },
+   {
+    "nombre": "procedimiento_realizado",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Procedimiento realizado."
+   },
+   {
+    "nombre": "piezas_tratadas",
+    "tipo": "varchar(120)",
+    "nulo": "No",
+    "descripcion": "Piezas tratadas. Números FDI separados por coma, p. ej. 16, 26."
+   },
+   {
+    "nombre": "num_piezas",
+    "tipo": "smallint",
+    "nulo": "No",
+    "descripcion": "Número de piezas tratadas."
+   },
+   {
+    "nombre": "anestesia",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Se aplicó anestesia."
+   },
+   {
+    "nombre": "materiales",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Materiales utilizados."
+   },
+   {
+    "nombre": "complicacion",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Hubo complicación."
+   },
+   {
+    "nombre": "detalle_complicacion",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Detalle de la complicación."
+   },
+   {
+    "nombre": "indicaciones",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Indicaciones al paciente."
+   },
+   {
+    "nombre": "registrado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Registrado por."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "plan_tratamiento",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Plan de tratamiento",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Código. El valor no puede repetirse en la tabla."
+   },
+   {
+    "nombre": "paciente_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Paciente. Llave foránea hacia la tabla «paciente»."
+   },
+   {
+    "nombre": "odontologo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Odontólogo responsable. Llave foránea hacia la tabla «odontologo»."
+   },
+   {
+    "nombre": "diagnostico",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Diagnóstico."
+   },
+   {
+    "nombre": "observaciones",
+    "tipo": "text",
+    "nulo": "No",
+    "descripcion": "Observaciones."
+   },
+   {
+    "nombre": "estado_plan",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Estado del plan. Valores admitidos: BORRADOR, APROBADO, EN_CURSO, FINALIZADO, RECHAZADO."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha de elaboración."
+   },
+   {
+    "nombre": "fecha_aprobacion",
+    "tipo": "date",
+    "nulo": "Sí",
+    "descripcion": "Fecha de aprobación."
+   },
+   {
+    "nombre": "descuento",
+    "tipo": "numeric(10,2)",
+    "nulo": "No",
+    "descripcion": "Descuento (Q)."
+   },
+   {
+    "nombre": "creado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Elaborado por."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "detalle_plan",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Renglón del plan",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "plan_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Plan. Llave foránea hacia la tabla «plan_tratamiento»."
+   },
+   {
+    "nombre": "fase",
+    "tipo": "smallint",
+    "nulo": "No",
+    "descripcion": "Fase. Las fases se ejecutan en orden."
+   },
+   {
+    "nombre": "orden",
+    "tipo": "smallint",
+    "nulo": "No",
+    "descripcion": "Orden dentro de la fase."
+   },
+   {
+    "nombre": "procedimiento_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Procedimiento. Llave foránea hacia la tabla «procedimiento»."
+   },
+   {
+    "nombre": "pieza",
+    "tipo": "smallint",
+    "nulo": "Sí",
+    "descripcion": "Pieza dental. Valores admitidos: 18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28, 48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38."
+   },
+   {
+    "nombre": "num_piezas",
+    "tipo": "smallint",
+    "nulo": "No",
+    "descripcion": "Número de piezas."
+   },
+   {
+    "nombre": "precio_unitario",
+    "tipo": "numeric(10,2)",
+    "nulo": "No",
+    "descripcion": "Precio unitario (Q)."
+   },
+   {
+    "nombre": "duracion_estimada_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración estimada (min)."
+   },
+   {
+    "nombre": "origen_estimacion",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Origen de la estimación."
+   },
+   {
+    "nombre": "estado_detalle",
+    "tipo": "varchar(10)",
+    "nulo": "No",
+    "descripcion": "Estado. Valores admitidos: PENDIENTE, AGENDADO, COMPLETADO, ANULADO."
+   },
+   {
+    "nombre": "cita_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Cita que lo atiende. Llave foránea hacia la tabla «cita»."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "pago",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Pago",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "plan_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Plan. Llave foránea hacia la tabla «plan_tratamiento»."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha del abono."
+   },
+   {
+    "nombre": "monto",
+    "tipo": "numeric(10,2)",
+    "nulo": "No",
+    "descripcion": "Monto (Q)."
+   },
+   {
+    "nombre": "metodo",
+    "tipo": "varchar(14)",
+    "nulo": "No",
+    "descripcion": "Forma de pago. Valores admitidos: EFECTIVO, TARJETA, TRANSFERENCIA, CHEQUE."
+   },
+   {
+    "nombre": "referencia",
+    "tipo": "varchar(60)",
+    "nulo": "No",
+    "descripcion": "Referencia o número de recibo."
+   },
+   {
+    "nombre": "observaciones",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Observaciones."
+   },
+   {
+    "nombre": "recibido_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Recibido por."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Vigente. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "historial_plan",
+  "modulo": "Expediente Clínico y Cobros",
+  "verbose": "Historial de plan",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "plan_ref",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Id del plan."
+   },
+   {
+    "nombre": "codigo",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Codigo."
+   },
+   {
+    "nombre": "paciente",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Paciente."
+   },
+   {
+    "nombre": "estado_anterior",
+    "tipo": "varchar(12)",
+    "nulo": "No",
+    "descripcion": "Estado anterior."
+   },
+   {
+    "nombre": "accion",
+    "tipo": "varchar(20)",
+    "nulo": "No",
+    "descripcion": "Accion. Valores admitidos: CREACION, ACTUALIZACION, APROBACION, RECHAZO, FINALIZACION, ANULACION, PAGO."
+   },
+   {
+    "nombre": "detalle",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Detalle."
+   },
+   {
+    "nombre": "realizado_por",
+    "tipo": "varchar(150)",
+    "nulo": "No",
+    "descripcion": "Realizado por."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   }
+  ]
+ },
+ {
+  "tabla": "modelo_version",
+  "modulo": "Inteligencia",
+  "verbose": "Versión de modelo",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "nombre",
+    "tipo": "varchar(80)",
+    "nulo": "No",
+    "descripcion": "Nombre."
+   },
+   {
+    "nombre": "algoritmo",
+    "tipo": "varchar(10)",
+    "nulo": "No",
+    "descripcion": "Algoritmo. Valores admitidos: LINEAL, RF."
+   },
+   {
+    "nombre": "mae",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "MAE."
+   },
+   {
+    "nombre": "rmse",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "RMSE."
+   },
+   {
+    "nombre": "r2",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "R²."
+   },
+   {
+    "nombre": "mae_catalogo",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "MAE del catálogo."
+   },
+   {
+    "nombre": "fecha_entrenamiento",
+    "tipo": "timestamp",
+    "nulo": "Sí",
+    "descripcion": "Fecha de entrenamiento."
+   },
+   {
+    "nombre": "ruta_archivo",
+    "tipo": "varchar(255)",
+    "nulo": "No",
+    "descripcion": "Ruta del modelo (.joblib)."
+   },
+   {
+    "nombre": "activo",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "En producción."
+   },
+   {
+    "nombre": "estado",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Activo. Soporta el borrado lógico: el registro inactivo se conserva."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "dato_entrenamiento",
+  "modulo": "Inteligencia",
+  "verbose": "Dato de entrenamiento",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "cita_id",
+    "tipo": "bigint",
+    "nulo": "Sí",
+    "descripcion": "Cita origen. Llave foránea hacia la tabla «cita»."
+   },
+   {
+    "nombre": "tipo_procedimiento",
+    "tipo": "varchar(120)",
+    "nulo": "No",
+    "descripcion": "Tipo de procedimiento."
+   },
+   {
+    "nombre": "odontologo",
+    "tipo": "varchar(200)",
+    "nulo": "No",
+    "descripcion": "Odontólogo."
+   },
+   {
+    "nombre": "dia_semana",
+    "tipo": "varchar(3)",
+    "nulo": "No",
+    "descripcion": "Día de la semana."
+   },
+   {
+    "nombre": "hora_inicio",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Hora de inicio (0-23)."
+   },
+   {
+    "nombre": "num_piezas",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Número de piezas."
+   },
+   {
+    "nombre": "anestesia",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Se aplicó anestesia."
+   },
+   {
+    "nombre": "complicacion",
+    "tipo": "boolean",
+    "nulo": "No",
+    "descripcion": "Hubo complicación."
+   },
+   {
+    "nombre": "duracion_catalogo_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración de referencia del catálogo (min)."
+   },
+   {
+    "nombre": "duracion_real_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración real (min)."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ },
+ {
+  "tabla": "prediccion",
+  "modulo": "Inteligencia",
+  "verbose": "Predicción",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "cita_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Cita. Llave foránea hacia la tabla «cita»."
+   },
+   {
+    "nombre": "modelo_id",
+    "tipo": "bigint",
+    "nulo": "No",
+    "descripcion": "Modelo. Llave foránea hacia la tabla «modelo_version»."
+   },
+   {
+    "nombre": "duracion_estimada_min",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Duración estimada (min)."
+   },
+   {
+    "nombre": "bloque_min_recomendado",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Bloque mínimo (min)."
+   },
+   {
+    "nombre": "bloque_max_recomendado",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Bloque máximo (min)."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Fecha de la predicción."
+   }
+  ]
+ },
+ {
+  "tabla": "indicador_desempeno",
+  "modulo": "Reportes e Indicadores",
+  "verbose": "Indicador de desempeño",
+  "campos": [
+   {
+    "nombre": "id",
+    "tipo": "bigserial",
+    "nulo": "No",
+    "descripcion": "Identificador único de la tabla (llave primaria)."
+   },
+   {
+    "nombre": "fecha",
+    "tipo": "date",
+    "nulo": "No",
+    "descripcion": "Fecha."
+   },
+   {
+    "nombre": "citas_atendidas",
+    "tipo": "integer",
+    "nulo": "No",
+    "descripcion": "Citas atendidas."
+   },
+   {
+    "nombre": "utilizacion_pct",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "Utilización de agenda (%)."
+   },
+   {
+    "nombre": "tiempo_espera_prom_min",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "Tiempo de espera promedio (min)."
+   },
+   {
+    "nombre": "mae_actual",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "MAE del modelo."
+   },
+   {
+    "nombre": "rmse_actual",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "RMSE del modelo."
+   },
+   {
+    "nombre": "r2_actual",
+    "tipo": "double precision",
+    "nulo": "Sí",
+    "descripcion": "R² del modelo."
+   },
+   {
+    "nombre": "creado",
+    "tipo": "timestamp",
+    "nulo": "No",
+    "descripcion": "Creado."
+   }
+  ]
+ }
+]

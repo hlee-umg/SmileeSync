@@ -1,0 +1,70 @@
+@startuml
+title Proceso de recomendación de bloques de tiempo
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el módulo Principal;
+:Seleccionar el odontólogo
+y el procedimiento a consultar;
+:Indicar el número de piezas;
+|Sistema|
+:Estimar la duración
+del procedimiento;
+:Determinar el período visible
+(semana o día);
+repeat
+:Tomar la siguiente fecha del período
+y calcular las franjas efectivas
+del odontólogo;
+:Avanzar al siguiente inicio candidato
+en pasos de quince minutos;
+    if (¿La cita completa cabe
+    dentro de la franja?) then (no)
+      :Descartar el candidato;
+    elseif (¿El horario ya pasó?) then (sí)
+      :Descartar el candidato;
+    elseif (¿Se traslapa con una
+    cita vigente?) then (sí)
+      :Descartar el candidato;
+    elseif (¿Queda una unidad
+    dental libre?) then (no)
+      :Descartar el candidato;
+    else (no)
+      :Marcar el espacio
+      como disponible;
+    endif
+repeat while (¿Quedan candidatos
+en el período?) is (sí)
+:Contar los espacios encontrados;
+|Recepcionista|
+:Visualizar la duración estimada,
+el bloque recomendado y los
+espacios marcados en el calendario;
+:Seleccionar un espacio sugerido;
+|Sistema|
+:Abrir el formulario de cita
+con la fecha, la hora y el
+procedimiento precargados;
+stop
+@enduml

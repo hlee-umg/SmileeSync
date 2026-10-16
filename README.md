@@ -6,17 +6,46 @@ de bloques de tiempo. Proyecto de Graduación II — Universidad Mariano Gálvez
 
 ## Estructura
 
-- `app/`   — Proyecto Django (backend + plantillas). Entrega actual: **login + módulo de usuarios**.
+- `app/`   — Proyecto Django (backend + plantillas): los ocho módulos del sistema.
 - `ml/`    — Entrenamiento offline del modelo y modelo exportado.
 - `infra/` — Infraestructura como código con AWS CDK (Python).
 - `docs/`  — Documentación y entregas.
 
-## Entrega actual: Seguridad y Usuarios
+## Módulos implementados
 
-- Autenticación (login / logout).
-- Módulo de usuarios con CRUD, **borrado lógico** (estado Activo/Inactivo) e **historial de auditoría**.
-- Control de acceso por rol (RBAC): el menú y el acceso a cada módulo dependen del rol.
-  Roles base: Administrador, Recepcionista, Odontólogo, Asistente.
+| Módulo | Contenido |
+|--------|-----------|
+| Seguridad y Usuarios | Autenticación por correo, roles (RBAC), recuperación por pregunta secreta, auditoría. |
+| Pacientes | Ficha, antecedentes médicos, historial de cambios. |
+| Catálogo Odontológico | Especialidades, procedimientos y tarifas, odontólogos, unidades dentales. |
+| Agenda y Citas (principal) | Calendario, estimación de duración, recomendación de espacios, horarios y ausencias, registro de tiempos reales. |
+| Expediente Clínico | Odontograma (notación FDI), notas de evolución por visita. |
+| Plan de Tratamiento y Cobros | Plan por fases, sesiones sugeridas, presupuesto, abonos y saldos. |
+| Inteligencia | Entrenamiento y versionado del modelo; cadena de estimación de tres niveles. |
+| Reportes e Indicadores | Utilización de la agenda, precisión de la estimación, carga por profesional. |
+
+Todas las entidades aplican **borrado lógico** (campo `estado`) y las sensibles,
+**historial de auditoría**.
+
+## Verificación
+
+```bash
+cd app
+for s in horarios permisos calendario recomendacion flujos capacidad clinico modelo; do
+    python prueba_$s.py
+done     # 336 verificaciones
+```
+
+## Modelo predictivo
+
+```bash
+python manage.py entrenar --algoritmo RF --activar      # entrena y pone en producción
+python manage.py entrenar --algoritmo RF --solo-si-mejora
+```
+
+El entrenamiento se ejecuta fuera del proceso web: importar scikit-learn y pandas
+añade ~140 MB al proceso, y el servidor de producción tiene 2 GB compartidos con
+PostgreSQL. El proceso web solo carga el archivo serializado y lo conserva en memoria.
 
 ## Ejecutar en local
 
@@ -31,10 +60,15 @@ python manage.py runserver
 
 Usuarios de demostración:
 
-| Usuario     | Contraseña      | Rol           |
-|-------------|-----------------|---------------|
-| `admin`     | `***REMOVED***`     | Administrador |
-| `recepcion` | `***REMOVED***` | Recepcionista |
+| Correo                        | Rol           |
+|-------------------------------|---------------|
+| `admin@smileesync.local`      | Administrador |
+| `recepcion@smileesync.local`  | Recepcionista |
+| `hjlee@smileesync.local`      | Odontólogo    |
+| `rgiron@smileesync.local`     | Odontólogo    |
+
+El inicio de sesión es por **correo**. Las contraseñas de demostración las imprime
+`manage.py seed` al terminar.
 
 ## Base de datos
 

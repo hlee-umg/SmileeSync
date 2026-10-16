@@ -1,0 +1,107 @@
+@startuml
+title Proceso de programación de cita con estimación predictiva
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Recepcionista|
+start
+:Abrir el formulario
+de nueva cita;
+:Seleccionar paciente, odontólogo,
+procedimiento y número de piezas;
+:Indicar la fecha
+y la hora de inicio;
+|Sistema|
+:Solicitar la estimación
+de duración al componente predictivo;
+|Componente predictivo|
+if (¿Existe un modelo entrenado
+y activo?) then (sí)
+  :Predecir la duración
+  con el modelo;
+elseif (¿Hay al menos tres
+atenciones previas?) then (sí)
+  :Promediar la duración real
+  de las atenciones históricas;
+else (no)
+  :Tomar la duración
+  de referencia del catálogo;
+endif
+:Calcular el bloque recomendado
+y devolver el origen
+de la estimación;
+|Recepcionista|
+:Visualizar la duración estimada
+y confirmar o ajustar
+la duración asignada;
+:Enviar el formulario;
+|Sistema|
+if (¿La fecha es anterior a hoy?) then (sí)
+  |Recepcionista|
+  :Corregir la fecha;
+  detach
+else (no)
+endif
+|Sistema|
+:Calcular la disponibilidad efectiva
+(patrón semanal menos ausencias);
+if (¿La cita cabe completa
+dentro de una franja?) then (no)
+  |Recepcionista|
+  :Visualizar las franjas en que
+  sí atiende ese día;
+  detach
+else (sí)
+endif
+|Sistema|
+if (¿Se traslapa con otra cita
+del mismo odontólogo?) then (sí)
+  |Recepcionista|
+  :Visualizar la cita
+  con la que choca;
+  detach
+else (no)
+endif
+|Sistema|
+:Buscar una unidad dental libre
+en ese intervalo;
+if (¿Hay una unidad disponible?) then (no)
+  |Recepcionista|
+  :Visualizar que las unidades
+  están ocupadas;
+  detach
+else (sí)
+endif
+|Sistema|
+:Asignar la primera unidad libre;
+:Calcular la hora de finalización;
+:Guardar la cita
+con estado programada;
+:Registrar la predicción
+asociada a la cita;
+:Registrar la creación
+en el historial de la agenda;
+|Recepcionista|
+:Visualizar la cita
+en el calendario;
+stop
+@enduml

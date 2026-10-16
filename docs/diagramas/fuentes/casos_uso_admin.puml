@@ -1,0 +1,72 @@
+@startuml
+title Casos de uso — módulos administrativos
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam backgroundColor white
+skinparam actorStyle awesome
+skinparam dpi 150
+skinparam usecase {
+  BackgroundColor #EEF2FF
+  BorderColor #4F46E5
+  ArrowColor #334155
+}
+skinparam package {
+  BackgroundColor #FAFAF9
+  BorderColor #94A3B8
+}
+
+actor "Administrador" as ADMIN
+actor "Recepcionista" as RECEP
+actor "Odontólogo" as ODONT
+
+rectangle "Sistema SmileeSync" {
+  package "Seguridad y Usuarios" {
+    usecase "Iniciar sesión" as UC01
+    usecase "Recuperar contraseña" as UC02
+    usecase "Gestionar usuarios" as UC03
+    usecase "Gestionar roles y permisos" as UC04
+    usecase "Consultar historial\nde auditoría" as UC05
+  }
+  package "Pacientes" {
+    usecase "Registrar paciente" as UC06
+    usecase "Consultar ficha\nde paciente" as UC07
+    usecase "Registrar antecedentes\nmédicos" as UC08
+  }
+  package "Catálogo Odontológico" {
+    usecase "Gestionar procedimientos" as UC09
+    usecase "Gestionar especialidades" as UC10
+    usecase "Gestionar odontólogos" as UC11
+    usecase "Gestionar unidades\ndentales" as UC22
+  }
+  package "Reportes e Indicadores" {
+    usecase "Consultar indicadores\nde desempeño" as UC20
+    usecase "Generar reporte\nde utilización" as UC21
+  }
+}
+
+ADMIN --> UC01
+ADMIN --> UC03
+ADMIN --> UC04
+ADMIN --> UC05
+ADMIN --> UC09
+ADMIN --> UC10
+ADMIN --> UC11
+ADMIN --> UC22
+ADMIN --> UC20
+ADMIN --> UC21
+
+RECEP --> UC01
+RECEP --> UC02
+RECEP --> UC06
+RECEP --> UC07
+RECEP --> UC08
+RECEP --> UC20
+
+ODONT --> UC01
+ODONT --> UC07
+
+UC03 ..> UC05 : <<include>>
+UC06 ..> UC08 : <<extend>>
+UC20 ..> UC21 : <<extend>>
+@enduml

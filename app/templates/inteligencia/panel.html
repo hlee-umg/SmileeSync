@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% block titulo %}Inteligencia — SmileeSync{% endblock %}
+{% block encabezado %}Módulo de Inteligencia{% endblock %}
+{% block contenido %}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h5 class="mb-0">Modelo de estimación de duraciones</h5>
+    <span class="small text-secondary">
+      {{ registros }} atenciones con duración real registrada ·
+      {{ cobertura }} documentadas con nota clínica ·
+      {{ en_conjunto }} en el conjunto de entrenamiento
+    </span>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">
+        {% if activa.mae %}{{ activa.mae|floatformat:2 }}{% else %}—{% endif %}
+      </div>
+      <div class="etiqueta">Error del modelo (min)</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      {% comment %}
+      La misma cifra que informa la validación de la hipótesis: el error de
+      reservar la duración del catálogo sobre el subconjunto de prueba. Cuando
+      la versión en producción es anterior a esa medición, se recae en el
+      promedio de la desviación por procedimiento.
+      {% endcomment %}
+      <div class="valor">
+        {% if activa.mae_catalogo %}{{ activa.mae_catalogo|floatformat:2 }}
+        {% elif error_catalogo %}{{ error_catalogo|floatformat:2 }}
+        {% else %}—{% endif %}
+      </div>
+      <div class="etiqueta">Error del catálogo (min)</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">
+        {% if activa.r2 %}{{ activa.r2|floatformat:3 }}{% else %}—{% endif %}
+      </div>
+      <div class="etiqueta">Coeficiente R²</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card kpi"><div class="card-body py-3">
+      <div class="valor">{{ registros }}</div>
+      <div class="etiqueta">Registros de entrenamiento</div>
+    </div></div>
+  </div>
+</div>
+
+{% comment %}
+Contraste del modelo con el método que la clínica usa hoy —reservar el bloque
+que declara el catálogo— sobre el subconjunto de prueba, con el que el modelo
+no fue entrenado. Es la medición que resuelve la hipótesis del proyecto.
+{% endcomment %}
+{% if validacion %}
+<div class="card border-0 shadow-sm mb-3"
+     style="border-left:4px solid {% if validacion.cumple %}#16a34a{% else %}#d97706{% endif %} !important;">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h6 class="mb-1">Validación de la hipótesis</h6>
+        <p class="small text-secondary mb-0" style="max-width:46rem;">
+          Error del modelo frente al de reservar la duración del catálogo, medido
+          sobre las mismas atenciones del subconjunto de prueba. Ninguna de ellas
+          intervino en el entrenamiento.
+        </p>
+      </div>
+      {% if validacion.cumple %}
+        <span class="badge bg-success align-self-center">
+          <i class="bi bi-check-circle"></i> Cumple la meta
+        </span>
+      {% else %}
+        <span class="badge bg-warning text-dark align-self-center">
+          <i class="bi bi-exclamation-triangle"></i> Por debajo de la meta
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="row g-3 mt-1 align-items-end">
+      <div class="col-6 col-lg-3">
+        <div class="valor" style="font-size:1.6rem;font-weight:700;color:var(--smilee);line-height:1.1;">
+          {{ validacion.mae_catalogo|floatformat:2 }} min
+        </div>
+        <div class="etiqueta" style="font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em;">
+          Error con bloques del catálogo
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="valor" style="font-size:1.6rem;font-weight:700;color:var(--smilee);line-height:1.1;">
+          {{ validacion.mae_modelo|floatformat:2 }} min
+        </div>
+        <div class="etiqueta" style="font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em;">
+          Error con el modelo
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="valor" style="font-size:1.6rem;font-weight:700;line-height:1.1;
+                    color:{% if validacion.cumple %}#15803d{% else %}#b45309{% endif %};">
+          {{ validacion.reduccion_pct|floatformat:1 }} %
+        </div>
+        <div class="etiqueta" style="font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em;">
+          Reducción del error
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="valor" style="font-size:1.6rem;font-weight:700;color:#64748b;line-height:1.1;">
+          {{ validacion.meta_pct|floatformat:0 }} %
+        </div>
+        <div class="etiqueta" style="font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.03em;">
+          Meta del proyecto
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if not suficientes %}
+<div class="alert alert-warning small">
+  <i class="bi bi-exclamation-triangle"></i>
+  El conjunto de entrenamiento tiene {{ registros }} registros y se requieren al
+  menos {{ minimo }}. Mientras tanto, la estimación recae en el promedio
+  histórico de la clínica o en la duración de referencia del catálogo.
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm mb-3" style="border-top:4px solid var(--smilee2) !important;">
+      <div class="card-body">
+        <h6 class="mb-1">Duración de referencia frente a duración real</h6>
+        <p class="small text-secondary mb-3">
+          Donde ambas barras coinciden, la duración del catálogo basta. Donde se
+          separan, el bloque reservado se queda corto o sobra, y es ahí donde la
+          estimación del modelo aporta.
+        </p>
+        <div class="lienzo lienzo-alto"><canvas id="g-desempeno"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-3">Versiones entrenadas</h6>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Versión</th><th>Algoritmo</th><th class="text-center">MAE</th>
+                <th class="text-center">RMSE</th><th class="text-center">R²</th>
+                <th>Estado</th><th class="text-end"></th></tr>
+          </thead>
+          <tbody>
+            {% for v in versiones %}
+            <tr {% if v.activo %}class="table-light"{% endif %}>
+              <td class="small">
+                {{ v.nombre }}
+                {% if v.fecha_entrenamiento %}
+                  <div class="text-secondary" style="font-size:.7rem;">
+                    {{ v.fecha_entrenamiento|date:"d/m/Y H:i" }}
+                  </div>
+                {% endif %}
+              </td>
+              <td class="small">{{ v.get_algoritmo_display }}</td>
+              <td class="text-center small">{{ v.mae|floatformat:2|default:"—" }}</td>
+              <td class="text-center small">{{ v.rmse|floatformat:2|default:"—" }}</td>
+              <td class="text-center small">{{ v.r2|floatformat:3|default:"—" }}</td>
+              <td>
+                {% if v.activo %}<span class="badge bg-success">En producción</span>
+                {% else %}<span class="badge bg-secondary">Histórico</span>{% endif %}
+              </td>
+              <td class="text-end">
+                {% if not v.activo and escritura.inteligencia %}
+                <form method="post" action="{% url 'inteligencia:activar' v.pk %}">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-primary">Activar</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="small text-secondary py-3">
+              Todavía no se ha entrenado ninguna versión del modelo.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if versiones|length > 1 %}
+        <div class="lienzo mt-3"><canvas id="g-versiones"></canvas></div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% comment %}
+    Lectura prospectiva: no sobre el subconjunto de prueba, sino sobre las
+    predicciones que el sistema emitió al agendar citas que después se
+    atendieron. Se llena conforme la clínica opera.
+    {% endcomment %}
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body">
+        <h6 class="mb-1">Desempeño en operación</h6>
+        <p class="small text-secondary mb-3">
+          Predicciones que el sistema emitió al programar una cita, contrastadas
+          con lo que esa atención duró en realidad.
+        </p>
+
+        {% if operacion %}
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-lg-3">
+            <div class="card kpi"><div class="card-body py-3">
+              <div class="valor">{{ operacion.predicciones }}</div>
+              <div class="etiqueta">Predicciones medidas</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="card kpi"><div class="card-body py-3">
+              <div class="valor">{{ operacion.mae_modelo|floatformat:2 }}</div>
+              <div class="etiqueta">Error del modelo (min)</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="card kpi"><div class="card-body py-3">
+              <div class="valor">{{ operacion.mae_catalogo|floatformat:2 }}</div>
+              <div class="etiqueta">Error del catálogo (min)</div>
+            </div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="card kpi"><div class="card-body py-3">
+              <div class="valor">{{ operacion.dentro_pct|floatformat:1 }}%</div>
+              <div class="etiqueta">Dentro del bloque sugerido</div>
+            </div></div>
+          </div>
+        </div>
+
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Procedimiento</th><th class="text-center">n</th>
+                <th class="text-center">Error del modelo</th>
+                <th class="text-center">Error del catálogo</th>
+                <th class="text-center">Dentro del bloque</th></tr>
+          </thead>
+          <tbody>
+            {% for f in operacion_proc %}
+            <tr>
+              <td class="small">{{ f.procedimiento }}</td>
+              <td class="text-center small text-secondary">{{ f.atenciones }}</td>
+              <td class="text-center small">{{ f.mae_modelo|floatformat:1 }} min</td>
+              <td class="text-center small">{{ f.mae_catalogo|floatformat:1 }} min</td>
+              <td class="text-center small">{{ f.dentro_pct|floatformat:0 }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-light border small mb-0">
+          <i class="bi bi-hourglass-split"></i>
+          Todavía no hay predicciones emitidas cuya cita se haya atendido. Esta
+          medición se llena sola: cada cita programada con el modelo en
+          producción deja registrada su predicción, y al cerrarse la atención
+          queda contrastada contra la duración real. Mientras tanto, la
+          validación de la hipótesis se sostiene en el subconjunto de prueba.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-gear"></i> Cómo se entrena</h6>
+        <p class="small text-secondary mb-2">
+          El entrenamiento se ejecuta fuera del servidor web. No es por costo de
+          cómputo —toma menos de un segundo— sino de memoria: cargar las
+          bibliotecas de aprendizaje automático añade alrededor de 170 MB al
+          proceso que lo haga, y el servidor los comparte con la base de datos.
+        </p>
+        <pre class="small bg-light border rounded p-2 mb-2" style="font-size:.74rem;">python manage.py entrenar --algoritmo RF --solo-si-mejora</pre>
+        <p class="small text-secondary mb-0">
+          El comando registra la versión con sus métricas y la pone en producción
+          únicamente si reduce el error de la versión vigente. El proceso web
+          solo carga el archivo resultante y conserva el modelo en memoria entre
+          peticiones.
+        </p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-diagram-3"></i> Cadena de estimación</h6>
+        <ol class="small text-secondary mb-0 ps-3">
+          <li><strong>Modelo entrenado</strong>, si existe una versión en producción.</li>
+          <li><strong>Promedio histórico</strong> de la clínica, con un mínimo de
+              tres atenciones del mismo procedimiento. Se prefiere el promedio
+              del propio odontólogo cuando tiene registros suficientes.</li>
+          <li><strong>Duración del catálogo</strong>, como último respaldo.</li>
+        </ol>
+        <p class="small text-secondary mt-2 mb-0">
+          El origen de cada estimación se declara en la pantalla de la cita, de
+          modo que quien agenda sepa de dónde salió el número.
+        </p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h6 class="mb-2">Desviación por procedimiento</h6>
+        <table class="table table-sm align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Procedimiento</th><th class="text-center">Catálogo</th>
+                <th class="text-center">Real</th><th class="text-center">n</th></tr>
+          </thead>
+          <tbody>
+            {% for f in desempeno %}
+            <tr>
+              <td class="small">{{ f.procedimiento }}</td>
+              <td class="text-center small">{{ f.catalogo }}</td>
+              <td class="text-center small">{{ f.real|floatformat:1 }}</td>
+              <td class="text-center small text-secondary">{{ f.atenciones }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="small text-secondary py-3">
+              Sin atenciones suficientes.
+            </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ serie_desempeno|json_script:"d-desempeno" }}
+{{ serie_versiones|json_script:"d-versiones" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  if (typeof Chart === 'undefined') return;
+
+  const SERIE_1 = '#2a78d6';
+  const SERIE_2 = '#eb6834';
+  const TINTA = '#334155';
+  const TENUE = '#64748b';
+  const REJILLA = '#e8ecf2';
+
+  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = TENUE;
+
+  const leer = (id) => JSON.parse(JSON.parse(document.getElementById(id).textContent));
+
+  const comunes = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10,
+                usePointStyle: true, pointStyle: 'rectRounded', color: TINTA,
+                padding: 14 } },
+      tooltip: { backgroundColor: '#0f172a', padding: 10, cornerRadius: 6,
+                 boxWidth: 10, boxHeight: 10, boxPadding: 4 },
+    },
+  };
+
+  const d = leer('d-desempeno');
+  new Chart(document.getElementById('g-desempeno'), {
+    type: 'bar',
+    data: {
+      labels: d.etiquetas,
+      datasets: [
+        { label: 'Duración del catálogo', data: d.catalogo, backgroundColor: SERIE_1,
+          borderRadius: 4, borderSkipped: 'start', maxBarThickness: 14 },
+        { label: 'Duración real promedio', data: d.real, backgroundColor: SERIE_2,
+          borderRadius: 4, borderSkipped: 'start', maxBarThickness: 14 },
+      ],
+    },
+    options: Object.assign({}, comunes, {
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, grid: { color: REJILLA, drawTicks: false },
+             border: { display: false },
+             title: { display: true, text: 'Minutos', color: TENUE } },
+        y: { grid: { display: false }, border: { color: REJILLA },
+             ticks: { color: TINTA, autoSkip: false } },
+      },
+      datasets: { bar: { barPercentage: 0.84, categoryPercentage: 0.76 } },
+    }),
+  });
+
+  const lienzo = document.getElementById('g-versiones');
+  if (lienzo) {
+    const v = leer('d-versiones');
+    new Chart(lienzo, {
+      type: 'line',
+      data: {
+        labels: v.etiquetas,
+        datasets: [{ label: 'Error absoluto medio', data: v.mae,
+                     borderColor: SERIE_1, backgroundColor: SERIE_1,
+                     borderWidth: 2, pointRadius: 5, pointHoverRadius: 7,
+                     pointBorderColor: '#ffffff', pointBorderWidth: 2,
+                     tension: 0.25 }],
+      },
+      options: Object.assign({}, comunes, {
+        plugins: Object.assign({}, comunes.plugins, { legend: { display: false } }),
+        scales: {
+          x: { grid: { display: false }, border: { color: REJILLA } },
+          y: { beginAtZero: true, grid: { color: REJILLA, drawTicks: false },
+               border: { display: false },
+               title: { display: true, text: 'MAE (min)', color: TENUE } },
+        },
+      }),
+    });
+  }
+})();
+</script>
+
+{% endblock %}

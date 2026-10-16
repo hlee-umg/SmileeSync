@@ -1,0 +1,16 @@
+[Unit]
+Description=SmileeSync — reentrenamiento mensual del modelo predictivo
+
+[Timer]
+# El día 1 de cada mes a las 03:30, hora del servidor. Con el volumen de la
+# clínica —alrededor de setenta atenciones al mes— es el período en que entra
+# material suficiente para que las métricas cambien.
+OnCalendar=*-*-01 03:30:00
+# Si el servidor estaba apagado a esa hora, se ejecuta al encender.
+Persistent=true
+# Evita que varias instalaciones coincidan exactamente en el mismo minuto.
+RandomizedDelaySec=900
+Unit=smileesync-entrenar.service
+
+[Install]
+WantedBy=timers.target

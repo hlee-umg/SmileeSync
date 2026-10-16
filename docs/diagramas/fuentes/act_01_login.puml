@@ -1,0 +1,68 @@
+@startuml
+title Proceso de inicio de sesión y control de acceso
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #334155
+skinparam ActivityBackgroundColor #EEF2FF
+skinparam ActivityBorderColor #4F46E5
+skinparam ActivityFontColor #1E1B4B
+skinparam ActivityDiamondBackgroundColor #FEF3C7
+skinparam ActivityDiamondBorderColor #D97706
+skinparam ActivityDiamondFontColor #78350F
+skinparam ActivityStartColor #1F3A5F
+skinparam ActivityEndColor #991B1B
+skinparam NoteBackgroundColor #FFFBEB
+skinparam NoteBorderColor #D97706
+skinparam swimlaneBorderColor #94A3B8
+skinparam swimlaneTitleBackgroundColor #F1F5F9
+skinparam swimlaneTitleFontColor #0F172A
+skinparam swimlaneTitleFontStyle bold
+skinparam dpi 160
+
+|Usuario|
+start
+:Solicitar la pantalla de acceso;
+:Ingresar correo electrónico
+y contraseña;
+|Sistema|
+:Buscar el usuario por correo;
+if (¿El correo existe?) then (no)
+  |Usuario|
+  :Visualizar el mensaje
+  de credenciales inválidas;
+  stop
+else (sí)
+endif
+|Sistema|
+:Verificar la contraseña cifrada;
+if (¿La contraseña coincide?) then (no)
+  |Usuario|
+  :Visualizar el mensaje
+  de credenciales inválidas;
+  stop
+else (sí)
+endif
+|Sistema|
+if (¿El usuario está activo?) then (no)
+  |Usuario|
+  :Visualizar el aviso de
+  cuenta desactivada;
+  stop
+else (sí)
+endif
+|Sistema|
+:Crear la sesión del usuario;
+:Leer el rol asignado
+y sus módulos habilitados;
+:Determinar si el rol es
+de solo consulta;
+:Construir el menú lateral
+según los permisos;
+|Usuario|
+:Visualizar el módulo Principal
+con las opciones permitidas;
+stop
+@enduml

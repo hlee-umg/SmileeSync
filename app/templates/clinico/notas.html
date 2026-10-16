@@ -42,6 +42,7 @@
       </div>
     </div>
 
+    <div class="table-responsive">
     <table class="table table-sm mb-0">
       <tr><th style="width:190px;" class="small fw-semibold">Motivo</th>
           <td class="small">{{ n.motivo }}</td></tr>
@@ -77,6 +78,7 @@
           </td></tr>
       {% endif %}
     </table>
+    </div>
 
     <div class="small text-secondary mt-2">
       Registrada por {{ n.registrado_por|default:"—" }} el {{ n.creado|date:"d/m/Y H:i" }}

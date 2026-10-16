@@ -11,7 +11,7 @@
       generado el {{ generado|date:"d/m/Y H:i" }}
     </span>
   </div>
-  <form class="d-flex gap-2 align-items-center">
+  <form class="d-flex gap-2 align-items-center flex-wrap">
     <label class="small text-secondary mb-0">Período</label>
     <select name="semanas" class="form-select form-select-sm" style="width:auto;"
             onchange="this.form.submit()">
@@ -98,6 +98,7 @@
     <div class="card border-0 shadow-sm mb-3">
       <div class="card-body">
         <h6 class="mb-3">Carga por odontólogo</h6>
+        <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
           <thead class="table-light">
             <tr><th>Profesional</th><th class="text-center">Atenciones</th>
@@ -118,12 +119,14 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
 
     <div class="card border-0 shadow-sm mb-3">
       <div class="card-body">
         <h6 class="mb-3">Procedimientos más frecuentes</h6>
+        <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
           <thead class="table-light">
             <tr><th>Procedimiento</th><th class="text-center">Veces</th>
@@ -141,6 +144,7 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
 
@@ -151,6 +155,7 @@
           Mismos datos de la gráfica, en tabla. Se incluyen únicamente los
           procedimientos con al menos tres atenciones registradas.
         </p>
+        <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
           <thead class="table-light">
             <tr><th>Procedimiento</th><th class="text-center">Catálogo</th>
@@ -175,6 +180,7 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   </div>

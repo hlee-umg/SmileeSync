@@ -35,6 +35,8 @@ infra/.venv/
 # Modelos entrenados por "manage.py entrenar": se regeneran y pesan varios MB.
 app/modelos/
 
-# PDF de las entregas: se regeneran desde el .docx con LibreOffice y pesan
-# varios MB cada uno. El .docx es el entregable; el PDF solo sirve para revisar.
+# Entregas del documento de graduación. No se versionan: pesan decenas de MB,
+# cambian por completo en cada revisión y el historial de un .docx no se puede
+# leer en un diff. El respaldo son OneDrive y la plataforma de la universidad.
+docs/*.docx
 docs/*.pdf

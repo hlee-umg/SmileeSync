@@ -45,3 +45,7 @@ docs/*.pdf
 .coverage
 .coverage.*
 htmlcov/
+
+# Resultados locales de pruebas
+junit.xml
+coverage.xml

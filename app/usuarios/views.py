@@ -37,10 +37,12 @@ def crear(request):
 def editar(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
     if request.method == 'POST':
+        # Histórico: se registra el estado previo. Se toma una copia aparte
+        # porque is_valid() ya escribe los datos nuevos en `usuario`.
+        previo = Usuario.objects.select_related('rol').get(pk=pk)
         form = UsuarioEditarForm(request.POST, instance=usuario)
         if form.is_valid():
-            # Histórico: se registra el estado previo antes de actualizar
-            HistorialUsuario.registrar(usuario, 'ACTUALIZACION', request.user.username)
+            HistorialUsuario.registrar(previo, 'ACTUALIZACION', request.user.username)
             form.save()
             messages.success(request, f'Usuario "{usuario.username}" actualizado.')
             return redirect('usuarios:lista')

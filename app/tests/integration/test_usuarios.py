@@ -74,11 +74,6 @@ def test_editar_usuario_actualiza_y_audita(cliente_admin, recepcionista, rol_con
 
 
 @pytest.mark.regression
-@pytest.mark.xfail(
-    strict=True,
-    reason="BUG-02: la auditoría de edición guarda los datos "
-    "nuevos en lugar del estado previo. Pendiente.",
-)
 def test_auditoria_de_edicion_guarda_el_estado_previo(
     cliente_admin, recepcionista, rol_consulta
 ):

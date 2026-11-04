@@ -1,4 +1,6 @@
+import os
 import random
+import secrets
 from datetime import date, datetime, time, timedelta
 
 from django.core.management.base import BaseCommand
@@ -73,6 +75,19 @@ class Command(BaseCommand):
         ('Jennifer Nicole', 'Dubón Escobar', date(2012, 1, 15), 'F', '4411 2299'),
     ]
 
+    def clave_demo(self):
+        """Contraseña de las cuentas de demostración.
+
+        Se toma de la variable de entorno SEED_PASSWORD; si no está definida, se
+        genera una aleatoria y se informa al terminar. Nunca se escribe en el
+        código.
+        """
+        if not getattr(self, '_clave_demo', None):
+            self._clave_generada = not os.environ.get('SEED_PASSWORD')
+            self._clave_demo = (os.environ.get('SEED_PASSWORD')
+                                or secrets.token_urlsafe(12))
+        return self._clave_demo
+
     def handle(self, *args, **options):
         roles = {
             'Administrador': dict(descripcion='Acceso total al sistema',
@@ -110,9 +125,9 @@ class Command(BaseCommand):
         admin = Usuario.objects.filter(email__iexact='admin@smileesync.local').first()
         if not admin:
             admin = Usuario.objects.create_superuser(
-                'admin@smileesync.local', 'admin@smileesync.local', 'Admin123!',
+                'admin@smileesync.local', 'admin@smileesync.local', self.clave_demo(),
                 first_name='Administrador', last_name='General')
-            self.stdout.write(self.style.SUCCESS('Superusuario creado: admin@smileesync.local / Admin123!'))
+            self.stdout.write(self.style.SUCCESS('Superusuario creado: admin@smileesync.local'))
         admin.rol = objetos['Administrador']
         admin.pregunta_secreta = 'MASCOTA'
         admin.set_respuesta_secreta('firulais')
@@ -121,9 +136,9 @@ class Command(BaseCommand):
         recep = Usuario.objects.filter(email__iexact='recepcion@smileesync.local').first()
         if not recep:
             recep = Usuario.objects.create_user(
-                'recepcion@smileesync.local', 'recepcion@smileesync.local', 'Recepcion123!',
+                'recepcion@smileesync.local', 'recepcion@smileesync.local', self.clave_demo(),
                 first_name='Ana', last_name='Recepción')
-            self.stdout.write(self.style.SUCCESS('Usuario creado: recepcion@smileesync.local / Recepcion123!'))
+            self.stdout.write(self.style.SUCCESS('Usuario creado: recepcion@smileesync.local'))
         recep.rol = objetos['Recepcionista']
         recep.pregunta_secreta = 'CIUDAD'
         recep.set_respuesta_secreta('guatemala')
@@ -140,10 +155,10 @@ class Command(BaseCommand):
             cuenta = Usuario.objects.filter(email__iexact=correo).first()
             if not cuenta:
                 cuenta = Usuario.objects.create_user(
-                    correo, correo, 'Odontologo123!',
+                    correo, correo, self.clave_demo(),
                     first_name=nombres, last_name=apellidos)
                 self.stdout.write(self.style.SUCCESS(
-                    f'Usuario creado: {correo} / Odontologo123!'))
+                    f'Usuario creado: {correo}'))
             cuenta.rol = objetos['Odontólogo']
             cuenta.save()
             cuentas[correo] = cuenta
@@ -155,6 +170,10 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('Seed completado. Login por CORREO. '
                                              'Pregunta secreta admin: mascota=firulais; recepcion: ciudad=guatemala'))
+        if getattr(self, '_clave_generada', False):
+            self.stdout.write(self.style.WARNING(
+                f'Contraseña generada para las cuentas nuevas: {self._clave_demo} '
+                '(defina SEED_PASSWORD para elegirla).'))
 
     # ==================================================================
     def sembrar_clinica(self, usuario_lee, usuario_giron):

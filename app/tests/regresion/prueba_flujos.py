@@ -38,7 +38,8 @@ admin = Usuario.objects.get(email='admin@smileesync.local')
 print('FLUJO 1 — Acceso, roles y recuperación de contraseña')
 c = Client()
 r = c.post(reverse('login'), {'username': 'admin@smileesync.local',
-                              'password': 'Admin123!'}, follow=True)
+                              'password': os.environ['SEED_PASSWORD']},
+           follow=True)
 probar('inicio de sesión con correo', r.status_code == 200 and
        'Administrador' in r.content.decode())
 cx = Client()

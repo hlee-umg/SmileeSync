@@ -37,6 +37,8 @@ def base_sembrada(db, settings, tmp_path, monkeypatch):
     monkeypatch.setattr(
         "inteligencia.entrenamiento.directorio_modelos", lambda: str(tmp_path)
     )
+    # Las cuentas de demostración toman su contraseña de esta variable.
+    monkeypatch.setenv("SEED_PASSWORD", "Clave-demo-regresion-1")
     call_command("seed", stdout=io.StringIO())
 
 

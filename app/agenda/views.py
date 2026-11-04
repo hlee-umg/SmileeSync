@@ -12,6 +12,7 @@ from django.db.models import Avg, Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from catalogo.models import Odontologo
 from inteligencia.servicio import (estimar_duracion, registrar_dato_entrenamiento,
@@ -519,7 +520,14 @@ def cancelar(request, pk):
             cita.observaciones = (cita.observaciones + f'\nCancelación: {motivo}').strip()
         cita.save(update_fields=['estado_cita', 'observaciones'])
         messages.success(request, f'La cita de {cita.paciente} fue cancelada.')
-    return redirect(request.POST.get('siguiente') or 'agenda:principal')
+    # Solo se vuelve a una dirección del propio sitio: aceptar cualquier URL
+    # permitiría usar la cancelación para redirigir a un sitio externo.
+    siguiente = request.POST.get('siguiente')
+    if siguiente and url_has_allowed_host_and_scheme(
+            siguiente, allowed_hosts={request.get_host()},
+            require_https=request.is_secure()):
+        return redirect(siguiente)
+    return redirect('agenda:principal')
 
 
 @login_required

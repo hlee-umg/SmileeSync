@@ -89,14 +89,17 @@ def test_cancelar_redirige_a_una_pagina_interna(cliente_recepcion, cita):
 
 
 @pytest.mark.regression
-@pytest.mark.xfail(
-    strict=True,
-    reason="BUG-01: Open Redirect en agenda.views.cancelar "
-    "(SonarCloud, Blocker). Pendiente de corrección.",
+@pytest.mark.parametrize(
+    "destino",
+    [
+        "https://sitio-malicioso.example/robo",
+        "//sitio-malicioso.example/robo",
+        "javascript:alert(1)",
+    ],
 )
-def test_cancelar_no_redirige_a_un_sitio_externo(cliente_recepcion, cita):
+def test_cancelar_no_redirige_a_un_sitio_externo(cliente_recepcion, cita, destino):
+    """BUG-01: la cancelación aceptaba cualquier URL en `siguiente`."""
     r = cliente_recepcion.post(
-        reverse("agenda:cancelar", args=[cita.pk]),
-        {"siguiente": "https://sitio-malicioso.example/robo"},
+        reverse("agenda:cancelar", args=[cita.pk]), {"siguiente": destino}
     )
-    assert not r.url.startswith("http")
+    assert r.url == reverse("agenda:principal")

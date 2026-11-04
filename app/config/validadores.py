@@ -57,7 +57,7 @@ def validar_email_real(valor, obligatorio=True):
     try:
         validate_email(valor)
     except ValidationError:
-        raise ValidationError(MENSAJE_EMAIL)
+        raise ValidationError(MENSAJE_EMAIL) from None
     return valor
 
 

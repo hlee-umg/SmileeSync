@@ -25,7 +25,9 @@ class Rol(models.Model):
     solo_lectura = models.BooleanField(
         "solo consulta",
         default=False,
-        help_text="Permite ver los módulos asignados, sin crear ni modificar registros.",
+        help_text=(
+            "Permite ver los módulos asignados, sin crear ni modificar registros."
+        ),
     )
 
     # El expediente clínico es un acto profesional, no una tarea
@@ -159,6 +161,9 @@ class HistorialUsuario(models.Model):
         verbose_name = "Historial de usuario"
         verbose_name_plural = "Historial de usuarios"
         ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"{self.username}: {self.accion} por {self.realizado_por}"
 
     @classmethod
     def registrar(cls, usuario, accion, realizado_por):

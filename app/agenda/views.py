@@ -4,12 +4,13 @@ La vista `principal` es la pantalla de inicio del sistema: presenta los
 indicadores operativos del día y el calendario semanal de la clínica.
 """
 
+import contextlib
 from datetime import date, datetime, time, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -115,9 +116,13 @@ def _huecos_sugeridos(odontologo, fechas, duracion, hoy, ahora):
                     for oi, of in ocupadas.get(fecha, [])
                 )
                 # Un espacio solo sirve si además queda un sillón libre.
-                if not ya_paso and not choca and clave not in sugeridos:
-                    if unidades_libres(fecha, inicio_h, fin_h):
-                        sugeridos[clave] = inicio_h.strftime("%H:%M")
+                if (
+                    not ya_paso
+                    and not choca
+                    and clave not in sugeridos
+                    and unidades_libres(fecha, inicio_h, fin_h)
+                ):
+                    sugeridos[clave] = inicio_h.strftime("%H:%M")
                 candidato += timedelta(minutes=PASO_SUGERENCIA_MIN)
     return sugeridos
 
@@ -322,10 +327,8 @@ def lista(request):
         .select_related("paciente", "odontologo", "procedimiento")
         .order_by("-fecha", "hora_inicio_programada")
     )
-    try:
+    with contextlib.suppress(ValueError, TypeError):
         citas = citas.filter(fecha__range=(desde, hasta))
-    except (ValueError, TypeError):
-        pass
     if odontologo.isdigit():
         citas = citas.filter(odontologo_id=int(odontologo))
     if estado_cita:

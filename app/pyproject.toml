@@ -46,6 +46,9 @@ max-complexity = 15
 [tool.ruff.lint.per-file-ignores]
 # En las pruebas se usan assert y claves de prueba a propósito.
 "tests/**" = ["S101", "S105", "S106"]
+# Los scripts de regresión configuran Django (django.setup()) antes de
+# importar los modelos, por lo que sus imports no pueden ir al inicio.
+"tests/regresion/prueba_*.py" = ["E402"]
 
 [tool.black]
 line-length = 88

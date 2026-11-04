@@ -549,6 +549,9 @@ class HistorialPlan(models.Model):
         verbose_name_plural = "Historial de planes"
         ordering = ["-fecha"]
 
+    def __str__(self):
+        return f"Plan {self.codigo}: {self.accion} por {self.realizado_por}"
+
     @classmethod
     def registrar(cls, plan, accion, realizado_por, detalle="", estado_anterior=None):
         return cls.objects.create(

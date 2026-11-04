@@ -202,9 +202,11 @@ if propuestas:
         probar(
             "la cita propuesta se creó",
             Cita.objects.count() == antes + 1,
-            [l.strip() for l in r.content.decode().splitlines() if "text-danger" in l][
-                :2
-            ],
+            [
+                linea.strip()
+                for linea in r.content.decode().splitlines()
+                if "text-danger" in linea
+            ][:2],
         )
     else:
         print("  (omitida: no hay propuestas en días futuros)")

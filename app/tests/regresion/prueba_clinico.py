@@ -1,8 +1,7 @@
 """Verifica el expediente clínico: odontograma, notas, planes y cobros."""
 
 import os
-import re
-from datetime import time, timedelta
+from datetime import timedelta
 from decimal import Decimal
 
 import django

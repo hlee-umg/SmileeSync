@@ -233,10 +233,8 @@ class Command(BaseCommand):
         Permite que el módulo Principal y la agenda tengan contenido real desde
         el primer arranque. Es idempotente: se puede ejecutar varias veces.
         """
-        from django.utils import timezone
 
         from agenda.models import Cita, HorarioDisponibilidad
-        from agenda.disponibilidad import asignar_unidad
         from catalogo.models import (
             Especialidad,
             Odontologo,
@@ -399,7 +397,8 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f"Datos de la clínica: {Especialidad.objects.count()} especialidades, "
                 f"{Procedimiento.objects.count()} procedimientos, "
-                f"{Odontologo.objects.filter(estado=True).count()} odontólogos activos, "
+                f"{Odontologo.objects.filter(estado=True).count()} "
+                "odontólogos activos, "
                 f"{Paciente.objects.count()} pacientes, "
                 f"{Cita.objects.count()} citas ({creadas} nuevas)."
             )
@@ -548,6 +547,63 @@ class Command(BaseCommand):
             registrado_por="seed",
         )
 
+    @staticmethod
+    def _piezas_de(codigo, rng):
+        """Número de piezas que trata un procedimiento en una sesión."""
+        if codigo == "PROC-005":
+            return rng.choice([10, 12, 14])
+        if codigo in ("PROC-002", "PROC-009"):
+            return rng.choices([1, 2, 3], weights=[62, 28, 10])[0]
+        if codigo == "PROC-010":
+            return rng.choice([1, 2])
+        return 1
+
+    def _duracion_programada(self, proc, piezas):
+        """Duración que se agenda, redondeada a bloques de 5 minutos.
+
+        El tiempo crece con el número de piezas solo donde el trabajo es
+        aditivo. La colocación de brackets abarca la arcada completa en una
+        sola sesión, de modo que su duración no se multiplica por cada bracket.
+        """
+        duracion = proc.duracion_promedio_min
+        if piezas > 1 and proc.codigo in self.ADITIVOS:
+            duracion += int(proc.duracion_promedio_min * 0.4 * (piezas - 1))
+        return max(15, int(round(duracion / 5) * 5))
+
+    @staticmethod
+    def _estado_cita(fecha, hoy, fin_h, rng):
+        """Estado de una cita sembrada según su fecha respecto de hoy."""
+        from django.utils import timezone
+
+        if fecha < hoy:
+            return "CANCELADA" if rng.random() < 0.07 else "ATENDIDA"
+        if fecha == hoy and fin_h < timezone.localtime().time():
+            return "ATENDIDA"
+        return "CANCELADA" if rng.random() < 0.04 else "PROGRAMADA"
+
+    @staticmethod
+    def _observaciones(piezas):
+        return f"Piezas por tratar: {piezas}." if piezas > 1 else ""
+
+    def _tiempos_reales(self, estado, odo, momento, duracion, rng):
+        """Duración real, inicio y fin reales, y si hubo complicación.
+
+        Solo una cita atendida tiene tiempos reales.
+        """
+        if estado != "ATENDIDA":
+            return None, None, None, False
+        complicacion = rng.random() < 0.12
+        factor = (
+            self.RITMO[odo.colegiado]
+            * (1.28 if complicacion else 1.0)
+            * rng.gauss(1.0, 0.09)
+        )
+        real = max(10, int(round(duracion * factor)))
+        retraso = rng.choice([0, 0, 0, 5, 5, 10])
+        inicio_real = (momento + timedelta(minutes=retraso)).time()
+        fin_real = (momento + timedelta(minutes=retraso + real)).time()
+        return real, inicio_real, fin_real, complicacion
+
     def sembrar_agenda(self, lee, giron, pacientes, procedimientos):
         """Genera dos meses de agenda: historia atendida y citas por atender.
 
@@ -563,7 +619,9 @@ class Command(BaseCommand):
         from agenda.models import Cita
         from agenda.disponibilidad import asignar_unidad, franjas_efectivas
 
-        rng = random.Random(self.SEMILLA)
+        # Generador con semilla fija: los datos de demostración deben ser
+        # reproducibles. No se usa para nada relacionado con la seguridad.
+        rng = random.Random(self.SEMILLA)  # noqa: S311
         hoy = timezone.localdate()
         lunes = hoy - timedelta(days=hoy.weekday())
         inicio = lunes - timedelta(weeks=self.SEMANAS_ATRAS)
@@ -579,15 +637,6 @@ class Command(BaseCommand):
             codigos = [c for c, _ in opciones]
             pesos = [p for _, p in opciones]
             return procedimientos[rng.choices(codigos, weights=pesos)[0]]
-
-        def piezas_de(codigo):
-            if codigo == "PROC-005":
-                return rng.choice([10, 12, 14])
-            if codigo in ("PROC-002", "PROC-009"):
-                return rng.choices([1, 2, 3], weights=[62, 28, 10])[0]
-            if codigo == "PROC-010":
-                return rng.choice([1, 2])
-            return 1
 
         creadas = 0
         fecha = inicio
@@ -611,17 +660,8 @@ class Command(BaseCommand):
                             continue
 
                         proc = elegir_procedimiento(odo)
-                        piezas = piezas_de(proc.codigo)
-                        duracion = proc.duracion_promedio_min
-                        # El tiempo crece con el número de piezas solo donde el
-                        # trabajo es aditivo. La colocación de brackets abarca la
-                        # arcada completa en una sola sesión, de modo que su
-                        # duración no se multiplica por cada bracket.
-                        if piezas > 1 and proc.codigo in self.ADITIVOS:
-                            duracion += int(
-                                proc.duracion_promedio_min * 0.4 * (piezas - 1)
-                            )
-                        duracion = max(15, int(round(duracion / 5) * 5))
+                        piezas = self._piezas_de(proc.codigo, rng)
+                        duracion = self._duracion_programada(proc, piezas)
                         fin_dt = momento + timedelta(minutes=duracion)
                         if fin_dt > limite:
                             break
@@ -640,35 +680,15 @@ class Command(BaseCommand):
 
                         # Los pacientes en ortodoncia regresan a control; el
                         # resto se reparte sobre el padrón completo.
-                        if proc.codigo in ("PROC-005", "PROC-007", "PROC-008"):
-                            paciente = rng.choice(en_ortodoncia)
-                        else:
-                            paciente = rng.choice(lista_pacientes)
+                        ortodoncia = proc.codigo in ("PROC-005", "PROC-007", "PROC-008")
+                        paciente = rng.choice(
+                            en_ortodoncia if ortodoncia else lista_pacientes
+                        )
 
-                        if fecha < hoy:
-                            estado = "CANCELADA" if rng.random() < 0.07 else "ATENDIDA"
-                        elif fecha == hoy and fin_h < timezone.localtime().time():
-                            estado = "ATENDIDA"
-                        else:
-                            estado = (
-                                "CANCELADA" if rng.random() < 0.04 else "PROGRAMADA"
-                            )
-
-                        real = inicio_real = fin_real = None
-                        complicacion = False
-                        if estado == "ATENDIDA":
-                            complicacion = rng.random() < 0.12
-                            factor = (
-                                self.RITMO[odo.colegiado]
-                                * (1.28 if complicacion else 1.0)
-                                * rng.gauss(1.0, 0.09)
-                            )
-                            real = max(10, int(round(duracion * factor)))
-                            retraso = rng.choice([0, 0, 0, 5, 5, 10])
-                            inicio_real = (momento + timedelta(minutes=retraso)).time()
-                            fin_real = (
-                                momento + timedelta(minutes=retraso + real)
-                            ).time()
+                        estado = self._estado_cita(fecha, hoy, fin_h, rng)
+                        real, inicio_real, fin_real, complicacion = (
+                            self._tiempos_reales(estado, odo, momento, duracion, rng)
+                        )
 
                         cita = Cita.objects.create(
                             paciente=paciente,
@@ -683,9 +703,7 @@ class Command(BaseCommand):
                             hora_fin_real=fin_real,
                             duracion_real_min=real,
                             estado_cita=estado,
-                            observaciones=(
-                                f"Piezas por tratar: {piezas}." if piezas > 1 else ""
-                            ),
+                            observaciones=self._observaciones(piezas),
                         )
                         creadas += 1
                         if estado == "ATENDIDA":
@@ -785,7 +803,6 @@ class Command(BaseCommand):
 
         from django.utils import timezone
 
-        from agenda.models import Cita
         from catalogo.models import Odontologo, Procedimiento
         from clinico.models import (
             DetallePlan,

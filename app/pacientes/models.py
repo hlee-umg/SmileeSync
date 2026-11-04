@@ -71,3 +71,6 @@ class HistorialPaciente(models.Model):
         verbose_name = "Historial de paciente"
         verbose_name_plural = "Historial de pacientes"
         ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"{self.codigo}: {self.accion} por {self.realizado_por}"

@@ -72,7 +72,7 @@ class CitaForm(forms.ModelForm):
         self.fields["procedimiento"].queryset = Procedimiento.objects.filter(
             estado=True
         )
-        for nombre, campo in self.fields.items():
+        for campo in self.fields.values():
             css = campo.widget.attrs.get("class", "")
             if not isinstance(campo.widget, forms.CheckboxInput):
                 campo.widget.attrs["class"] = (css + " " + BASE).strip()

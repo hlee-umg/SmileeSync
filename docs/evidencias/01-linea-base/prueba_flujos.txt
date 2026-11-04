@@ -1,0 +1,47 @@
+FLUJO 1 — Acceso, roles y recuperación de contraseña
+  OK    inicio de sesión con correo
+  OK    credenciales incorrectas no entran
+  OK    recuperación: acepta el correo y pide la pregunta
+  OK    recuperación: acepta la respuesta secreta
+  OK    recuperación: cambia la contraseña
+  OK    la contraseña nueva funciona
+
+FLUJO 2 — Programar una cita con recomendación
+  OK    el calendario marca espacios disponibles
+  OK    muestra la duración estimada
+  OK    el formulario abre precargado
+  OK    el endpoint de estimación responde en línea
+        estimación: {'disponible': True, 'duracion': 20, 'bloque_min': 15, 'bloque_max': 25, 'origen': 'historico', 'etiqueta_origen': 'Promedio histórico de la clínica', 'detalle': 'Promedio de 20 atenciones previas de este odontólogo. La precisión aumentará al acumularse más registros.'}
+  FALLA la cita se crea 
+  OK    queda registro de auditoría
+
+FLUJO 3 — El sistema impide errores de agenda
+  OK    rechaza el traslape y nombra la cita en conflicto
+  OK    rechaza fuera del horario de atención
+  OK    rechaza una fecha pasada
+
+FLUJO 4 — Cerrar el ciclo: registrar la atención alimenta el modelo
+  OK    la cita queda atendida
+  OK    calcula la duración real
+  OK    el registro entra al conjunto de entrenamiento
+  OK    el detalle muestra la desviación
+
+FLUJO 5 — Alta de odontólogo y sus horarios
+  OK    se crea el odontólogo
+  OK    el listado lo marca como pendiente de configurar
+  OK    sin horarios, el sistema rechaza sus citas
+  OK    se configuran las franjas de lunes a viernes
+  OK    ahora sí acepta la cita
+
+FLUJO 6 — Mantenimiento de usuarios con validaciones y auditoría
+  OK    rechaza números en el nombre
+  OK    rechaza un correo inválido
+  OK    acepta nombres compuestos y con guion
+  OK    el borrado es lógico
+  OK    queda registrado en el historial
+  OK    el historial es consultable en pantalla
+
+FLUJO 7 — Ninguna pantalla filtra sintaxis de plantilla
+  OK    ninguna de las 22 pantallas imprime sintaxis de plantilla
+
+=== 30 correctas, 1 fallidas ===

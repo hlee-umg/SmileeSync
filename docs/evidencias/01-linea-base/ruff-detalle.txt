@@ -1,0 +1,172 @@
+agenda\admin.py:14:89: E501 Line too long (90 > 88)
+agenda\admin.py:22:89: E501 Line too long (93 > 88)
+agenda\disponibilidad.py:17:22: F401 [*] `datetime.date` imported but unused
+agenda\disponibilidad.py:17:38: F401 [*] `datetime.timedelta` imported but unused
+agenda\disponibilidad.py:145:9: B007 Loop control variable `f` not used within loop body
+agenda\forms.py:39:89: E501 Line too long (93 > 88)
+agenda\forms.py:40:89: E501 Line too long (100 > 88)
+agenda\forms.py:52:89: E501 Line too long (89 > 88)
+agenda\forms.py:53:13: B007 Loop control variable `nombre` not used within loop body
+agenda\forms.py:63:89: E501 Line too long (94 > 88)
+agenda\forms.py:66:9: C901 `clean` is too complex (11 > 10)
+agenda\forms.py:79:89: E501 Line too long (99 > 88)
+agenda\forms.py:92:89: E501 Line too long (89 > 88)
+agenda\forms.py:263:89: E501 Line too long (92 > 88)
+agenda\models.py:4:7: DJ008 Model does not define `__str__` method
+agenda\models.py:30:89: E501 Line too long (89 > 88)
+agenda\models.py:31:89: E501 Line too long (89 > 88)
+agenda\models.py:44:89: E501 Line too long (97 > 88)
+agenda\models.py:45:89: E501 Line too long (109 > 88)
+agenda\models.py:60:7: DJ008 Model does not define `__str__` method
+agenda\urls.py:17:89: E501 Line too long (90 > 88)
+agenda\views.py:11:42: F401 [*] `django.db.models.Q` imported but unused
+agenda\views.py:107:17: SIM102 Use a single `if` statement instead of nested `if` statements
+agenda\views.py:225:89: E501 Line too long (99 > 88)
+agenda\views.py:228:89: E501 Line too long (95 > 88)
+agenda\views.py:282:5: SIM105 Use `contextlib.suppress(ValueError, TypeError)` instead of `try`-`except`-`pass`
+agenda\views.py:420:5: C901 `crear` is too complex (12 > 10)
+agenda\views.py:437:89: E501 Line too long (96 > 88)
+agenda\views.py:519:89: E501 Line too long (90 > 88)
+agenda\views.py:588:89: E501 Line too long (89 > 88)
+agenda\views.py:667:89: E501 Line too long (91 > 88)
+catalogo\admin.py:14:89: E501 Line too long (111 > 88)
+catalogo\forms.py:33:89: E501 Line too long (89 > 88)
+catalogo\forms.py:77:89: E501 Line too long (92 > 88)
+catalogo\forms.py:88:89: E501 Line too long (89 > 88)
+catalogo\forms.py:113:89: E501 Line too long (100 > 88)
+catalogo\forms.py:136:89: E501 Line too long (95 > 88)
+catalogo\forms.py:167:89: E501 Line too long (89 > 88)
+catalogo\models.py:28:89: E501 Line too long (96 > 88)
+catalogo\models.py:31:89: E501 Line too long (94 > 88)
+catalogo\models.py:60:89: E501 Line too long (93 > 88)
+catalogo\views.py:112:89: E501 Line too long (99 > 88)
+catalogo\views.py:133:89: E501 Line too long (91 > 88)
+clinico\forms.py:123:89: E501 Line too long (91 > 88)
+clinico\forms.py:131:89: E501 Line too long (97 > 88)
+clinico\forms.py:169:89: E501 Line too long (89 > 88)
+clinico\forms.py:193:89: E501 Line too long (89 > 88)
+clinico\forms.py:258:89: E501 Line too long (91 > 88)
+clinico\forms.py:283:89: E501 Line too long (91 > 88)
+clinico\models.py:158:89: E501 Line too long (98 > 88)
+clinico\models.py:159:89: E501 Line too long (89 > 88)
+clinico\models.py:205:89: E501 Line too long (96 > 88)
+clinico\models.py:357:89: E501 Line too long (89 > 88)
+clinico\models.py:365:89: E501 Line too long (93 > 88)
+clinico\models.py:366:89: E501 Line too long (94 > 88)
+clinico\models.py:417:89: E501 Line too long (93 > 88)
+clinico\models.py:433:7: DJ008 Model does not define `__str__` method
+clinico\views.py:101:89: E501 Line too long (90 > 88)
+clinico\views.py:202:89: E501 Line too long (90 > 88)
+config\settings.py:114:89: E501 Line too long (89 > 88)
+config\urls.py:9:89: E501 Line too long (101 > 88)
+config\validadores.py:14:89: E501 Line too long (89 > 88)
+config\validadores.py:35:89: E501 Line too long (91 > 88)
+config\validadores.py:54:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+inteligencia\admin.py:13:89: E501 Line too long (119 > 88)
+inteligencia\admin.py:19:89: E501 Line too long (123 > 88)
+inteligencia\entrenamiento.py:16:22: F401 [*] `datetime.datetime` imported but unused
+inteligencia\entrenamiento.py:278:20: B905 `zip()` without an explicit `strict=` parameter
+inteligencia\evaluacion.py:19:30: F401 [*] `django.db.models.Avg` imported but unused
+inteligencia\evaluacion.py:19:35: F401 [*] `django.db.models.Count` imported but unused
+inteligencia\evaluacion.py:19:42: F401 [*] `django.db.models.F` imported but unused
+inteligencia\models.py:17:89: E501 Line too long (95 > 88)
+inteligencia\models.py:18:89: E501 Line too long (92 > 88)
+inteligencia\models.py:33:7: DJ008 Model does not define `__str__` method
+inteligencia\models.py:72:7: DJ008 Model does not define `__str__` method
+inteligencia\servicio.py:193:89: E501 Line too long (90 > 88)
+inteligencia\views.py:12:35: F401 [*] `django.db.models.Count` imported but unused
+inteligencia\views.py:60:89: E501 Line too long (92 > 88)
+pacientes\forms.py:76:89: E501 Line too long (90 > 88)
+pacientes\models.py:46:7: DJ008 Model does not define `__str__` method
+pacientes\urls.py:13:89: E501 Line too long (94 > 88)
+pacientes\views.py:57:89: E501 Line too long (94 > 88)
+prueba_calendario.py:64:89: E501 Line too long (92 > 88)
+prueba_calendario.py:138:89: E501 Line too long (89 > 88)
+prueba_capacidad.py:47:89: E501 Line too long (90 > 88)
+prueba_capacidad.py:78:89: E501 Line too long (91 > 88)
+prueba_clinico.py:3:8: F401 [*] `re` imported but unused
+prueba_clinico.py:4:22: F401 [*] `datetime.time` imported but unused
+prueba_flujos.py:65:53: S106 Possible hardcoded password assigned to argument: "password"
+prueba_flujos.py:74:89: E501 Line too long (90 > 88)
+prueba_flujos.py:139:89: E501 Line too long (90 > 88)
+prueba_flujos.py:178:89: E501 Line too long (90 > 88)
+prueba_horarios.py:98:23: E741 Ambiguous variable name: `l`
+prueba_horarios.py:126:47: E741 Ambiguous variable name: `l`
+prueba_horarios.py:160:23: E741 Ambiguous variable name: `l`
+prueba_modelo.py:43:13: E702 Multiple statements on one line (semicolon)
+prueba_modelo.py:44:19: E702 Multiple statements on one line (semicolon)
+prueba_modelo.py:45:17: E702 Multiple statements on one line (semicolon)
+prueba_modelo.py:330:89: E501 Line too long (89 > 88)
+prueba_modelo.py:336:19: E702 Multiple statements on one line (semicolon)
+prueba_permisos.py:74:89: E501 Line too long (89 > 88)
+prueba_permisos.py:81:89: E501 Line too long (94 > 88)
+prueba_recomendacion.py:54:89: E501 Line too long (92 > 88)
+prueba_recomendacion.py:55:89: E501 Line too long (91 > 88)
+prueba_recomendacion.py:61:89: E501 Line too long (89 > 88)
+prueba_recomendacion.py:85:89: E501 Line too long (96 > 88)
+prueba_recomendacion.py:90:89: E501 Line too long (91 > 88)
+prueba_recomendacion.py:118:89: E501 Line too long (89 > 88)
+prueba_recomendacion.py:155:31: E741 Ambiguous variable name: `l`
+reportes\models.py:4:7: DJ008 Model does not define `__str__` method
+reportes\models.py:8:89: E501 Line too long (91 > 88)
+reportes\models.py:9:89: E501 Line too long (104 > 88)
+reportes\servicio.py:10:42: F401 [*] `django.db.models.F` imported but unused
+reportes\servicio.py:141:89: E501 Line too long (90 > 88)
+reportes\views.py:46:89: E501 Line too long (96 > 88)
+reportes\views.py:48:89: E501 Line too long (99 > 88)
+usuarios\admin.py:8:89: E501 Line too long (92 > 88)
+usuarios\forms.py:25:89: E501 Line too long (98 > 88)
+usuarios\forms.py:35:89: E501 Line too long (102 > 88)
+usuarios\forms.py:36:89: E501 Line too long (112 > 88)
+usuarios\forms.py:37:89: E501 Line too long (113 > 88)
+usuarios\forms.py:41:89: E501 Line too long (92 > 88)
+usuarios\forms.py:80:89: E501 Line too long (92 > 88)
+usuarios\forms.py:106:89: E501 Line too long (95 > 88)
+usuarios\forms.py:110:89: E501 Line too long (116 > 88)
+usuarios\forms.py:114:89: E501 Line too long (108 > 88)
+usuarios\forms.py:115:89: E501 Line too long (112 > 88)
+usuarios\forms.py:122:89: E501 Line too long (90 > 88)
+usuarios\management\commands\seed.py:79:89: E501 Line too long (98 > 88)
+usuarios\management\commands\seed.py:80:89: E501 Line too long (93 > 88)
+usuarios\management\commands\seed.py:85:89: E501 Line too long (96 > 88)
+usuarios\management\commands\seed.py:92:89: E501 Line too long (98 > 88)
+usuarios\management\commands\seed.py:108:89: E501 Line too long (107 > 88)
+usuarios\management\commands\seed.py:115:89: E501 Line too long (108 > 88)
+usuarios\management\commands\seed.py:121:89: E501 Line too long (90 > 88)
+usuarios\management\commands\seed.py:124:89: E501 Line too long (92 > 88)
+usuarios\management\commands\seed.py:126:89: E501 Line too long (111 > 88)
+usuarios\management\commands\seed.py:157:89: E501 Line too long (118 > 88)
+usuarios\management\commands\seed.py:166:34: F401 [*] `django.utils.timezone` imported but unused
+usuarios\management\commands\seed.py:169:43: F401 [*] `agenda.disponibilidad.asignar_unidad` imported but unused
+usuarios\management\commands\seed.py:170:89: E501 Line too long (89 > 88)
+usuarios\management\commands\seed.py:329:89: E501 Line too long (92 > 88)
+usuarios\management\commands\seed.py:330:89: E501 Line too long (94 > 88)
+usuarios\management\commands\seed.py:333:89: E501 Line too long (95 > 88)
+usuarios\management\commands\seed.py:335:89: E501 Line too long (91 > 88)
+usuarios\management\commands\seed.py:336:89: E501 Line too long (92 > 88)
+usuarios\management\commands\seed.py:379:89: E501 Line too long (89 > 88)
+usuarios\management\commands\seed.py:382:9: C901 `sembrar_agenda` is too complex (21 > 10)
+usuarios\management\commands\seed.py:397:15: S311 Standard pseudo-random generators are not suitable for cryptographic purposes
+usuarios\management\commands\seed.py:433:89: E501 Line too long (90 > 88)
+usuarios\management\commands\seed.py:450:89: E501 Line too long (92 > 88)
+usuarios\management\commands\seed.py:479:89: E501 Line too long (89 > 88)
+usuarios\management\commands\seed.py:491:89: E501 Line too long (91 > 88)
+usuarios\management\commands\seed.py:501:89: E501 Line too long (96 > 88)
+usuarios\management\commands\seed.py:574:9: C901 `sembrar_expediente` is too complex (11 > 10)
+usuarios\management\commands\seed.py:586:35: F401 [*] `agenda.models.Cita` imported but unused
+usuarios\management\commands\seed.py:660:89: E501 Line too long (103 > 88)
+usuarios\management\commands\seed.py:662:89: E501 Line too long (98 > 88)
+usuarios\models.py:26:89: E501 Line too long (89 > 88)
+usuarios\models.py:71:89: E501 Line too long (99 > 88)
+usuarios\models.py:80:89: E501 Line too long (97 > 88)
+usuarios\models.py:121:7: DJ008 Model does not define `__str__` method
+usuarios\views.py:28:89: E501 Line too long (92 > 88)
+usuarios\views.py:32:89: E501 Line too long (91 > 88)
+usuarios\views.py:82:1: E402 Module level import not at top of file
+usuarios\views.py:82:21: F811 [*] Redefinition of unused `Usuario` from line 5: `Usuario` redefined here
+usuarios\views.py:83:1: E402 Module level import not at top of file
+usuarios\views.py:97:89: E501 Line too long (114 > 88)
+usuarios\views.py:119:89: E501 Line too long (104 > 88)
+usuarios\views.py:137:89: E501 Line too long (98 > 88)
+Found 170 errors.
+[*] 15 fixable with `--fix` (3 unsafe fixes available with `--fix --unsafe-fixes`).

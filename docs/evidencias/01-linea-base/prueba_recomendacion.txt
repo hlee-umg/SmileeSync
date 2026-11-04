@@ -1,0 +1,42 @@
+Odontólogo: Rachelle Girón | largo: PROC-005 - Colocación de brackets (120 min) | corto: PROC-006 - Aplicación de flúor (20 min)
+
+1. Sin procedimiento no hay sugerencias
+  OK    no hay huecos sugeridos
+  OK    el panel invita a elegir
+
+2. Con procedimiento y odontólogo se marcan los huecos
+  OK    aparecen huecos sugeridos
+  OK    se muestra la duración estimada
+  OK    se informa cuántos espacios hay
+
+3. Un procedimiento más largo no ofrece más espacios que uno corto
+  OK    el procedimiento largo tiene menos o igual espacios
+
+4. Sin odontólogo se pide elegir uno
+  OK    avisa que falta el odontólogo
+  OK    no marca huecos
+
+4b. Sin procedimiento se pide elegir uno
+  OK    avisa que falta el procedimiento
+  OK    el filtro del calendario conserva el procedimiento consultado
+  OK    el panel ofrece elegir el odontólogo sin salir de él
+
+5. Los huecos propuestos son realmente válidos
+  OK    se extrajeron propuestas del HTML
+  OK    todas las propuestas caben en una franja y no se traslapan
+
+6. La propuesta abre el formulario ya cargado
+  OK    el formulario responde 200
+  OK    trae la fecha
+  OK    trae la hora
+  OK    trae el procedimiento
+
+7. Y la cita propuesta se puede guardar sin errores de validación
+  OK    la cita propuesta se creó
+
+8. Vista diaria con recomendación
+  (día evaluado: 2026-11-04)
+  OK    responde 200
+  OK    marca huecos también en la vista diaria
+
+=== 20 correctas, 0 fallidas ===

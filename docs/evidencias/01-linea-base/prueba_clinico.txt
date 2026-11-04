@@ -1,0 +1,112 @@
+Forbidden (Permission denied): /expedientes/1/odontograma/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 15, in _envuelta
+    return vista(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\clinico\views.py", line 124, in odontograma
+    _exigir_escritura_clinica(request)
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\clinico\views.py", line 35, in _exigir_escritura_clinica
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: El expediente clínico solo lo registra el personal odontológico.
+Forbidden (Permission denied): /planes/renglon/7/agendar/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\prueba_clinico.py", line 274, in <module>
+    r = c_recep.post(reverse('agenda:tiempos', args=[cita_plan.pk]),
+                                                     ^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'pk'
+1. Quién escribe el expediente y quién cobra
+  OK    el administrador escribe el expediente
+  OK    el odontólogo escribe el expediente
+  OK    el odontólogo sigue sin escribir la agenda
+  OK    la recepción consulta el expediente
+  OK    la recepción no escribe el expediente
+  OK    la recepción cobra
+  OK    el odontólogo no cobra
+  OK    la recepción abre el odontograma
+  OK    la recepción no puede registrar un hallazgo
+
+2. El odontograma dibuja la arcada completa
+  OK    responde 200
+  OK    dibuja las 32 piezas permanentes
+  OK    marca las piezas patológicas
+  OK    marca las piezas ausentes
+  OK    muestra los cuatro cuadrantes
+
+3. Se registra un hallazgo y el más reciente es el vigente
+  OK    el hallazgo se crea
+  OK    queda como vigente de la pieza 15
+  OK    el hallazgo posterior sustituye al anterior en el odontograma
+  OK    el anterior sigue en el historial
+
+4. Validaciones del odontograma
+  OK    una pieza ausente no se registra por cara
+  OK    no se acepta un hallazgo con fecha futura
+
+5. Al retirar un hallazgo vuelve a regir el anterior
+  OK    el vigente vuelve a ser el hallazgo previo
+
+6. Notas clínicas: validaciones
+  OK    el número de piezas debe coincidir con las enumeradas
+  OK    rechaza una pieza que no existe en la nomenclatura FDI
+  OK    una complicación exige su descripción
+
+7. La nota se liga a la cita atendida
+  OK    el formulario avisa de la cita ligada
+  OK    precarga el procedimiento como motivo
+  FALLA la nota queda ligada a la cita 
+  FALLA guarda las variables que usa el modelo None
+  FALLA no se documenta dos veces la misma cita 
+
+8. Plan de tratamiento: creación y renglones
+  OK    el plan se crea en borrador
+  OK    recibe un código de la serie
+  OK    no se aprueba un plan sin renglones
+  OK    el mensaje lo explica
+  OK    el renglón toma el precio de lista del catálogo
+  OK    el modelo le estima una duración
+  OK    registra el origen de la estimación
+  OK    el plan acumula cuatro renglones
+  OK    el total es la suma de los importes
+
+9. Los renglones se reparten en sesiones de sillón
+  OK    propone más de una sesión
+  OK    ninguna sesión pasa de 120 minutos
+  OK    ninguna sesión mezcla fases
+  OK    la primera sesión es la de la fase 1
+  OK    los minutos estimados del plan son la suma de sus renglones
+
+10. Aprobación y agendado de un renglón
+  OK    el plan queda aprobado
+  OK    registra la fecha de aprobación
+  OK    el odontólogo no agenda (no escribe la agenda)
+  OK    la recepción sí agenda
+  OK    el destino es el formulario de cita con los datos del renglón
+  OK    el formulario avisa de qué renglón viene
+  OK    precarga la duración estimada del plan
+  FALLA la cita del renglón se programa 
+  FALLA el renglón queda agendado PENDIENTE
+  FALLA el renglón apunta a la cita 
+
+11. Al registrar la atención el renglón se cierra y el plan avanza

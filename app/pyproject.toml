@@ -1,0 +1,29 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --reuse-db"
+filterwarnings = [
+    "ignore:No directory at:UserWarning",
+]
+markers = [
+    "unit: prueba unitaria (sin peticiones HTTP)",
+    "integration: prueba de integración (vista + formulario + modelo + base de datos)",
+    "regression: prueba de regresión (flujos completos y bugs corregidos)",
+]
+
+[tool.coverage.run]
+source = ["."]
+branch = true
+omit = [
+    "*/migrations/*",
+    "tests/*",
+    ".venv/*",
+    "manage.py",
+    "config/asgi.py",
+    "config/wsgi.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

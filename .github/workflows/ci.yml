@@ -165,6 +165,16 @@ jobs:
           args: >
             -Dsonar.qualitygate.wait=true
 
+      - name: Publicar el detalle del quality gate de SonarCloud
+        if: success() || failure()
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_NUMERO: ${{ github.event.pull_request.number }}
+          RAMA: ${{ github.ref_name }}
+        run: |
+          python ../.github/scripts/resumen_sonar.py | tee -a "$GITHUB_STEP_SUMMARY"
+
   # ---------------------------------------------------------------------------
   # 4) REPORT — resumen de pruebas, cobertura y gates en la página de la
   #    ejecución. Corre siempre, también cuando una etapa anterior falla.

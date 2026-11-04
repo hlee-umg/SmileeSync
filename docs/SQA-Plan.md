@@ -4,7 +4,7 @@
 |------|-------|
 | Proyecto | SmileeSync: gestión de citas y agenda de la Clínica Dental Smilee |
 | Curso | Aseguramiento de la Calidad del Software (SQA), Universidad Mariano Gálvez |
-| Responsable | _[Nombre del estudiante]_ |
+| Responsable | Hee Sung Lee, carné 3190-11-342 |
 | Versión del plan | 1.0, 2026-11-03 |
 | Repositorio | `hlee-umg/SmileeSync`, rama de trabajo `qa/pipeline-sqa` |
 | Estructura de referencia | IEEE Std 730-2014 (SQA Processes), adaptada al alcance del curso |

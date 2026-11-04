@@ -8,6 +8,7 @@ Casos de prueba automatizados definidos según la estrategia del [SQA Plan](SQA-
 | Ubicación | `app/tests/unit/`, `app/tests/integration/`, `app/tests/regresion/` |
 | Fecha de ejecución | 2026-11-03 |
 | Evidencias | [`docs/evidencias/02-pruebas/`](evidencias/02-pruebas/): salida de pytest, JUnit XML y reporte HTML de cobertura |
+| Capturas | [Ejecución de pytest](evidencias/02-pruebas/pytest.png) · [Reporte de cobertura (PDF)](evidencias/02-pruebas/reporte-cobertura.pdf) |
 | Ejecutar | `cd app && pytest` (todas) · `pytest -m unit` · `pytest -m integration` · `pytest -m regression` |
 
 ## 1. Resumen de resultados

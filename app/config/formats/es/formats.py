@@ -7,6 +7,7 @@ horas se leían mal en pantalla. Solo se redefinen los separadores numéricos; e
 resto de los formatos (fechas, horas) se toma de la configuración regional de
 español que trae Django.
 """
-DECIMAL_SEPARATOR = '.'
-THOUSAND_SEPARATOR = ','
+
+DECIMAL_SEPARATOR = "."
+THOUSAND_SEPARATOR = ","
 NUMBER_GROUPING = 3

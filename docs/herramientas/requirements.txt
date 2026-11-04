@@ -1,0 +1,4 @@
+# Herramientas para generar los entregables .docx y .pdf de la documentación.
+python-docx>=1.1
+markdown-it-py>=3.0
+pymupdf>=1.24

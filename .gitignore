@@ -52,3 +52,6 @@ coverage.xml
 
 # Clave secreta generada para desarrollo local
 app/.clave-desarrollo
+
+# Entregables generados a partir del Markdown (docs/herramientas/generar_docx.py)
+docs/entregables/

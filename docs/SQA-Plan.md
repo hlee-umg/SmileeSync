@@ -165,7 +165,7 @@ La lista vive en la plantilla del pull request (`.github/pull_request_template.m
 | Calificación de mantenibilidad | SonarCloud | A (3) | A |
 | Issues Blocker | SonarCloud | ≥ 4 | **0** |
 | Duplicación | SonarCloud | 0,9 % | ≤ 3 % |
-| Funciones con complejidad > 15 | Radon | 6 | ≤ 4 |
+| Funciones con complejidad > 15 | Radon | 4 | ≤ 3 |
 | Advertencias de `check --deploy` | Django | 4 | 0 en configuración de producción |
 
 \* Obtenida con scripts manuales no reproducibles en CI. La cobertura de pytest se mide

@@ -215,11 +215,19 @@ Capturas: [resumen](evidencias/01-linea-base/sonarcloud/summary.png) ·
 | Duplicación | **0,9 %** (sobre 18 k líneas) | |
 | Cobertura | **No configurada**: el análisis automático no importa cobertura | — |
 | Security hotspots | 0 | |
-| Riesgos en dependencias | 0 | A |
+| Riesgos en dependencias | 0 en el análisis automático; **15 en el análisis desde CI** (ver nota) | **D** |
 | Tamaño | 15 k líneas de código en 155 archivos (Python, HTML, YAML) | |
 
 > SonarCloud mide 15 k líneas porque incluye plantillas HTML, la infraestructura (CDK)
 > y el workflow; Radon (sección 4.3) mide solo Python.
+
+> **Nota sobre las dependencias.** El análisis automático no revisa dependencias. El
+> primer análisis desde el pipeline (commit `f2d5f9a`, con el código de la aplicación sin
+> cambios respecto a `120f743`) detectó **15 riesgos en 54 dependencias**, todos en
+> **Django 5.0.14**. Entre ellos hay inyección SQL (CVE-2025-64459, CVSS 9,1;
+> CVE-2025-57833; CVE-2025-59681), control externo de rutas (CVE-2026-15307) y
+> complejidad algorítmica (CVE-2025-64458). La rama 5.0 de Django ya no recibe parches de
+> seguridad. Captura: [dependencias](evidencias/03-pipeline/sonar-dependencias-antes.png).
 
 Issues **Blocker** más relevantes:
 

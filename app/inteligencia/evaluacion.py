@@ -17,8 +17,6 @@ Este módulo resuelve las dos lecturas que lo responden:
                      sistema.
 """
 
-from django.db.models import Avg, Count, F
-
 from .entrenamiento import META_REDUCCION_PCT
 
 

@@ -134,7 +134,7 @@ texto = r.content.decode()
 probar(
     "reporta 24 horas por semana",
     ("24,0 hora" in texto or "24.0 hora" in texto),
-    [l.strip() for l in texto.splitlines() if "por semana" in l],
+    [linea.strip() for linea in texto.splitlines() if "por semana" in linea],
 )
 
 print("\n8. Retirar una franja (borrado lógico)")
@@ -178,7 +178,11 @@ if cita:
         )
         print(
             "     mensaje:",
-            [l.strip() for l in cuerpo.splitlines() if "alert-warning" in l][:1],
+            [
+                linea.strip()
+                for linea in cuerpo.splitlines()
+                if "alert-warning" in linea
+            ][:1],
         )
     else:
         print("  (omitida: la cita no cae dentro de una franja activa)")
@@ -227,7 +231,11 @@ creada = Cita.objects.filter(odontologo=nuevo, fecha=prox_lunes).exists()
 probar(
     "la cita se creó dentro de la franja 14:00-18:00",
     creada,
-    [l.strip() for l in r.content.decode().splitlines() if "text-danger" in l][:2],
+    [
+        linea.strip()
+        for linea in r.content.decode().splitlines()
+        if "text-danger" in linea
+    ][:2],
 )
 
 print("\n12. Fuera de la franja sigue siendo rechazada")

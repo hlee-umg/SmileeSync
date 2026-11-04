@@ -22,3 +22,6 @@ class IndicadorDesempeno(models.Model):
         verbose_name = "Indicador de desempeño"
         verbose_name_plural = "Indicadores de desempeño"
         ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"Indicadores del {self.fecha:%d/%m/%Y}"

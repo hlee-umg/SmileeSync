@@ -29,6 +29,12 @@ class HorarioDisponibilidad(models.Model):
         verbose_name = "Horario de disponibilidad"
         verbose_name_plural = "Horarios de disponibilidad"
 
+    def __str__(self):
+        return (
+            f"{self.odontologo} — {self.get_dia_semana_display()} "
+            f"{self.hora_inicio:%H:%M} a {self.hora_fin:%H:%M}"
+        )
+
 
 class Cita(models.Model):
     """Cita odontológica programada. Registra tiempos programados y reales."""
@@ -111,6 +117,9 @@ class HistorialCita(models.Model):
         verbose_name = "Historial de cita"
         verbose_name_plural = "Historial de citas"
         ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"Cita {self.cita_ref}: {self.accion} por {self.realizado_por}"
 
 
 class AusenciaOdontologo(models.Model):

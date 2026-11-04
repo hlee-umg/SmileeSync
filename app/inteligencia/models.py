@@ -78,6 +78,9 @@ class DatoEntrenamiento(models.Model):
         verbose_name_plural = "Datos de entrenamiento"
         ordering = ["-creado"]
 
+    def __str__(self):
+        return f"Dato de entrenamiento de la cita {self.cita_id}"
+
 
 class Prediccion(models.Model):
     """Predicción de duración y recomendación de bloque para una cita."""
@@ -104,3 +107,9 @@ class Prediccion(models.Model):
         verbose_name = "Predicción"
         verbose_name_plural = "Predicciones"
         ordering = ["-fecha"]
+
+    def __str__(self):
+        return (
+            f"Predicción de {self.duracion_estimada_min} min "
+            f"para la cita {self.cita_id}"
+        )

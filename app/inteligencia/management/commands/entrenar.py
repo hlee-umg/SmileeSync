@@ -97,7 +97,8 @@ class Command(BaseCommand):
                 activar = False
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  La versión en producción tiene un error de {activa.mae} min; "
+                        f"  La versión en producción tiene un error de "
+                        f"{activa.mae} min; "
                         f"la nueva no mejora y se conserva como histórico."
                     )
                 )

@@ -15,7 +15,7 @@ Dos recursos limitan la operación y deben cumplirse a la vez:
   simultáneas posibles.
 """
 
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
 DIAS = ["LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM"]
 
@@ -152,7 +152,7 @@ def capacidad_minutos(odontologos, fechas):
         ]
 
     total = 0
-    for f, listas in por_fecha.items():
+    for listas in por_fecha.values():
         if not listas:
             continue
         inicio_dia = min((i for lista in listas for i, _ in lista), default=None)

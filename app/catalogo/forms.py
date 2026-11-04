@@ -63,8 +63,10 @@ class ProcedimientoForm(forms.ModelForm):
             "precio": "Precio de lista (Q)",
         }
         help_texts = {
-            "duracion_promedio_min": "Valor de referencia inicial. El modelo predictivo lo ajusta "
-            "conforme se acumulan atenciones reales.",
+            "duracion_promedio_min": (
+                "Valor de referencia inicial. El modelo predictivo lo ajusta "
+                "conforme se acumulan atenciones reales."
+            ),
             "precio": "Tarifa con que se presupuestan los planes de tratamiento.",
         }
 

@@ -14,7 +14,6 @@ métricas. El proceso web únicamente carga ese archivo y predice.
 
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
 
 from django.conf import settings
 from django.utils import timezone
@@ -294,7 +293,7 @@ def _importancias(pipe, limite=8):
         pesos = pipe.named_steps["estimador"].feature_importances_
     except Exception:
         return []
-    pares = sorted(zip(nombres, pesos), key=lambda p: p[1], reverse=True)
+    pares = sorted(zip(nombres, pesos, strict=True), key=lambda p: p[1], reverse=True)
     salida = []
     for nombre, peso in pares[:limite]:
         legible = (

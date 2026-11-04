@@ -3,7 +3,13 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Usuario, HistorialUsuario
-from .forms import UsuarioCrearForm, UsuarioEditarForm
+from .forms import (
+    NuevaPasswordForm,
+    RecuperarCorreoForm,
+    RecuperarRespuestaForm,
+    UsuarioCrearForm,
+    UsuarioEditarForm,
+)
 from .decorators import escritura_requerida, modulo_requerido
 
 
@@ -90,8 +96,6 @@ def historial(request):
 
 
 # ================= Recuperación de contraseña (pregunta secreta) =================
-from .models import Usuario
-from .forms import RecuperarCorreoForm, RecuperarRespuestaForm, NuevaPasswordForm
 
 
 def recuperar_correo(request):
@@ -107,7 +111,8 @@ def recuperar_correo(request):
                 return redirect("usuarios:recuperar_pregunta")
             form.add_error(
                 "email",
-                "No se encontró una cuenta con pregunta secreta configurada para ese correo.",
+                "No se encontró una cuenta con pregunta secreta configurada "
+                "para ese correo.",
             )
     else:
         form = RecuperarCorreoForm()

@@ -8,7 +8,7 @@ prestada ni tiempo de sillón ocupado.
 
 from datetime import timedelta
 
-from django.db.models import Avg, Count, F, Sum
+from django.db.models import Avg, Count, Sum
 from django.utils import timezone
 
 from agenda.disponibilidad import capacidad_minutos

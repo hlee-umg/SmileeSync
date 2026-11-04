@@ -255,7 +255,7 @@ build ──► test ──► analyze ──► report ──► deploy (solo p
 | Fase | Actividades | Entregable |
 |------|-------------|------------|
 | 1. Planeación | Línea base de calidad (local + SonarCloud); SQA Plan | `Linea-Base-Calidad.md`, `SQA-Plan.md` |
-| 2. Pruebas | Configurar pytest; matriz de pruebas; pruebas unitarias, de integración y de regresión; cobertura ≥ 70 % | `Matriz-Pruebas.md`, `app/*/tests/` |
+| 2. Pruebas | Configurar pytest; matriz de pruebas; pruebas unitarias, de integración y de regresión; cobertura ≥ 70 % | `Matriz-Pruebas.md`, `app/tests/` |
 | 3. Pipeline | `ci.yml` con 4 etapas + deploy; Ruff, Black, Bandit; SonarCloud desde CI; protección de `main` | `.github/workflows/ci.yml`, `pyproject.toml`, `sonar-project.properties` |
 | 4. Mejora | Corregir issues Blocker y mayores; formatear; medición final | `Reporte-Mejora.md` |
 | 5. Cierre | Manual técnico; README con badges; video; presentación | `Manual-Tecnico.md`, video `.mp4`, presentación PDF |

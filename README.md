@@ -31,10 +31,13 @@ Todas las entidades aplican **borrado lógico** (campo `estado`) y las sensibles
 
 ```bash
 cd app
-for s in horarios permisos calendario recomendacion flujos capacidad clinico modelo; do
-    python prueba_$s.py
-done     # 336 verificaciones
+pip install -r requirements-dev.txt
+pytest                      # todas las pruebas, con base de datos aislada
+pytest -m unit              # solo unitarias (también: integration, regression)
+pytest --cov                # con reporte de cobertura
 ```
+
+Los casos están documentados en [docs/Matriz-Pruebas.md](docs/Matriz-Pruebas.md).
 
 ## Modelo predictivo
 

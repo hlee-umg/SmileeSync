@@ -397,8 +397,8 @@ def exportar_pdf(docx):
         f"$d = $w.Documents.Open('{docx}'); "
         f"$d.SaveAs([ref]'{pdf}', [ref]17); $d.Close(); $w.Quit()"
     )
-    resultado = subprocess.run(  # noqa: S603, S607 - comando fijo, sin datos externos
-        ["powershell", "-NoProfile", "-Command", script],
+    resultado = subprocess.run(  # noqa: S603 - comando fijo, sin datos externos
+        ["powershell", "-NoProfile", "-Command", script],  # noqa: S607
         capture_output=True,
         text=True,
         timeout=180,

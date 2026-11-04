@@ -1,0 +1,82 @@
+........................................................................ [ 40%]
+........................................................................ [ 81%]
+.................................                                        [100%]
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+agenda\__init__.py                                 0      0      0      0   100%
+agenda\admin.py                                   17      0      0      0   100%
+agenda\apps.py                                     4      0      0      0   100%
+agenda\disponibilidad.py                          71      1     32      1    98%   157
+agenda\forms.py                                  182     14     66     17    88%   77->75, 102-106, 145, 165, 195->197, 197->199, 237, 253, 279-282, 283->271, 310->322, 312, 326->328, 329->331, 372, 376, 387
+agenda\models.py                                  74      4      2      0    92%   100, 157-159
+agenda\urls.py                                     4      0      0      0   100%
+agenda\views.py                                  380     40    130     19    86%   61-67, 93, 139->137, 151, 280, 333, 335, 405, 409, 413-414, 433, 438, 443-444, 495->497, 564-581, 606->626, 656, 711->743, 716->729, 774, 788->818, 836->868, 888-897
+catalogo\__init__.py                               0      0      0      0   100%
+catalogo\admin.py                                 17      0      0      0   100%
+catalogo\apps.py                                   4      0      0      0   100%
+catalogo\forms.py                                121     44     38      7    57%   16->12, 26-28, 31-41, 74-78, 81-86, 89-97, 100-105, 108-113, 156, 159, 161, 187, 189, 195
+catalogo\models.py                                62      1      0      0    98%   20
+catalogo\urls.py                                   4      0      0      0   100%
+catalogo\views.py                                 65     23     20      5    60%   63-65, 77->79, 80, 119-120, 135-147, 165-174
+clinico\__init__.py                                0      0      0      0   100%
+clinico\admin.py                                  24      0      0      0   100%
+clinico\apps.py                                    5      0      0      0   100%
+clinico\forms.py                                 173     12     52     12    88%   52, 144, 196, 198, 204, 247-249, 254->256, 270, 291->293, 321, 323, 342
+clinico\models.py                                239      9     28      5    95%   102, 217, 221, 276, 301, 366, 371, 372->374, 374->377, 390, 517
+clinico\piezas.py                                 17      0      2      0   100%
+clinico\urls.py                                    4      0      0      0   100%
+clinico\views.py                                 249      9     70     15    92%   73, 242->246, 304->306, 349, 351, 383->401, 452-453, 455->471, 504->517, 532->563, 542->545, 584-585, 587-588, 622->624, 652->664
+config\__init__.py                                 0      0      0      0   100%
+config\formats\__init__.py                         0      0      0      0   100%
+config\formats\es\__init__.py                      0      0      0      0   100%
+config\formats\es\formats.py                       3      0      0      0   100%
+config\settings.py                                51     10     10      5    75%   23-24, 29->42, 35, 40, 50-54, 108
+config\urls.py                                     5      0      0      0   100%
+config\validadores.py                             41      0     16      0   100%
+inteligencia\__init__.py                           0      0      0      0   100%
+inteligencia\admin.py                             13      0      0      0   100%
+inteligencia\apps.py                               4      0      0      0   100%
+inteligencia\entrenamiento.py                    144      9     32      7    91%   75, 87, 97-99, 184->187, 221, 240, 274->277, 277->286, 294-295
+inteligencia\evaluacion.py                        44      1     16      1    97%   120
+inteligencia\management\__init__.py                0      0      0      0   100%
+inteligencia\management\commands\__init__.py       0      0      0      0   100%
+inteligencia\management\commands\entrenar.py      35     35     10      0     0%   13-115
+inteligencia\models.py                            54      1      0      0    98%   34
+inteligencia\servicio.py                         108     11     22      2    90%   86-87, 92-95, 132-133, 151-153, 243-245, 265
+inteligencia\urls.py                               4      0      0      0   100%
+inteligencia\views.py                             44      7      6      1    80%   41, 120-130
+pacientes\__init__.py                              0      0      0      0   100%
+pacientes\admin.py                                20      0      0      0   100%
+pacientes\apps.py                                  4      0      0      0   100%
+pacientes\forms.py                                69      0     20      2    98%   22->18, 83->93
+pacientes\models.py                               48      1      0      0    98%   49
+pacientes\urls.py                                  4      0      0      0   100%
+pacientes\views.py                                84      0     20      2    98%   85->92, 167->172
+reportes\__init__.py                               0      0      0      0   100%
+reportes\admin.py                                  6      0      0      0   100%
+reportes\apps.py                                   4      0      0      0   100%
+reportes\models.py                                17      0      0      0   100%
+reportes\servicio.py                              73      1     18      3    96%   55->62, 154, 184->180
+reportes\urls.py                                   4      0      0      0   100%
+reportes\views.py                                 16      0      0      0   100%
+usuarios\__init__.py                               0      0      0      0   100%
+usuarios\admin.py                                 17      0      0      0   100%
+usuarios\apps.py                                   5      0      0      0   100%
+usuarios\backends.py                              18      2      4      0    91%   18-19
+usuarios\context_processors.py                     6      0      2      0   100%
+usuarios\decorators.py                            33      2     12      2    91%   14, 38
+usuarios\forms.py                                 84      1     16      3    96%   18->15, 89->91, 122
+usuarios\management\__init__.py                    0      0      0      0   100%
+usuarios\management\commands\__init__.py           0      0      0      0   100%
+usuarios\management\commands\seed.py             264     19     92     14    90%   141-143, 152->163, 171->182, 196->205, 222, 338, 673-674, 678-679, 759->777, 761-775, 785, 851, 918, 938
+usuarios\middleware.py                            11      0      2      1    92%   19->23
+usuarios\models.py                                84      0     12      0   100%
+usuarios\urls.py                                   4      0      0      0   100%
+usuarios\views.py                                106      2     36      6    94%   54->61, 74->88, 105->119, 118, 131->138, 152
+------------------------------------------------------------------------------------------
+TOTAL                                           3247    259    786    130    89%
+Coverage JSON written to file ../docs/evidencias/04-mejora/cobertura.json
+177 passed in 186.28s (0:03:06)

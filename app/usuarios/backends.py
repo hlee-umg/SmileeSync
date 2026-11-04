@@ -4,9 +4,10 @@ from django.contrib.auth.backends import ModelBackend
 
 class EmailBackend(ModelBackend):
     """Permite iniciar sesión con el correo electrónico en lugar del username."""
+
     def authenticate(self, request, username=None, password=None, **kwargs):
         UserModel = get_user_model()
-        email = kwargs.get('email') or username
+        email = kwargs.get("email") or username
         if not email or not password:
             return None
         try:

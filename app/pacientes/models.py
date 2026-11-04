@@ -4,12 +4,12 @@ from django.db import models
 class Paciente(models.Model):
     """Paciente atendido en la clínica."""
 
-    SEXO = [("M", "Masculino"), ("F", "Femenino")]
+    OPCIONES_SEXO = [("M", "Masculino"), ("F", "Femenino")]
     codigo = models.CharField("código", max_length=20, unique=True)
     nombres = models.CharField("nombres", max_length=80)
     apellidos = models.CharField("apellidos", max_length=80)
     fecha_nacimiento = models.DateField("fecha de nacimiento", null=True, blank=True)
-    sexo = models.CharField("sexo", max_length=1, choices=SEXO, blank=True)
+    sexo = models.CharField("sexo", max_length=1, choices=OPCIONES_SEXO, blank=True)
     telefono = models.CharField("teléfono", max_length=20, blank=True)
     email = models.EmailField("correo", blank=True)
     direccion = models.CharField("dirección", max_length=200, blank=True)

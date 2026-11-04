@@ -681,7 +681,9 @@ class Command(BaseCommand):
                         # Los pacientes en ortodoncia regresan a control; el
                         # resto se reparte sobre el padrón completo.
                         ortodoncia = proc.codigo in ("PROC-005", "PROC-007", "PROC-008")
-                        paciente = rng.choice(
+                        # Generador no criptográfico a propósito: solo produce
+                        # datos de demostración reproducibles.
+                        paciente = rng.choice(  # NOSONAR
                             en_ortodoncia if ortodoncia else lista_pacientes
                         )
 

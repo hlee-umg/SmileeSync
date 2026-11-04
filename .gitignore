@@ -40,3 +40,8 @@ app/modelos/
 # leer en un diff. El respaldo son OneDrive y la plataforma de la universidad.
 docs/*.docx
 docs/*.pdf
+
+# Cobertura
+.coverage
+.coverage.*
+htmlcov/

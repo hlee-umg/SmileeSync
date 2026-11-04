@@ -67,9 +67,12 @@ def crear(request):
 def editar(request, pk):
     paciente = get_object_or_404(Paciente, pk=pk)
     if request.method == 'POST':
+        # Copia del estado previo para la auditoría: is_valid() ya escribe los
+        # datos nuevos en `paciente`.
+        previo = Paciente.objects.get(pk=pk)
         form = PacienteForm(request.POST, instance=paciente)
         if form.is_valid():
-            _auditar(paciente, 'ACTUALIZACION', request.user.username)
+            _auditar(previo, 'ACTUALIZACION', request.user.username)
             paciente = form.save()
             messages.success(request, 'Los datos del paciente fueron actualizados.')
             return redirect('pacientes:ficha', pk=paciente.pk)

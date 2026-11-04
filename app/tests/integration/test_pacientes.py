@@ -69,11 +69,6 @@ def test_editar_paciente_actualiza_y_audita(cliente_recepcion, paciente):
 
 
 @pytest.mark.regression
-@pytest.mark.xfail(
-    strict=True,
-    reason="BUG-02: la auditoría de edición guarda los datos "
-    "nuevos en lugar del estado previo. Pendiente.",
-)
 def test_auditoria_de_edicion_guarda_el_nombre_previo(cliente_recepcion, paciente):
     datos = datos_paciente(codigo="PAC-0001", nombres="María Fernanda")
     cliente_recepcion.post(reverse("pacientes:editar", args=[paciente.pk]), datos)

@@ -6,6 +6,9 @@ En producción (EC2) se usa PostgreSQL leyendo las variables de entorno.
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carga automática de variables desde app/.env si existe, para que los comandos
@@ -19,12 +22,32 @@ except ImportError:
     pass
 
 # --- Seguridad -------------------------------------------------------------
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-inseguro-cambiar-en-produccion')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    # Sin clave definida solo se admite el modo de desarrollo: se genera una
+    # aleatoria y se guarda en un archivo local fuera del repositorio, para que
+    # las sesiones sobrevivan a los reinicios del servidor de desarrollo. En
+    # producción la ausencia de la variable es un error.
+    if not DEBUG:
+        raise ImproperlyConfigured('Defina DJANGO_SECRET_KEY en el entorno de producción.')
+    _archivo_clave = BASE_DIR / '.clave-desarrollo'
+    if not _archivo_clave.exists():
+        _archivo_clave.write_text(get_random_secret_key(), encoding='utf-8')
+    SECRET_KEY = _archivo_clave.read_text(encoding='utf-8').strip()
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get('DJANGO_CSRF_TRUSTED', '').split(',') if o
 ]
+
+# Endurecimiento para el sitio servido por HTTPS (Nginx + certificado). Se
+# activa con DJANGO_HTTPS=True para no romper un despliegue que aún use HTTP.
+if os.environ.get('DJANGO_HTTPS', 'False') == 'True':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_HSTS_SECONDS', '3600'))
 
 # --- Aplicaciones ----------------------------------------------------------
 INSTALLED_APPS = [

@@ -49,3 +49,6 @@ htmlcov/
 # Resultados locales de pruebas
 junit.xml
 coverage.xml
+
+# Clave secreta generada para desarrollo local
+app/.clave-desarrollo

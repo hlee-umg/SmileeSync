@@ -27,3 +27,30 @@ omit = [
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
+
+# --- Análisis estático (QG-4, QG-5 y QG-6 del SQA Plan) ---------------------
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, bugbear, seguridad, complejidad, Django,
+# modernización y simplificación.
+select = ["E", "W", "F", "B", "S", "C90", "DJ", "UP", "SIM"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.per-file-ignores]
+# En las pruebas se usan assert y claves de prueba a propósito.
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+extend-exclude = "migrations"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "migrations"]

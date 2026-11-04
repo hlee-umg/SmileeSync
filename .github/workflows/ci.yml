@@ -1,0 +1,226 @@
+# Pipeline CI/CD de SmileeSync con quality gates (ver docs/SQA-Plan.md, sección 10).
+#
+#   build ──► test ──► analyze ──► report
+#                          └─────────────► deploy (solo push a main)
+#
+# Un cambio llega a main únicamente por pull request y solo si build, test y
+# analyze terminan en verde. El despliegue a la EC2 depende de las mismas etapas.
+name: CI/CD SmileeSync
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  COBERTURA_MINIMA: "70"
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1) BUILD — QG-1: dependencias, configuración de Django y migraciones.
+  # ---------------------------------------------------------------------------
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: app/requirements*.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Revisar la configuración de Django
+        run: python manage.py check
+
+      - name: Verificar que no haya migraciones pendientes
+        run: python manage.py makemigrations --check --dry-run
+
+  # ---------------------------------------------------------------------------
+  # 2) TEST — QG-2 (todas las pruebas pasan) y QG-3 (cobertura mínima).
+  #    Se prueba sobre PostgreSQL, el mismo motor que producción.
+  # ---------------------------------------------------------------------------
+  test:
+    name: test
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: smileesync
+          POSTGRES_PASSWORD: smileesync-ci
+          POSTGRES_DB: smileesync
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U smileesync"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DB_ENGINE: postgres
+      DB_NAME: smileesync
+      DB_USER: smileesync
+      DB_PASSWORD: smileesync-ci   # base efímera del pipeline, no es de producción
+      DB_HOST: localhost
+      DB_PORT: "5432"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: app/requirements*.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Pruebas unitarias, de integración y de regresión con cobertura
+        run: >
+          pytest --create-db
+          --cov --cov-report=term --cov-report=xml:coverage.xml
+          --cov-report=html:htmlcov
+          --cov-fail-under=${{ env.COBERTURA_MINIMA }}
+          --junitxml=junit.xml
+
+      - name: Guardar resultados de pruebas y cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: |
+            app/junit.xml
+            app/coverage.xml
+            app/htmlcov/
+          retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # 3) ANALYZE — QG-4 Ruff, QG-5 Black, QG-6 Bandit y QG-7 SonarCloud.
+  #    Cada herramienta corre aunque la anterior falle, para reportarlas todas;
+  #    la etapa falla si cualquiera falla.
+  # ---------------------------------------------------------------------------
+  analyze:
+    name: analyze
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # SonarCloud necesita el historial para el "código nuevo"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: app/requirements*.txt
+
+      - name: Instalar herramientas de análisis
+        run: pip install -r requirements-dev.txt
+
+      - name: "QG-4: Linter (Ruff)"
+        id: ruff
+        run: ruff check . --output-format=github
+
+      - name: "QG-5: Formato (Black)"
+        id: black
+        if: success() || failure()
+        run: black --check --diff .
+
+      - name: "QG-6: Seguridad (Bandit, severidad media o alta)"
+        id: bandit
+        if: success() || failure()
+        run: bandit -c pyproject.toml -r . -ll
+
+      - name: Descargar la cobertura de la etapa test
+        if: success() || failure()
+        uses: actions/download-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: app
+
+      - name: "QG-7: SonarCloud (quality gate)"
+        if: success() || failure()
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.qualitygate.wait=true
+
+  # ---------------------------------------------------------------------------
+  # 4) REPORT — resumen de pruebas, cobertura y gates en la página de la
+  #    ejecución. Corre siempre, también cuando una etapa anterior falla.
+  # ---------------------------------------------------------------------------
+  report:
+    name: report
+    needs: [build, test, analyze]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Descargar resultados
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: app
+
+      - name: Publicar resumen de calidad
+        env:
+          RESULTADO_BUILD: ${{ needs.build.result }}
+          RESULTADO_TEST: ${{ needs.test.result }}
+          RESULTADO_ANALYZE: ${{ needs.analyze.result }}
+        run: python ../.github/scripts/resumen_calidad.py >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # 5) DEPLOY — solo en push a main y solo si todas las etapas pasaron.
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: deploy
+    needs: [build, test, analyze]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: produccion
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Desplegar en EC2 por SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/smileesync
+            git pull origin main
+            cd app
+            source .venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+            sudo systemctl restart gunicorn

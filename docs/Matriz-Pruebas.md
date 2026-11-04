@@ -6,8 +6,8 @@ Casos de prueba automatizados definidos según la estrategia del [SQA Plan](SQA-
 |------|-------|
 | Framework | pytest 8 + pytest-django + pytest-cov |
 | Ubicación | `app/tests/unit/`, `app/tests/integration/`, `app/tests/regresion/` |
-| Fecha de ejecución | 2026-11-03 |
-| Evidencias | [`docs/evidencias/02-pruebas/`](evidencias/02-pruebas/): salida de pytest, JUnit XML y reporte HTML de cobertura |
+| Fecha de ejecución | 2026-11-03 (Fase 2) y 2026-11-04 (Fase 4, versión vigente) |
+| Evidencias | [`docs/evidencias/02-pruebas/`](evidencias/02-pruebas/) (Fase 2) y [`docs/evidencias/04-mejora/`](evidencias/04-mejora/) (Fase 4): salida de pytest, JUnit XML y cobertura |
 | Capturas | [Ejecución de pytest](evidencias/02-pruebas/pytest.png) · [Reporte de cobertura (PDF)](evidencias/02-pruebas/reporte-cobertura.pdf) |
 | Ejecutar | `cd app && pytest` (todas) · `pytest -m unit` · `pytest -m integration` · `pytest -m regression` |
 
@@ -15,10 +15,14 @@ Casos de prueba automatizados definidos según la estrategia del [SQA Plan](SQA-
 
 | Tipo | Funciones de prueba | Casos ejecutados* | Aprobados | Fallo esperado (bug conocido) | Fallidos |
 |------|--------------------:|------------------:|----------:|------------------------------:|---------:|
-| Unitarias | 49 | 99 | 99 | 0 | 0 |
+| Unitarias | 52 | 108 | 108 | 0 | 0 |
 | Integración | 42 | 56 | 56 | 0 | 0 |
-| Regresión | 4 | 11 | 8 | 3 | 0 |
-| **Total** | **95** | **166** | **163** | **3** | **0** |
+| Regresión | 4 | 13 | 13 | 0 | 0 |
+| **Total** | **98** | **177** | **177** | **0** | **0** |
+
+Evolución: al cerrar la Fase 2 había 166 casos (163 aprobados y 3 con fallo esperado por
+bugs conocidos). En la Fase 4 se corrigieron los dos bugs, sus pruebas pasaron a aprobar y se
+agregaron 11 casos (variantes de BUG-01 y representación de modelos).
 
 \* Un caso es una ejecución; las funciones parametrizadas se ejecutan una vez por cada
 conjunto de datos de entrada.
@@ -27,23 +31,25 @@ conjunto de datos de entrada.
 |-----------|------:|--------------:|
 | Líneas y ramas (`--cov-branch`) | **89 %** | ≥ 70 % ✅ |
 
-**Fallo esperado (`xfail`):** son pruebas que documentan un bug real todavía sin corregir.
-Se ejecutan en cada corrida y deben fallar. La marca es `strict`: si el bug se corrige y la
-prueba empieza a pasar, pytest lo reporta y hay que quitar la marca. Esto obliga a mantener
-la matriz actualizada.
+**Fallo esperado (`xfail`):** durante la Fase 2, los bugs encontrados se documentaron con
+pruebas marcadas `xfail(strict=True)`. Estas pruebas se ejecutan en cada corrida y deben
+fallar mientras el bug exista; si empiezan a pasar, pytest lo reporta y hay que quitar la
+marca. En la Fase 4 se corrigieron los bugs y se quitaron las marcas: hoy no queda ninguna
+prueba con fallo esperado.
 
 ## 2. Bugs detectados por las pruebas
 
 | ID | Descripción | Severidad | Detectado por | Prueba asociada | Estado |
 |----|-------------|-----------|---------------|-----------------|--------|
-| BUG-01 | **Open Redirect** en la cancelación de citas: `redirect(request.POST.get('siguiente'))` acepta cualquier URL, incluso de otro sitio | Blocker (seguridad) | SonarCloud + prueba | INT-CIT-06 | Pendiente (Fase 4) |
-| BUG-02 | La **auditoría de edición** de usuarios y pacientes guarda los datos *nuevos* en lugar del estado previo, porque `form.is_valid()` ya modificó la instancia antes de registrar el historial | Mayor (integridad de auditoría) | Prueba de integración | REG-AUD-01, REG-AUD-02 | Pendiente (Fase 4) |
+| BUG-01 | **Open Redirect** en la cancelación de citas: `redirect(request.POST.get('siguiente'))` acepta cualquier URL, incluso de otro sitio | Blocker (seguridad) | SonarCloud + prueba | INT-CIT-06 | ✅ Corregido (commit `b93a256`): solo redirige a direcciones del propio sitio |
+| BUG-02 | La **auditoría de edición** de usuarios y pacientes guarda los datos *nuevos* en lugar del estado previo, porque `form.is_valid()` ya modificó la instancia antes de registrar el historial | Mayor (integridad de auditoría) | Prueba de integración | REG-AUD-01, REG-AUD-02 | ✅ Corregido (commit `b93a256`): se audita una copia del estado previo |
 | — | Los 12 fallos de la línea base **no eran bugs**: los scripts se contaminaban con los datos de ejecuciones previas. Con una base aislada por prueba, los 8 flujos pasan al 100 % (REG-FLU-01 a 08) | — | Migración a pytest | REG-FLU-* | Resuelto |
 
 ## 3. Casos de prueba
 
-**Columnas:** el resultado obtenido corresponde a la ejecución del 2026-11-03. ✅ aprobado ·
-⚠️ fallo esperado (bug conocido) · ❌ fallido.
+**Columnas:** el resultado obtenido corresponde a la ejecución vigente (Fase 4). ✅ aprobado ·
+⚠️ fallo esperado (bug conocido) · ❌ fallido. Entre paréntesis, el número de casos
+parametrizados.
 
 ### 3.1 Pruebas unitarias
 
@@ -116,6 +122,16 @@ la matriz actualizada.
 | UNI-DIS-14 | Capacidad en minutos | 1 odontólogo de 8:00 a 12:00 y 2 sillones | 240 minutos | ✅ |
 | UNI-DIS-15 | Sin unidades activas | 0 sillones | Capacidad 0 | ✅ |
 
+#### Representación de registros — `tests/unit/test_representacion_modelos.py`
+
+Se agregó en la Fase 4 junto con los métodos `__str__` que pedía Ruff (regla DJ008).
+
+| ID | Caso | Entrada | Resultado esperado | Obtenido |
+|----|------|---------|--------------------|:--------:|
+| UNI-STR-01 | Horario de disponibilidad | Lunes 8:00–12:00 | "Carlos Pérez — Lunes 08:00 a 12:00" | ✅ |
+| UNI-STR-02 | Auditoría e indicadores | Historial de cita, plan, paciente y usuario; dato de entrenamiento; predicción; indicador | Texto legible, p. ej. "Cita 7: CANCELACION por ana" | ✅ (7) |
+| UNI-STR-03 | Horario con minutos | Viernes 14:30–18:15 | Termina en "Viernes 14:30 a 18:15" | ✅ |
+
 ### 3.2 Pruebas de integración
 
 Peticiones HTTP reales con el *test client* de Django: vista + formulario + modelo + base
@@ -187,7 +203,7 @@ de datos + permisos.
 | INT-CIT-03 | Traslape con el mismo odontólogo | 9:15, con una cita existente 9:00–9:30 | Se rechaza | ✅ |
 | INT-CIT-04 | Cancelar cita | Motivo "no asistirá" | Estado `CANCELADA`, registro conservado, motivo en observaciones, historial | ✅ |
 | INT-CIT-05 | Redirección interna después de cancelar | `siguiente=/citas/<id>/` | 302 a esa página | ✅ |
-| INT-CIT-06 | **Redirección externa después de cancelar** | `siguiente=https://sitio-malicioso.example` | No debe redirigir fuera del sitio | ⚠️ **BUG-01** |
+| INT-CIT-06 | **Redirección externa después de cancelar** | `https://sitio-malicioso.example/robo`, `//sitio-malicioso.example/robo`, `javascript:alert(1)` | Redirige a la agenda, nunca fuera del sitio | ✅ (3) |
 
 ### 3.3 Pruebas de regresión
 
@@ -208,25 +224,32 @@ script se interrumpe.
 | REG-FLU-07 | `prueba_clinico.py` | 60+ | Odontograma, notas, plan de tratamiento, cobros | ✅ |
 | REG-FLU-08 | `prueba_modelo.py` | 86 | Entrenamiento, versionado y estimación del modelo | ✅ |
 
-#### Bugs conocidos — pruebas de regresión con fallo esperado
+#### Bugs corregidos — pruebas de regresión
 
 | ID | Bug | Entrada | Resultado esperado | Obtenido |
 |----|-----|---------|--------------------|:--------:|
-| INT-CIT-06 | BUG-01 | Ver la sección 3.2 | No redirige fuera del sitio | ⚠️ |
-| REG-AUD-01 | BUG-02 | Editar el rol de un usuario de Recepcionista a Consulta | El historial guarda `Recepcionista` (estado previo) | ⚠️ guarda `Consulta` |
-| REG-AUD-02 | BUG-02 | Editar el nombre de un paciente | El historial guarda "María José López García" (nombre previo) | ⚠️ guarda el nuevo |
+| INT-CIT-06 | BUG-01 | Ver la sección 3.2 | No redirige fuera del sitio | ✅ (3) |
+| REG-AUD-01 | BUG-02 | Editar el rol de un usuario de Recepcionista a Consulta | El historial guarda `Recepcionista` (estado previo) | ✅ |
+| REG-AUD-02 | BUG-02 | Editar el nombre de un paciente | El historial guarda "María José López García" (nombre previo) | ✅ |
 
 ## 4. Trazabilidad con los módulos
 
-| Módulo | Unitarias | Integración | Regresión | Cobertura |
+| Módulo | Unitarias | Integración | Regresión | Cobertura de líneas (Fase 4) |
 |--------|:---------:|:-----------:|:---------:|----------:|
-| Seguridad y Usuarios | UNI-USR | INT-AUT, INT-USR, INT-RBAC | REG-FLU-02, REG-AUD-01 | ver reporte |
-| Pacientes | UNI-VAL | INT-PAC | REG-FLU-05, REG-AUD-02 | ver reporte |
-| Catálogo | UNI-VAL | INT-RBAC-02 | REG-FLU-01, 05, 06 | ver reporte |
-| Agenda y Citas | UNI-DIS | INT-CIT | REG-FLU-01, 03, 04, 06 | ver reporte |
-| Expediente Clínico y Cobros | UNI-FDI | — | REG-FLU-07 | ver reporte |
-| Inteligencia | — | — | REG-FLU-08 | ver reporte |
-| Reportes | — | — | REG-FLU-03, 05 | ver reporte |
+| Seguridad y Usuarios | UNI-USR, UNI-STR | INT-AUT, INT-USR, INT-RBAC | REG-FLU-02, REG-AUD-01 | 95,9 % |
+| Pacientes | UNI-VAL, UNI-STR | INT-PAC | REG-FLU-05, REG-AUD-02 | 99,6 % |
+| Catálogo | UNI-VAL | INT-RBAC-02 | REG-FLU-01, 05, 06 | 75,1 % |
+| Agenda y Citas | UNI-DIS, UNI-STR | INT-CIT | REG-FLU-01, 03, 04, 06 | 91,9 % |
+| Expediente Clínico y Cobros | UNI-FDI, UNI-STR | — | REG-FLU-07 | 95,8 % |
+| Inteligencia | UNI-STR | — | REG-FLU-08 | 85,8 % |
+| Reportes | UNI-STR | — | REG-FLU-03, 05 | 99,2 % |
+| Configuración (`config/`) | UNI-VAL | INT-AUT-05 | — | 90,0 % |
+| **Total** | | | | **92,0 % de líneas · 76,6 % de ramas · 89 % combinado** |
 
-La cobertura por archivo está en
-[`evidencias/02-pruebas/cobertura-html/index.html`](evidencias/02-pruebas/cobertura-html/index.html).
+El catálogo es el módulo menos cubierto: sus pantallas de alta y edición solo se recorren en
+los flujos de regresión. Es el primer candidato para nuevas pruebas de integración.
+
+La cobertura por archivo está en el reporte HTML de cada ejecución del pipeline (artefacto
+`resultados-pruebas`) y en
+[`evidencias/02-pruebas/cobertura-html/index.html`](evidencias/02-pruebas/cobertura-html/index.html)
+(Fase 2).

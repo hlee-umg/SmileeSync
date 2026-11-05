@@ -55,3 +55,7 @@ app/.clave-desarrollo
 
 # Entregables generados a partir del Markdown (docs/herramientas/generar_docx.py)
 docs/entregables/
+
+# Datos de infraestructura y credenciales: nunca se versionan
+claude/
+infra/cdk.context.json

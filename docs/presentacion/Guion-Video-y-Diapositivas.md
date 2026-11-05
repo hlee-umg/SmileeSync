@@ -150,12 +150,13 @@ Mostrar `git switch -c`, la línea agregada, `git commit` y `git push`.
 
 ### 2.3 Dashboard de calidad (2:40 – 3:35)
 
-**Pantalla:** SonarCloud, Summary de la rama `qa/pipeline-sqa` o el pull request #1.
+**Pantalla:** SonarCloud, Summary de `main` (pestañas *New Code* y *Overall Code*).
 
 > "Este es el panel de SonarCloud. En la línea base, la seguridad tenía nota E y la
 > confiabilidad C. Hoy, el código intervenido tiene A en seguridad, confiabilidad y
 > mantenibilidad, cero issues abiertos, 89 % de cobertura medida desde el pipeline y 0,3 %
-> de duplicación."
+> de duplicación. En el código global los issues bajaron de 89 a 75, aunque la seguridad
+> sigue en E por archivos que no intervine: eso queda documentado como deuda técnica."
 
 **Pantalla:** Issues, filtrados por severidad.
 

@@ -9,7 +9,7 @@ commit `120f743`) y **después** de la intervención de aseguramiento de la cali
 | Línea base | 2026-11-03, commit `120f743` de `main` |
 | Medición final | 2026-11-04, rama `qa/pipeline-sqa` |
 | Evidencias | [`docs/evidencias/04-mejora/`](evidencias/04-mejora/) · reproducir con [`medir.sh`](evidencias/04-mejora/medir.sh) |
-| Estado | **Borrador.** Falta la medición global de SonarCloud sobre `main` (sección 6.2), que se toma después del merge |
+| Estado | Versión final de entrega. Medición sobre la rama `qa/pipeline-sqa` y el pull request #1 (ver sección 6.2) |
 
 ## 1. Resumen ejecutivo
 
@@ -40,6 +40,7 @@ Después de la intervención:
 | Archivos sin formato (Black) | 67 | **0** | 0 | ✅ |
 | Bandit, severidad media o alta | 0 | **0** | 0 | ✅ |
 | Bandit, severidad baja | 4 | **1** (justificado) | — | ✅ |
+| Credenciales de producción en el repositorio | `ONBOARDING.md` con llaves de AWS, Django y PostgreSQL | **0** (archivo retirado, credenciales rotadas) | 0 | ✅ |
 | Contraseñas de cuentas en el código | 3 (`seed.py`) y una usada para iniciar sesión en los scripts | **0**† | 0 | ✅ |
 | Advertencias de `check --deploy` | 4 | **0 de esas 4**\*\* | 0 | ✅ |
 | Riesgos en dependencias (SonarCloud) | 15 (D) | **0 en Django 5.2**\*\*\* | — | ✅ |
@@ -50,7 +51,7 @@ Después de la intervención:
 | Índice de mantenibilidad | A en todos | A en 72 de 73; **B en 1** | A | ⚠️ |
 | Etapas del pipeline | 2 (test parcial, deploy) | **5** (build, test, analyze, report, deploy) | ≥ 4 | ✅ |
 | Quality gates | 0 | **7** | 7 | ✅ |
-| `main` protegida | No | **Pendiente** (requiere GitHub Pro) | Sí | ⏳ |
+| `main` protegida | No | **Sí**: PR obligatorio y `build`, `test`, `analyze` requeridos | Sí | ✅ |
 
 \* Medida ejecutando a mano los scripts sobre la base de desarrollo; no era reproducible en CI.<br>
 \*\* Con `DJANGO_HTTPS=True`. Quedan W005 y W021 (HSTS para subdominios y *preload*), que se
@@ -150,6 +151,7 @@ tamaño). El archivo concentra 11 vistas y la función más compleja del sistema
 | SEC-03 | `SECRET_KEY` con valor inseguro por defecto | Mayor | `check --deploy`, revisión | Sin la variable, la aplicación no arranca en producción | `manage.py check` |
 | SEC-04 | Cookies y HTTPS no forzados | Mayor | `check --deploy` | Ajustes activables con `DJANGO_HTTPS` | `check --deploy` |
 | SEC-05 | Ambigüedad entre la constante `SEXO` y el campo `sexo` | Blocker (SonarCloud) | Gate del código nuevo | Renombrada a `OPCIONES_SEXO` | Suite completa |
+| SEC-06 | **Credenciales de producción versionadas** en `claude/ONBOARDING.md` (llave de acceso de AWS, `SECRET_KEY`, contraseña de PostgreSQL) e ID de la cuenta de AWS en `infra/cdk.context.json` | **Crítica** | **Revisión manual** antes de hacer público el repositorio (ni Bandit ni SonarCloud analizan archivos `.md`) | Llave de AWS desactivada; `SECRET_KEY` y contraseña de la base cambiadas en el servidor; archivos retirados del repositorio y agregados al `.gitignore` | Verificación manual del sitio en producción |
 
 ### 5.2 Valor de las pruebas en la actualización de Django
 
@@ -175,19 +177,21 @@ obsoletas. Sin pruebas, ese cambio habría requerido revisar a mano los 8 módul
 Capturas: [gate fallido](evidencias/04-mejora/run-anterior-sonar-gate.png) ·
 [gate aprobado](evidencias/04-mejora/run-verde-sonar-gate.png).
 
-### 6.2 Métricas globales de `main` (pendiente)
+### 6.2 Alcance de la medición de SonarCloud
 
-> Se completa después del merge del PR #1, cuando SonarCloud analice `main`.
+En las ramas y los pull requests, SonarCloud evalúa el **código nuevo**: todo lo que cambió
+respecto de `main`. Como la intervención reformateó y corrigió prácticamente todo el código
+de la aplicación (67 archivos), ese "código nuevo" abarca casi todo el proyecto, y sobre él
+el resultado es **0 issues abiertos, calificación A en seguridad, confiabilidad y
+mantenibilidad, 89,7 % de cobertura y 0,3 % de duplicación**.
 
-| Métrica | Antes (`120f743`) | Después (`main`) |
-|---------|------------------:|-----------------:|
-| Seguridad | E (27) | _pendiente_ |
-| Confiabilidad | C (61) | _pendiente_ |
-| Mantenibilidad | A (3) | _pendiente_ |
-| Issues totales | 89 | _pendiente_ |
-| Cobertura | no medida | _pendiente_ (~89 %) |
-| Duplicación | 0,9 % | _pendiente_ |
-| Riesgos en dependencias | 15 (D) | _pendiente_ |
+El análisis global de la rama `main` se actualiza cuando el pull request #1 se integra. Al
+cierre del proyecto el PR quedó abierto, con todos los checks aprobados, porque el merge
+despliega automáticamente a la instancia de producción y antes debe verificarse en el
+servidor la variable `DJANGO_SECRET_KEY`, que ahora es obligatoria (Manual Técnico,
+sección 6.5).
+
+Captura del pull request: [gate aprobado en el PR #1](evidencias/04-mejora/pr1-sonarcloud-gate.png).
 
 ## 7. Proceso: evolución del pipeline
 
@@ -217,7 +221,7 @@ Capturas: [historial](evidencias/04-mejora/historial-ejecuciones.png) ·
 | `agenda/views.py` con mantenibilidad B | Menor | Dividir en módulos por pantalla |
 | Catálogo con 75 % de cobertura | Menor | Pruebas de integración del CRUD del catálogo |
 | `sincronizar` y `capacidad_minutos` con complejidad 16–17 | Menor | Refactor con la misma técnica de verificación por huella |
-| Protección de `main` | Mayor (proceso) | Aplicar las reglas del Manual Técnico al activarse GitHub Pro |
+| Credenciales antiguas en el historial de git | Menor (ya rotadas) | Purgar el historial con `git filter-repo` si se requiere un historial limpio |
 
 ## 9. Conclusiones
 
@@ -226,8 +230,9 @@ Capturas: [historial](evidencias/04-mejora/historial-ejecuciones.png) ·
    los bugs reales.
 2. **Cada herramienta encontró algo que las otras no**: Ruff, el estilo y los errores
    lógicos; SonarCloud, el Open Redirect, las dependencias vulnerables y la ambigüedad de
-   nombres; y las pruebas de integración, el bug de auditoría, que ninguna herramienta
-   estática podía detectar.
+   nombres; las pruebas de integración, el bug de auditoría; y la **revisión manual**, las
+   credenciales de producción guardadas en un archivo de notas, que ninguna herramienta
+   automática analizaba.
 3. **Las pruebas hicieron segura la actualización de Django**, que corrigió las
    vulnerabilidades más graves del proyecto.
 4. **El pipeline cambia el proceso, no solo el código**: antes, cualquier push llegaba a

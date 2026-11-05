@@ -7,16 +7,12 @@ No forma parte de la documentación técnica.
 
 ## 1. Preparación (antes de grabar)
 
-### 1.1 Orden recomendado
+### 1.1 Situación al grabar
 
-La demostración se ve mejor con la protección de `main` activa: en el pull request aparece
-**"Merging is blocked"** mientras el gate falla. Por eso conviene grabar en este orden:
-
-1. Activar GitHub Pro y aplicar la protección de `main` (Manual Técnico, sección 4.4).
-2. Revisar el `.env` del servidor y hacer merge del PR #1 (despliega a la EC2).
-3. Esperar el análisis de `main` en SonarCloud y completar la sección 6.2 del Reporte de
-   Mejora.
-4. Grabar la demo con un pull request pequeño (sección 1.2).
+- `main` ya está **protegida** (el repositorio es público): en el pull request de demostración
+  se verá **"Merging is blocked"** mientras un check falle.
+- El PR #1 queda abierto: no hace falta integrarlo para grabar. Las métricas de SonarCloud que
+  se muestran son las del análisis de la rama y del PR (código nuevo).
 
 ### 1.2 Pull request de demostración
 
@@ -154,11 +150,12 @@ Mostrar `git switch -c`, la línea agregada, `git commit` y `git push`.
 
 ### 2.3 Dashboard de calidad (2:40 – 3:35)
 
-**Pantalla:** SonarCloud, Summary de `main`.
+**Pantalla:** SonarCloud, Summary de la rama `qa/pipeline-sqa` o el pull request #1.
 
-> "Este es el panel de SonarCloud de la rama principal. La seguridad pasó de E a
-> [calificación final], la confiabilidad de C a [calificación final], y ahora se mide la
-> cobertura: [valor] %. La duplicación es de [valor] %."
+> "Este es el panel de SonarCloud. En la línea base, la seguridad tenía nota E y la
+> confiabilidad C. Hoy, el código intervenido tiene A en seguridad, confiabilidad y
+> mantenibilidad, cero issues abiertos, 89 % de cobertura medida desde el pipeline y 0,3 %
+> de duplicación."
 
 **Pantalla:** Issues, filtrados por severidad.
 
@@ -189,9 +186,10 @@ Mostrar `git switch -c`, la línea agregada, `git commit` y `git push`.
 > "Aprendí que cada herramienta encuentra cosas distintas: el linter, el estilo; SonarCloud,
 > la seguridad; y las pruebas, los errores de lógica. Las dificultades fueron que el
 > proyecto usa Django y no el stack sugerido, lo que resolví usando herramientas
-> equivalentes de Python; que GitHub no permite proteger ramas privadas en el plan gratuito,
-> lo que resolví con el paquete de estudiante, y que SonarCloud evalúa el código nuevo, por
-> lo que tuve que corregir hasta el último issue. El resultado es que hoy ningún cambio
+> equivalentes de Python, y que GitHub no permite proteger ramas privadas en el plan
+> gratuito, así que hice público el repositorio. Al revisarlo antes de publicarlo encontré
+> credenciales de producción en un archivo de notas que ninguna herramienta había detectado:
+> las cambié y saqué el archivo del repositorio. El resultado es que hoy ningún cambio
 > llega a producción sin pasar por los siete gates. Muchas gracias."
 
 ---

@@ -224,6 +224,9 @@ build ──► test ──► analyze ──► report ──► deploy (solo p
 - Las conversaciones del pull request deben estar resueltas.
 - Las reglas se aplican también a los administradores.
 
+> **Estado:** aplicadas el 2026-11-05 sobre el repositorio público (Manual Técnico,
+> sección 4.4).
+
 ### 11.2 Manejo de secretos
 
 | Secreto | Dónde vive |

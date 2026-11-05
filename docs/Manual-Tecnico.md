@@ -38,7 +38,7 @@ quien tenga que modificar el pipeline, agregar pruebas o diagnosticar un fallo.
 |------------|------------|---------|
 | Aplicación | Django 5.2 LTS, Python 3.12 | Sistema web de la clínica (8 módulos) |
 | Base de datos | PostgreSQL (producción y CI), SQLite (desarrollo) | Persistencia |
-| Repositorio | GitHub (`hlee-umg/SmileeSync`) | Código, pull requests, protección de `main` |
+| Repositorio | GitHub (`hlee-umg/SmileeSync`, público) | Código, pull requests, protección de `main` |
 | CI/CD | GitHub Actions | Ejecuta el pipeline en cada push y pull request |
 | Análisis estático | Ruff, Black, Bandit, SonarCloud | Quality gates QG-4 a QG-7 |
 | Pruebas | pytest, pytest-django, pytest-cov | Quality gates QG-2 y QG-3 |
@@ -178,9 +178,15 @@ Reglas definidas en el SQA Plan (sección 11.1):
 | Aplica a administradores | Sí |
 | Force push y borrado de la rama | No permitidos |
 
-> GitHub solo permite proteger ramas de repositorios **privados** con GitHub Pro. La cuenta
-> obtuvo el beneficio del GitHub Student Developer Pack; las reglas se aplican cuando se
-> active.
+> **Estado: aplicada el 2026-11-05.** GitHub solo permite proteger ramas de repositorios
+> privados con GitHub Pro, así que el repositorio se hizo **público**. Antes se retiraron
+> del repositorio las notas con credenciales (`claude/ONBOARDING.md`) y se rotaron las
+> credenciales expuestas (Reporte de Mejora, SEC-06).
+
+Se puede configurar desde **Settings → Rules → Rulesets → New branch ruleset** (destino: la
+rama por defecto; reglas: *Restrict deletions*, *Block force pushes*, *Require a pull
+request* con 0 aprobaciones y conversaciones resueltas, y *Require status checks* con
+`build`, `test` y `analyze` y la rama actualizada) o por API.
 
 Comando para aplicarlas (requiere permisos de administrador del repositorio):
 

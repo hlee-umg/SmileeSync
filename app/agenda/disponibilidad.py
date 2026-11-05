@@ -14,9 +14,10 @@ Dos recursos limitan la operación y deben cumplirse a la vez:
   profesionales, por lo que dos odontólogos libres no implican dos citas
   simultáneas posibles.
 """
-from datetime import date, datetime, timedelta
 
-DIAS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
+from datetime import datetime
+
+DIAS = ["LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM"]
 
 # Granularidad con que se recorre la jornada para medir la capacidad.
 PASO_CAPACIDAD_MIN = 15
@@ -45,12 +46,12 @@ def _restar(intervalos, quitar):
     inicio_q, fin_q = quitar
     resultado = []
     for inicio, fin in intervalos:
-        if fin_q <= inicio or inicio_q >= fin:      # no se tocan
+        if fin_q <= inicio or inicio_q >= fin:  # no se tocan
             resultado.append((inicio, fin))
             continue
-        if inicio_q > inicio:                        # queda un tramo antes
+        if inicio_q > inicio:  # queda un tramo antes
             resultado.append((inicio, inicio_q))
-        if fin_q < fin:                              # queda un tramo después
+        if fin_q < fin:  # queda un tramo después
             resultado.append((fin_q, fin))
     return resultado
 
@@ -65,16 +66,20 @@ def franjas_efectivas(odontologo, fecha):
     intervalos = [
         (_a_minutos(f.hora_inicio), _a_minutos(f.hora_fin))
         for f in HorarioDisponibilidad.objects.filter(
-            odontologo=odontologo, dia_semana=DIAS[fecha.weekday()], estado=True)
+            odontologo=odontologo, dia_semana=DIAS[fecha.weekday()], estado=True
+        )
         if f.hora_fin > f.hora_inicio
     ]
     if not intervalos:
         return []
 
     for ausencia in AusenciaOdontologo.objects.filter(
-            odontologo=odontologo, fecha=fecha, estado=True):
-        intervalos = _restar(intervalos, (_a_minutos(ausencia.hora_inicio),
-                                          _a_minutos(ausencia.hora_fin)))
+        odontologo=odontologo, fecha=fecha, estado=True
+    ):
+        intervalos = _restar(
+            intervalos,
+            (_a_minutos(ausencia.hora_inicio), _a_minutos(ausencia.hora_fin)),
+        )
         if not intervalos:
             break
 
@@ -83,13 +88,16 @@ def franjas_efectivas(odontologo, fecha):
 
 def cabe_en_franja(odontologo, fecha, inicio, fin):
     """La cita completa cabe dentro de una sola franja efectiva."""
-    return any(f_ini <= inicio and fin <= f_fin
-               for f_ini, f_fin in franjas_efectivas(odontologo, fecha))
+    return any(
+        f_ini <= inicio and fin <= f_fin
+        for f_ini, f_fin in franjas_efectivas(odontologo, fecha)
+    )
 
 
 def unidades_activas():
     from catalogo.models import UnidadDental
-    return list(UnidadDental.objects.filter(estado=True).order_by('codigo'))
+
+    return list(UnidadDental.objects.filter(estado=True).order_by("codigo"))
 
 
 def unidades_libres(fecha, inicio, fin, excluir_cita=None):
@@ -102,13 +110,15 @@ def unidades_libres(fecha, inicio, fin, excluir_cita=None):
     from .models import Cita
 
     ocupadas = set()
-    citas = (Cita.objects.filter(fecha=fecha, estado=True, unidad__isnull=False)
-             .exclude(estado_cita='CANCELADA'))
+    citas = Cita.objects.filter(fecha=fecha, estado=True, unidad__isnull=False).exclude(
+        estado_cita="CANCELADA"
+    )
     if excluir_cita:
         citas = citas.exclude(pk=excluir_cita)
     for cita in citas:
-        if hay_traslape(inicio, fin, cita.hora_inicio_programada,
-                        cita.hora_fin_programada):
+        if hay_traslape(
+            inicio, fin, cita.hora_inicio_programada, cita.hora_fin_programada
+        ):
             ocupadas.add(cita.unidad_id)
 
     return [u for u in unidades_activas() if u.pk not in ocupadas]
@@ -142,7 +152,7 @@ def capacidad_minutos(odontologos, fechas):
         ]
 
     total = 0
-    for f, listas in por_fecha.items():
+    for listas in por_fecha.values():
         if not listas:
             continue
         inicio_dia = min((i for lista in listas for i, _ in lista), default=None)
@@ -152,8 +162,8 @@ def capacidad_minutos(odontologos, fechas):
         momento = inicio_dia
         while momento < fin_dia:
             disponibles = sum(
-                1 for lista in listas
-                if any(i <= momento < t for i, t in lista))
+                1 for lista in listas if any(i <= momento < t for i, t in lista)
+            )
             total += min(disponibles, unidades) * PASO_CAPACIDAD_MIN
             momento += PASO_CAPACIDAD_MIN
     return total

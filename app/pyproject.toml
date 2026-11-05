@@ -1,0 +1,59 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --reuse-db"
+filterwarnings = [
+    "ignore:No directory at:UserWarning",
+]
+markers = [
+    "unit: prueba unitaria (sin peticiones HTTP)",
+    "integration: prueba de integración (vista + formulario + modelo + base de datos)",
+    "regression: prueba de regresión (flujos completos y bugs corregidos)",
+]
+
+[tool.coverage.run]
+source = ["."]
+branch = true
+omit = [
+    "*/migrations/*",
+    "tests/*",
+    ".venv/*",
+    "manage.py",
+    "config/asgi.py",
+    "config/wsgi.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+# --- Análisis estático (QG-4, QG-5 y QG-6 del SQA Plan) ---------------------
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, bugbear, seguridad, complejidad, Django,
+# modernización y simplificación.
+select = ["E", "W", "F", "B", "S", "C90", "DJ", "UP", "SIM"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.per-file-ignores]
+# En las pruebas se usan assert y claves de prueba a propósito.
+"tests/**" = ["S101", "S105", "S106"]
+# Los scripts de regresión configuran Django (django.setup()) antes de
+# importar los modelos, por lo que sus imports no pueden ir al inicio.
+"tests/regresion/prueba_*.py" = ["E402"]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+extend-exclude = "migrations"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "migrations"]

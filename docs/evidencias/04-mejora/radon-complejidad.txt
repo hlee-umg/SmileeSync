@@ -1,0 +1,23 @@
+agenda\disponibilidad.py
+    F 133:0 capacidad_minutos - C (16)
+agenda\forms.py
+    M 90:4 CitaForm.clean - C (15)
+agenda\views.py
+    F 174:0 principal - D (26)
+    F 84:0 _huecos_sugeridos - C (14)
+    F 487:0 crear - C (13)
+    F 823:0 ausencias - C (12)
+    F 636:0 horarios - C (11)
+clinico\views.py
+    F 145:0 odontograma - C (12)
+inteligencia\entrenamiento.py
+    F 134:0 sincronizar - C (17)
+inteligencia\views.py
+    F 57:0 panel - C (15)
+usuarios\management\commands\seed.py
+    M 794:4 Command.sembrar_expediente - C (15)
+    M 607:4 Command.sembrar_agenda - C (12)
+
+12 blocks (classes, functions, methods) analyzed.
+Average complexity: C (14.833333333333334)
+Average complexity: A (3.3430232558139537)

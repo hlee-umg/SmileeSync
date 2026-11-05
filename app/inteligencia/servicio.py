@@ -14,33 +14,35 @@ aprendizaje automático todavía no esté entrenado:
 
 La estimación mejora sola conforme la clínica acumula citas atendidas.
 """
+
 import os
 from dataclasses import dataclass
 
 from django.db.models import Avg, Count
 
-DIAS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
+DIAS = ["LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM"]
 
-MINIMO_REGISTROS_HISTORICOS = 3   # por debajo de esto el promedio no es fiable
-REDONDEO_MIN = 5                  # las citas se agendan en múltiplos de 5 minutos
+MINIMO_REGISTROS_HISTORICOS = 3  # por debajo de esto el promedio no es fiable
+REDONDEO_MIN = 5  # las citas se agendan en múltiplos de 5 minutos
 
 
 @dataclass
 class Estimacion:
     """Resultado de una estimación de duración."""
+
     duracion_min: int
     bloque_min: int
     bloque_max: int
-    origen: str          # 'modelo' | 'historico' | 'catalogo'
-    detalle: str         # texto explicativo para mostrar al usuario
-    modelo = None        # instancia de ModeloVersion cuando el origen es 'modelo'
+    origen: str  # 'modelo' | 'historico' | 'catalogo'
+    detalle: str  # texto explicativo para mostrar al usuario
+    modelo = None  # instancia de ModeloVersion cuando el origen es 'modelo'
 
     @property
     def etiqueta_origen(self):
         return {
-            'modelo': 'Modelo predictivo',
-            'historico': 'Promedio histórico de la clínica',
-            'catalogo': 'Duración de referencia del catálogo',
+            "modelo": "Modelo predictivo",
+            "historico": "Promedio histórico de la clínica",
+            "catalogo": "Duración de referencia del catálogo",
         }.get(self.origen, self.origen)
 
 
@@ -57,6 +59,7 @@ def _bloque_recomendado(duracion):
 
 def _modelo_activo():
     from .models import ModeloVersion
+
     return ModeloVersion.objects.filter(activo=True, estado=True).first()
 
 
@@ -64,20 +67,20 @@ def _modelo_activo():
 # El archivo del modelo puede pesar varios megabytes. Deserializarlo en cada
 # estimación significaría releerlo en cada cita que se agenda, de modo que se
 # conserva en memoria y solo se recarga cuando cambia la versión activa.
-_CACHE = {'version': None, 'estimador': None, 'anestesia': {}}
+_CACHE = {"version": None, "estimador": None, "anestesia": {}}
 
 
 def limpiar_cache():
     """Descarta el modelo en memoria. Se invoca al activar otra versión."""
-    _CACHE['version'] = None
-    _CACHE['estimador'] = None
-    _CACHE['anestesia'] = {}
+    _CACHE["version"] = None
+    _CACHE["estimador"] = None
+    _CACHE["anestesia"] = {}
 
 
 def _cargar(modelo):
     """Devuelve el estimador de la versión indicada, cargándolo una sola vez."""
-    if _CACHE['version'] == modelo.pk and _CACHE['estimador'] is not None:
-        return _CACHE['estimador']
+    if _CACHE["version"] == modelo.pk and _CACHE["estimador"] is not None:
+        return _CACHE["estimador"]
     try:
         import joblib
     except ImportError:
@@ -90,8 +93,8 @@ def _cargar(modelo):
         # Un archivo dañado o entrenado con otra versión de la biblioteca no
         # debe impedir que se agende: la cadena de respaldo continúa.
         return None
-    _CACHE['version'] = modelo.pk
-    _CACHE['estimador'] = estimador
+    _CACHE["version"] = modelo.pk
+    _CACHE["estimador"] = estimador
     return estimador
 
 
@@ -103,14 +106,14 @@ def _anestesia_habitual(procedimiento):
     cambio, se asume ausente: por definición es imprevista, y el sistema estima
     el caso nominal.
     """
-    if procedimiento.pk in _CACHE['anestesia']:
-        return _CACHE['anestesia'][procedimiento.pk]
+    if procedimiento.pk in _CACHE["anestesia"]:
+        return _CACHE["anestesia"][procedimiento.pk]
     from clinico.models import NotaClinica
-    notas = NotaClinica.objects.filter(cita__procedimiento=procedimiento,
-                                       estado=True)
+
+    notas = NotaClinica.objects.filter(cita__procedimiento=procedimiento, estado=True)
     total = notas.count()
     valor = 1 if total and notas.filter(anestesia=True).count() * 2 >= total else 0
-    _CACHE['anestesia'][procedimiento.pk] = valor
+    _CACHE["anestesia"][procedimiento.pk] = valor
     return valor
 
 
@@ -131,15 +134,19 @@ def _estimar_con_modelo(modelo, procedimiento, odontologo, fecha, hora, num_piez
 
     try:
         # Los nombres de las columnas deben coincidir con los del entrenamiento.
-        entrada = pd.DataFrame([{
-            'procedimiento': procedimiento.nombre,
-            'odontologo': f'{odontologo.nombres} {odontologo.apellidos}',
-            'dia_semana': DIAS[fecha.weekday()],
-            'hora_inicio': hora.hour,
-            'num_piezas': num_piezas,
-            'anestesia': _anestesia_habitual(procedimiento),
-            'complicacion': 0,
-        }])
+        entrada = pd.DataFrame(
+            [
+                {
+                    "procedimiento": procedimiento.nombre,
+                    "odontologo": f"{odontologo.nombres} {odontologo.apellidos}",
+                    "dia_semana": DIAS[fecha.weekday()],
+                    "hora_inicio": hora.hour,
+                    "num_piezas": num_piezas,
+                    "anestesia": _anestesia_habitual(procedimiento),
+                    "complicacion": 0,
+                }
+            ]
+        )
         return float(estimador.predict(entrada)[0])
     except Exception:
         # Un fallo del modelo no debe impedir agendar una cita.
@@ -156,19 +163,20 @@ def _estimar_con_historico(procedimiento, odontologo):
 
     base = Cita.objects.filter(
         procedimiento=procedimiento,
-        estado_cita='ATENDIDA',
+        estado_cita="ATENDIDA",
         duracion_real_min__isnull=False,
         estado=True,
     )
 
     del_odontologo = base.filter(odontologo=odontologo).aggregate(
-        promedio=Avg('duracion_real_min'), total=Count('id'))
-    if (del_odontologo['total'] or 0) >= MINIMO_REGISTROS_HISTORICOS:
-        return del_odontologo['promedio'], del_odontologo['total'], True
+        promedio=Avg("duracion_real_min"), total=Count("id")
+    )
+    if (del_odontologo["total"] or 0) >= MINIMO_REGISTROS_HISTORICOS:
+        return del_odontologo["promedio"], del_odontologo["total"], True
 
-    general = base.aggregate(promedio=Avg('duracion_real_min'), total=Count('id'))
-    if (general['total'] or 0) >= MINIMO_REGISTROS_HISTORICOS:
-        return general['promedio'], general['total'], False
+    general = base.aggregate(promedio=Avg("duracion_real_min"), total=Count("id"))
+    if (general["total"] or 0) >= MINIMO_REGISTROS_HISTORICOS:
+        return general["promedio"], general["total"], False
 
     return None, 0, False
 
@@ -178,43 +186,62 @@ def estimar_duracion(procedimiento, odontologo, fecha, hora, num_piezas=1):
     # --- Nivel 1: modelo predictivo entrenado ---
     modelo = _modelo_activo()
     if modelo:
-        prediccion = _estimar_con_modelo(modelo, procedimiento, odontologo,
-                                         fecha, hora, num_piezas)
+        prediccion = _estimar_con_modelo(
+            modelo, procedimiento, odontologo, fecha, hora, num_piezas
+        )
         if prediccion:
             duracion = _redondear(prediccion)
             minimo, maximo = _bloque_recomendado(duracion)
-            est = Estimacion(duracion, minimo, maximo, 'modelo',
-                             f'Estimado por {modelo.nombre} '
-                             f'({modelo.get_algoritmo_display()}).')
+            est = Estimacion(
+                duracion,
+                minimo,
+                maximo,
+                "modelo",
+                f"Estimado por {modelo.nombre} " f"({modelo.get_algoritmo_display()}).",
+            )
             est.modelo = modelo
             return est
 
     # --- Nivel 2: promedio histórico real de la clínica ---
-    promedio, total, es_del_odontologo = _estimar_con_historico(procedimiento, odontologo)
+    promedio, total, es_del_odontologo = _estimar_con_historico(
+        procedimiento, odontologo
+    )
     if promedio:
         duracion = _redondear(promedio)
         minimo, maximo = _bloque_recomendado(duracion)
-        alcance = ('de este odontólogo' if es_del_odontologo
-                   else 'de todos los odontólogos')
-        return Estimacion(duracion, minimo, maximo, 'historico',
-                          f'Promedio de {total} atenciones previas {alcance}. '
-                          f'La precisión aumentará al acumularse más registros.')
+        alcance = (
+            "de este odontólogo" if es_del_odontologo else "de todos los odontólogos"
+        )
+        return Estimacion(
+            duracion,
+            minimo,
+            maximo,
+            "historico",
+            f"Promedio de {total} atenciones previas {alcance}. "
+            f"La precisión aumentará al acumularse más registros.",
+        )
 
     # --- Nivel 3: duración de referencia del catálogo ---
     duracion = _redondear(procedimiento.duracion_promedio_min)
     minimo, maximo = _bloque_recomendado(duracion)
-    return Estimacion(duracion, minimo, maximo, 'catalogo',
-                      'Aún no hay suficientes atenciones registradas de este '
-                      'procedimiento; se usa la duración de referencia del catálogo.')
+    return Estimacion(
+        duracion,
+        minimo,
+        maximo,
+        "catalogo",
+        "Aún no hay suficientes atenciones registradas de este "
+        "procedimiento; se usa la duración de referencia del catálogo.",
+    )
 
 
 def registrar_prediccion(cita, estimacion):
     """Guarda la predicción generada para poder contrastarla después con la
     duración real. Solo se registra cuando proviene de un modelo entrenado,
     porque la tabla de predicciones exige una versión de modelo asociada."""
-    if estimacion.origen != 'modelo' or not estimacion.modelo:
+    if estimacion.origen != "modelo" or not estimacion.modelo:
         return None
     from .models import Prediccion
+
     return Prediccion.objects.create(
         cita=cita,
         modelo=estimacion.modelo,
@@ -237,5 +264,6 @@ def registrar_dato_entrenamiento(cita):
     if not cita.duracion_real_min:
         return None
     dato, _ = DatoEntrenamiento.objects.update_or_create(
-        cita=cita, defaults=_fila_de(cita))
+        cita=cita, defaults=_fila_de(cita)
+    )
     return dato

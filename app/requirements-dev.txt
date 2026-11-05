@@ -1,0 +1,13 @@
+# Dependencias de desarrollo y del pipeline de calidad.
+-r requirements.txt
+
+# Pruebas y cobertura
+pytest>=8.3
+pytest-django>=4.9
+pytest-cov>=5.0
+
+# Análisis estático
+ruff>=0.8
+black>=24.10
+bandit>=1.8
+radon>=6.0

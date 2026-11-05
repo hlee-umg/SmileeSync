@@ -15,6 +15,7 @@ cita aislada: cada renglón guarda la duración estimada por el modelo, de modo
 que el plan completo puede traducirse en un número de sesiones y en minutos de
 sillón antes de agendar la primera.
 """
+
 from decimal import Decimal
 
 from django.db import models
@@ -26,7 +27,7 @@ from .piezas import PIEZAS, nombre as nombre_pieza
 # margen. Es el tope con que se reparten los renglones del plan en sesiones.
 MINUTOS_SESION_MAX = 120
 
-OPCIONES_PIEZA = [(p, f'{p} — {nombre_pieza(p)}') for p in PIEZAS]
+OPCIONES_PIEZA = [(p, f"{p} — {nombre_pieza(p)}") for p in PIEZAS]
 
 
 class Hallazgo(models.Model):
@@ -37,58 +38,68 @@ class Hallazgo(models.Model):
     combinación de pieza y cara, de modo que el expediente conserva la
     evolución de cada diente sin necesidad de una tabla de auditoría aparte.
     """
+
     TIPOS = [
-        ('SANA', 'Sana'),
-        ('CARIES', 'Caries'),
-        ('OBTURADA', 'Obturada'),
-        ('SELLANTE', 'Sellante'),
-        ('ENDODONCIA', 'Endodoncia'),
-        ('CORONA', 'Corona'),
-        ('PROTESIS', 'Prótesis'),
-        ('IMPLANTE', 'Implante'),
-        ('FRACTURA', 'Fractura'),
-        ('EXTRACCION', 'Indicada para extracción'),
-        ('AUSENTE', 'Ausente'),
+        ("SANA", "Sana"),
+        ("CARIES", "Caries"),
+        ("OBTURADA", "Obturada"),
+        ("SELLANTE", "Sellante"),
+        ("ENDODONCIA", "Endodoncia"),
+        ("CORONA", "Corona"),
+        ("PROTESIS", "Prótesis"),
+        ("IMPLANTE", "Implante"),
+        ("FRACTURA", "Fractura"),
+        ("EXTRACCION", "Indicada para extracción"),
+        ("AUSENTE", "Ausente"),
     ]
     # Hallazgos que describen un problema por atender. Separarlos del resto
     # permite contar la carga pendiente del paciente sin listar estados.
-    PATOLOGICOS = {'CARIES', 'FRACTURA', 'EXTRACCION'}
+    PATOLOGICOS = {"CARIES", "FRACTURA", "EXTRACCION"}
     # Hallazgos que ya son un tratamiento colocado.
-    TRATADOS = {'OBTURADA', 'SELLANTE', 'ENDODONCIA', 'CORONA', 'PROTESIS',
-                'IMPLANTE'}
+    TRATADOS = {"OBTURADA", "SELLANTE", "ENDODONCIA", "CORONA", "PROTESIS", "IMPLANTE"}
 
     CARAS = [
-        ('TODA', 'Toda la pieza'),
-        ('O', 'Oclusal / incisal'),
-        ('M', 'Mesial'),
-        ('D', 'Distal'),
-        ('V', 'Vestibular'),
-        ('L', 'Lingual / palatina'),
+        ("TODA", "Toda la pieza"),
+        ("O", "Oclusal / incisal"),
+        ("M", "Mesial"),
+        ("D", "Distal"),
+        ("V", "Vestibular"),
+        ("L", "Lingual / palatina"),
     ]
 
-    paciente = models.ForeignKey('pacientes.Paciente', on_delete=models.CASCADE,
-                                 related_name='hallazgos', verbose_name='paciente')
-    pieza = models.PositiveSmallIntegerField('pieza dental (FDI)',
-                                             choices=OPCIONES_PIEZA)
-    cara = models.CharField('cara', max_length=4, choices=CARAS, default='TODA')
-    tipo = models.CharField('hallazgo', max_length=12, choices=TIPOS)
-    observacion = models.CharField('observación', max_length=200, blank=True)
-    nota = models.ForeignKey('clinico.NotaClinica', on_delete=models.SET_NULL,
-                             null=True, blank=True, related_name='hallazgos',
-                             verbose_name='visita en que se registró')
-    fecha = models.DateField('fecha del hallazgo')
-    registrado_por = models.CharField('registrado por', max_length=150, blank=True)
-    estado = models.BooleanField('activo', default=True)  # borrado lógico
+    paciente = models.ForeignKey(
+        "pacientes.Paciente",
+        on_delete=models.CASCADE,
+        related_name="hallazgos",
+        verbose_name="paciente",
+    )
+    pieza = models.PositiveSmallIntegerField(
+        "pieza dental (FDI)", choices=OPCIONES_PIEZA
+    )
+    cara = models.CharField("cara", max_length=4, choices=CARAS, default="TODA")
+    tipo = models.CharField("hallazgo", max_length=12, choices=TIPOS)
+    observacion = models.CharField("observación", max_length=200, blank=True)
+    nota = models.ForeignKey(
+        "clinico.NotaClinica",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="hallazgos",
+        verbose_name="visita en que se registró",
+    )
+    fecha = models.DateField("fecha del hallazgo")
+    registrado_por = models.CharField("registrado por", max_length=150, blank=True)
+    estado = models.BooleanField("activo", default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'hallazgo'
-        verbose_name = 'Hallazgo odontológico'
-        verbose_name_plural = 'Hallazgos odontológicos'
-        ordering = ['-fecha', '-creado']
+        db_table = "hallazgo"
+        verbose_name = "Hallazgo odontológico"
+        verbose_name_plural = "Hallazgos odontológicos"
+        ordering = ["-fecha", "-creado"]
 
     def __str__(self):
-        return f'Pieza {self.pieza} — {self.get_tipo_display()}'
+        return f"Pieza {self.pieza} — {self.get_tipo_display()}"
 
     @property
     def es_patologico(self):
@@ -97,25 +108,33 @@ class Hallazgo(models.Model):
     # Abreviatura con que se rotula la pieza en la arcada. El color ya comunica
     # la gravedad; la letra distingue hallazgos del mismo color entre sí.
     SIMBOLOS = {
-        'SANA': '·', 'CARIES': 'C', 'OBTURADA': 'O', 'SELLANTE': 'S',
-        'ENDODONCIA': 'E', 'CORONA': 'K', 'PROTESIS': 'P', 'IMPLANTE': 'I',
-        'FRACTURA': 'F', 'EXTRACCION': 'X', 'AUSENTE': '—',
+        "SANA": "·",
+        "CARIES": "C",
+        "OBTURADA": "O",
+        "SELLANTE": "S",
+        "ENDODONCIA": "E",
+        "CORONA": "K",
+        "PROTESIS": "P",
+        "IMPLANTE": "I",
+        "FRACTURA": "F",
+        "EXTRACCION": "X",
+        "AUSENTE": "—",
     }
 
     @property
     def simbolo(self):
-        return self.SIMBOLOS.get(self.tipo, '?')
+        return self.SIMBOLOS.get(self.tipo, "?")
 
     @property
     def clase_css(self):
         """Clase de color con que la plantilla pinta la pieza."""
-        if self.tipo == 'AUSENTE':
-            return 'pieza-ausente'
+        if self.tipo == "AUSENTE":
+            return "pieza-ausente"
         if self.tipo in self.PATOLOGICOS:
-            return 'pieza-patologica'
+            return "pieza-patologica"
         if self.tipo in self.TRATADOS:
-            return 'pieza-tratada'
-        return 'pieza-sana'
+            return "pieza-tratada"
+        return "pieza-sana"
 
 
 def odontograma_vigente(paciente):
@@ -126,9 +145,9 @@ def odontograma_vigente(paciente):
     la anterior, de modo que al terminar queda la observación vigente.
     """
     vigente = {}
-    consulta = (Hallazgo.objects
-                .filter(paciente=paciente, estado=True)
-                .order_by('fecha', 'creado'))
+    consulta = Hallazgo.objects.filter(paciente=paciente, estado=True).order_by(
+        "fecha", "creado"
+    )
     for h in consulta:
         vigente.setdefault(h.pieza, {})[h.cara] = h
     return vigente
@@ -143,42 +162,63 @@ class NotaClinica(models.Model):
     complicación—, que son las que explican por qué dos citas del mismo
     procedimiento duran distinto.
     """
-    cita = models.OneToOneField('agenda.Cita', on_delete=models.SET_NULL,
-                                null=True, blank=True, related_name='nota',
-                                verbose_name='cita atendida')
-    paciente = models.ForeignKey('pacientes.Paciente', on_delete=models.PROTECT,
-                                 related_name='notas', verbose_name='paciente')
-    odontologo = models.ForeignKey('catalogo.Odontologo', on_delete=models.PROTECT,
-                                   related_name='notas', verbose_name='odontólogo')
-    fecha = models.DateField('fecha de la visita')
-    motivo = models.CharField('motivo de la consulta', max_length=200)
-    hallazgos_clinicos = models.TextField('hallazgos clínicos', blank=True)
-    procedimiento_realizado = models.TextField('procedimiento realizado')
-    piezas_tratadas = models.CharField('piezas tratadas', max_length=120, blank=True,
-                                       help_text='Números FDI separados por coma, p. ej. 16, 26.')
-    num_piezas = models.PositiveSmallIntegerField('número de piezas tratadas', default=1)
-    anestesia = models.BooleanField('se aplicó anestesia', default=False)
-    materiales = models.CharField('materiales utilizados', max_length=200, blank=True)
-    complicacion = models.BooleanField('hubo complicación', default=False)
-    detalle_complicacion = models.CharField('detalle de la complicación',
-                                            max_length=200, blank=True)
-    indicaciones = models.TextField('indicaciones al paciente', blank=True)
-    registrado_por = models.CharField('registrado por', max_length=150, blank=True)
-    estado = models.BooleanField('activo', default=True)  # borrado lógico
+
+    cita = models.OneToOneField(
+        "agenda.Cita",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="nota",
+        verbose_name="cita atendida",
+    )
+    paciente = models.ForeignKey(
+        "pacientes.Paciente",
+        on_delete=models.PROTECT,
+        related_name="notas",
+        verbose_name="paciente",
+    )
+    odontologo = models.ForeignKey(
+        "catalogo.Odontologo",
+        on_delete=models.PROTECT,
+        related_name="notas",
+        verbose_name="odontólogo",
+    )
+    fecha = models.DateField("fecha de la visita")
+    motivo = models.CharField("motivo de la consulta", max_length=200)
+    hallazgos_clinicos = models.TextField("hallazgos clínicos", blank=True)
+    procedimiento_realizado = models.TextField("procedimiento realizado")
+    piezas_tratadas = models.CharField(
+        "piezas tratadas",
+        max_length=120,
+        blank=True,
+        help_text="Números FDI separados por coma, p. ej. 16, 26.",
+    )
+    num_piezas = models.PositiveSmallIntegerField(
+        "número de piezas tratadas", default=1
+    )
+    anestesia = models.BooleanField("se aplicó anestesia", default=False)
+    materiales = models.CharField("materiales utilizados", max_length=200, blank=True)
+    complicacion = models.BooleanField("hubo complicación", default=False)
+    detalle_complicacion = models.CharField(
+        "detalle de la complicación", max_length=200, blank=True
+    )
+    indicaciones = models.TextField("indicaciones al paciente", blank=True)
+    registrado_por = models.CharField("registrado por", max_length=150, blank=True)
+    estado = models.BooleanField("activo", default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'nota_clinica'
-        verbose_name = 'Nota clínica'
-        verbose_name_plural = 'Notas clínicas'
-        ordering = ['-fecha', '-creado']
+        db_table = "nota_clinica"
+        verbose_name = "Nota clínica"
+        verbose_name_plural = "Notas clínicas"
+        ordering = ["-fecha", "-creado"]
 
     def __str__(self):
-        return f'{self.paciente} — {self.fecha}'
+        return f"{self.paciente} — {self.fecha}"
 
     @property
     def lista_piezas(self):
-        return [p.strip() for p in self.piezas_tratadas.split(',') if p.strip()]
+        return [p.strip() for p in self.piezas_tratadas.split(",") if p.strip()]
 
 
 class PlanTratamiento(models.Model):
@@ -189,57 +229,68 @@ class PlanTratamiento(models.Model):
     acuerdo y el que permite responder de antemano cuántas sesiones y cuántos
     minutos de sillón hará falta reservar.
     """
-    ESTADOS = [
-        ('BORRADOR', 'Borrador'),
-        ('APROBADO', 'Aprobado por el paciente'),
-        ('EN_CURSO', 'En curso'),
-        ('FINALIZADO', 'Finalizado'),
-        ('RECHAZADO', 'Rechazado'),
-    ]
-    ABIERTOS = ('APROBADO', 'EN_CURSO')
 
-    codigo = models.CharField('código', max_length=20, unique=True)
-    paciente = models.ForeignKey('pacientes.Paciente', on_delete=models.PROTECT,
-                                 related_name='planes', verbose_name='paciente')
-    odontologo = models.ForeignKey('catalogo.Odontologo', on_delete=models.PROTECT,
-                                   related_name='planes', verbose_name='odontólogo responsable')
-    diagnostico = models.TextField('diagnóstico')
-    observaciones = models.TextField('observaciones', blank=True)
-    estado_plan = models.CharField('estado del plan', max_length=12,
-                                   choices=ESTADOS, default='BORRADOR')
-    fecha = models.DateField('fecha de elaboración')
-    fecha_aprobacion = models.DateField('fecha de aprobación', null=True, blank=True)
-    descuento = models.DecimalField('descuento (Q)', max_digits=10, decimal_places=2,
-                                    default=Decimal('0.00'))
-    creado_por = models.CharField('elaborado por', max_length=150, blank=True)
-    estado = models.BooleanField('activo', default=True)  # borrado lógico
+    ESTADOS = [
+        ("BORRADOR", "Borrador"),
+        ("APROBADO", "Aprobado por el paciente"),
+        ("EN_CURSO", "En curso"),
+        ("FINALIZADO", "Finalizado"),
+        ("RECHAZADO", "Rechazado"),
+    ]
+    ABIERTOS = ("APROBADO", "EN_CURSO")
+
+    codigo = models.CharField("código", max_length=20, unique=True)
+    paciente = models.ForeignKey(
+        "pacientes.Paciente",
+        on_delete=models.PROTECT,
+        related_name="planes",
+        verbose_name="paciente",
+    )
+    odontologo = models.ForeignKey(
+        "catalogo.Odontologo",
+        on_delete=models.PROTECT,
+        related_name="planes",
+        verbose_name="odontólogo responsable",
+    )
+    diagnostico = models.TextField("diagnóstico")
+    observaciones = models.TextField("observaciones", blank=True)
+    estado_plan = models.CharField(
+        "estado del plan", max_length=12, choices=ESTADOS, default="BORRADOR"
+    )
+    fecha = models.DateField("fecha de elaboración")
+    fecha_aprobacion = models.DateField("fecha de aprobación", null=True, blank=True)
+    descuento = models.DecimalField(
+        "descuento (Q)", max_digits=10, decimal_places=2, default=Decimal("0.00")
+    )
+    creado_por = models.CharField("elaborado por", max_length=150, blank=True)
+    estado = models.BooleanField("activo", default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'plan_tratamiento'
-        verbose_name = 'Plan de tratamiento'
-        verbose_name_plural = 'Planes de tratamiento'
-        ordering = ['-fecha', '-creado']
+        db_table = "plan_tratamiento"
+        verbose_name = "Plan de tratamiento"
+        verbose_name_plural = "Planes de tratamiento"
+        ordering = ["-fecha", "-creado"]
 
     def __str__(self):
-        return f'{self.codigo} — {self.paciente}'
+        return f"{self.codigo} — {self.paciente}"
 
     # ------------------------------------------------------------ presupuesto
     @property
     def renglones(self):
-        return self.detalles.filter(estado=True).exclude(estado_detalle='ANULADO')
+        return self.detalles.filter(estado=True).exclude(estado_detalle="ANULADO")
 
     @property
     def subtotal(self):
-        return sum((d.importe for d in self.renglones), Decimal('0.00'))
+        return sum((d.importe for d in self.renglones), Decimal("0.00"))
 
     @property
     def total(self):
-        return max(Decimal('0.00'), self.subtotal - (self.descuento or Decimal('0.00')))
+        return max(Decimal("0.00"), self.subtotal - (self.descuento or Decimal("0.00")))
 
     @property
     def pagado(self):
-        return sum((p.monto for p in self.pagos.filter(estado=True)), Decimal('0.00'))
+        return sum((p.monto for p in self.pagos.filter(estado=True)), Decimal("0.00"))
 
     @property
     def saldo(self):
@@ -247,7 +298,7 @@ class PlanTratamiento(models.Model):
 
     @property
     def esta_pagado(self):
-        return self.saldo <= Decimal('0.00')
+        return self.saldo <= Decimal("0.00")
 
     # -------------------------------------------------------------- ejecución
     @property
@@ -257,8 +308,11 @@ class PlanTratamiento(models.Model):
 
     @property
     def minutos_pendientes(self):
-        return sum(d.duracion_estimada_min for d in self.renglones
-                   if d.estado_detalle != 'COMPLETADO')
+        return sum(
+            d.duracion_estimada_min
+            for d in self.renglones
+            if d.estado_detalle != "COMPLETADO"
+        )
 
     def sesiones_sugeridas(self):
         """Reparte los renglones pendientes en sesiones de sillón.
@@ -270,21 +324,23 @@ class PlanTratamiento(models.Model):
         """
         sesiones = []
         actual, minutos, fase_actual = [], 0, None
-        for d in self.renglones.order_by('fase', 'orden', 'id'):
-            if d.estado_detalle == 'COMPLETADO':
+        for d in self.renglones.order_by("fase", "orden", "id"):
+            if d.estado_detalle == "COMPLETADO":
                 continue
             cambia_fase = fase_actual is not None and d.fase != fase_actual
             no_cabe = minutos + d.duracion_estimada_min > MINUTOS_SESION_MAX
             if actual and (cambia_fase or no_cabe):
-                sesiones.append({'fase': fase_actual, 'renglones': actual,
-                                 'minutos': minutos})
+                sesiones.append(
+                    {"fase": fase_actual, "renglones": actual, "minutos": minutos}
+                )
                 actual, minutos = [], 0
             actual.append(d)
             minutos += d.duracion_estimada_min
             fase_actual = d.fase
         if actual:
-            sesiones.append({'fase': fase_actual, 'renglones': actual,
-                             'minutos': minutos})
+            sesiones.append(
+                {"fase": fase_actual, "renglones": actual, "minutos": minutos}
+            )
         return sesiones
 
     @property
@@ -293,7 +349,7 @@ class PlanTratamiento(models.Model):
 
     @property
     def renglones_completados(self):
-        return self.renglones.filter(estado_detalle='COMPLETADO').count()
+        return self.renglones.filter(estado_detalle="COMPLETADO").count()
 
     @property
     def avance(self):
@@ -312,12 +368,12 @@ class PlanTratamiento(models.Model):
         completados = self.renglones_completados
         nuevo = self.estado_plan
         if total and completados == total:
-            nuevo = 'FINALIZADO'
+            nuevo = "FINALIZADO"
         elif completados:
-            nuevo = 'EN_CURSO'
+            nuevo = "EN_CURSO"
         if nuevo != self.estado_plan:
             self.estado_plan = nuevo
-            self.save(update_fields=['estado_plan'])
+            self.save(update_fields=["estado_plan"])
         return nuevo
 
     @classmethod
@@ -328,11 +384,11 @@ class PlanTratamiento(models.Model):
         de modo que convivan los planes creados desde la pantalla con los que
         el seed siembra con un código fijo.
         """
-        ultimo = cls.objects.order_by('-id').first()
+        ultimo = cls.objects.order_by("-id").first()
         numero = (ultimo.pk if ultimo else 0) + 1
-        while cls.objects.filter(codigo=f'PLAN-{numero:04d}').exists():
+        while cls.objects.filter(codigo=f"PLAN-{numero:04d}").exists():
             numero += 1
-        return f'PLAN-{numero:04d}'
+        return f"PLAN-{numero:04d}"
 
 
 class DetallePlan(models.Model):
@@ -343,55 +399,78 @@ class DetallePlan(models.Model):
     tiempo, y compararla después con la duración real es lo que permite medir
     al modelo sobre tratamientos completos y no solo sobre citas sueltas.
     """
+
     ESTADOS = [
-        ('PENDIENTE', 'Pendiente'),
-        ('AGENDADO', 'Agendado'),
-        ('COMPLETADO', 'Completado'),
-        ('ANULADO', 'Anulado'),
+        ("PENDIENTE", "Pendiente"),
+        ("AGENDADO", "Agendado"),
+        ("COMPLETADO", "Completado"),
+        ("ANULADO", "Anulado"),
     ]
-    plan = models.ForeignKey(PlanTratamiento, on_delete=models.CASCADE,
-                             related_name='detalles', verbose_name='plan')
-    fase = models.PositiveSmallIntegerField('fase', default=1,
-                                            help_text='Las fases se ejecutan en orden.')
-    orden = models.PositiveSmallIntegerField('orden dentro de la fase', default=1)
-    procedimiento = models.ForeignKey('catalogo.Procedimiento', on_delete=models.PROTECT,
-                                      related_name='renglones_plan',
-                                      verbose_name='procedimiento')
-    pieza = models.PositiveSmallIntegerField('pieza dental', null=True, blank=True,
-                                             choices=OPCIONES_PIEZA)
-    num_piezas = models.PositiveSmallIntegerField('número de piezas', default=1)
-    precio_unitario = models.DecimalField('precio unitario (Q)', max_digits=10,
-                                          decimal_places=2, default=Decimal('0.00'))
-    duracion_estimada_min = models.PositiveIntegerField('duración estimada (min)', default=0)
-    origen_estimacion = models.CharField('origen de la estimación', max_length=12, blank=True)
-    estado_detalle = models.CharField('estado', max_length=10, choices=ESTADOS,
-                                      default='PENDIENTE')
-    cita = models.ForeignKey('agenda.Cita', on_delete=models.SET_NULL, null=True,
-                             blank=True, related_name='renglones_plan',
-                             verbose_name='cita que lo atiende')
-    estado = models.BooleanField('activo', default=True)  # borrado lógico
+    plan = models.ForeignKey(
+        PlanTratamiento,
+        on_delete=models.CASCADE,
+        related_name="detalles",
+        verbose_name="plan",
+    )
+    fase = models.PositiveSmallIntegerField(
+        "fase", default=1, help_text="Las fases se ejecutan en orden."
+    )
+    orden = models.PositiveSmallIntegerField("orden dentro de la fase", default=1)
+    procedimiento = models.ForeignKey(
+        "catalogo.Procedimiento",
+        on_delete=models.PROTECT,
+        related_name="renglones_plan",
+        verbose_name="procedimiento",
+    )
+    pieza = models.PositiveSmallIntegerField(
+        "pieza dental", null=True, blank=True, choices=OPCIONES_PIEZA
+    )
+    num_piezas = models.PositiveSmallIntegerField("número de piezas", default=1)
+    precio_unitario = models.DecimalField(
+        "precio unitario (Q)", max_digits=10, decimal_places=2, default=Decimal("0.00")
+    )
+    duracion_estimada_min = models.PositiveIntegerField(
+        "duración estimada (min)", default=0
+    )
+    origen_estimacion = models.CharField(
+        "origen de la estimación", max_length=12, blank=True
+    )
+    estado_detalle = models.CharField(
+        "estado", max_length=10, choices=ESTADOS, default="PENDIENTE"
+    )
+    cita = models.ForeignKey(
+        "agenda.Cita",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="renglones_plan",
+        verbose_name="cita que lo atiende",
+    )
+    estado = models.BooleanField("activo", default=True)  # borrado lógico
     creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'detalle_plan'
-        verbose_name = 'Renglón del plan'
-        verbose_name_plural = 'Renglones del plan'
-        ordering = ['fase', 'orden', 'id']
+        db_table = "detalle_plan"
+        verbose_name = "Renglón del plan"
+        verbose_name_plural = "Renglones del plan"
+        ordering = ["fase", "orden", "id"]
 
     def __str__(self):
         if self.pieza:
-            return f'{self.procedimiento.nombre} — pieza {self.pieza}'
+            return f"{self.procedimiento.nombre} — pieza {self.pieza}"
         return self.procedimiento.nombre
 
     @property
     def importe(self):
-        return (self.precio_unitario or Decimal('0.00')) * self.num_piezas
+        return (self.precio_unitario or Decimal("0.00")) * self.num_piezas
 
     @property
     def etiqueta_origen(self):
-        return {'modelo': 'Modelo predictivo',
-                'historico': 'Promedio histórico',
-                'catalogo': 'Catálogo'}.get(self.origen_estimacion, '—')
+        return {
+            "modelo": "Modelo predictivo",
+            "historico": "Promedio histórico",
+            "catalogo": "Catálogo",
+        }.get(self.origen_estimacion, "—")
 
 
 class Pago(models.Model):
@@ -402,32 +481,40 @@ class Pago(models.Model):
     plan. Un abono mal registrado se anula lógicamente; no se elimina, para que
     el estado de cuenta conserve la traza.
     """
+
     METODOS = [
-        ('EFECTIVO', 'Efectivo'),
-        ('TARJETA', 'Tarjeta'),
-        ('TRANSFERENCIA', 'Transferencia'),
-        ('CHEQUE', 'Cheque'),
+        ("EFECTIVO", "Efectivo"),
+        ("TARJETA", "Tarjeta"),
+        ("TRANSFERENCIA", "Transferencia"),
+        ("CHEQUE", "Cheque"),
     ]
-    plan = models.ForeignKey(PlanTratamiento, on_delete=models.PROTECT,
-                             related_name='pagos', verbose_name='plan')
-    fecha = models.DateField('fecha del abono')
-    monto = models.DecimalField('monto (Q)', max_digits=10, decimal_places=2)
-    metodo = models.CharField('forma de pago', max_length=14, choices=METODOS,
-                              default='EFECTIVO')
-    referencia = models.CharField('referencia o número de recibo', max_length=60, blank=True)
-    observaciones = models.CharField('observaciones', max_length=200, blank=True)
-    recibido_por = models.CharField('recibido por', max_length=150, blank=True)
-    estado = models.BooleanField('vigente', default=True)  # anulación lógica
+    plan = models.ForeignKey(
+        PlanTratamiento,
+        on_delete=models.PROTECT,
+        related_name="pagos",
+        verbose_name="plan",
+    )
+    fecha = models.DateField("fecha del abono")
+    monto = models.DecimalField("monto (Q)", max_digits=10, decimal_places=2)
+    metodo = models.CharField(
+        "forma de pago", max_length=14, choices=METODOS, default="EFECTIVO"
+    )
+    referencia = models.CharField(
+        "referencia o número de recibo", max_length=60, blank=True
+    )
+    observaciones = models.CharField("observaciones", max_length=200, blank=True)
+    recibido_por = models.CharField("recibido por", max_length=150, blank=True)
+    estado = models.BooleanField("vigente", default=True)  # anulación lógica
     creado = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'pago'
-        verbose_name = 'Pago'
-        verbose_name_plural = 'Pagos'
-        ordering = ['-fecha', '-creado']
+        db_table = "pago"
+        verbose_name = "Pago"
+        verbose_name_plural = "Pagos"
+        ordering = ["-fecha", "-creado"]
 
     def __str__(self):
-        return f'Q{self.monto} — {self.plan.codigo}'
+        return f"Q{self.monto} — {self.plan.codigo}"
 
 
 class HistorialPlan(models.Model):
@@ -437,16 +524,17 @@ class HistorialPlan(models.Model):
     entero, sin llave foránea, para que el histórico sobreviva al registro que
     describe.
     """
+
     ACCIONES = [
-        ('CREACION', 'Creación'),
-        ('ACTUALIZACION', 'Actualización'),
-        ('APROBACION', 'Aprobación'),
-        ('RECHAZO', 'Rechazo'),
-        ('FINALIZACION', 'Finalización'),
-        ('ANULACION', 'Anulación'),
-        ('PAGO', 'Registro de pago'),
+        ("CREACION", "Creación"),
+        ("ACTUALIZACION", "Actualización"),
+        ("APROBACION", "Aprobación"),
+        ("RECHAZO", "Rechazo"),
+        ("FINALIZACION", "Finalización"),
+        ("ANULACION", "Anulación"),
+        ("PAGO", "Registro de pago"),
     ]
-    plan_ref = models.IntegerField('id del plan')
+    plan_ref = models.IntegerField("id del plan")
     codigo = models.CharField(max_length=20)
     paciente = models.CharField(max_length=200)
     estado_anterior = models.CharField(max_length=12, blank=True)
@@ -456,15 +544,24 @@ class HistorialPlan(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'historial_plan'
-        verbose_name = 'Historial de plan'
-        verbose_name_plural = 'Historial de planes'
-        ordering = ['-fecha']
+        db_table = "historial_plan"
+        verbose_name = "Historial de plan"
+        verbose_name_plural = "Historial de planes"
+        ordering = ["-fecha"]
+
+    def __str__(self):
+        return f"Plan {self.codigo}: {self.accion} por {self.realizado_por}"
 
     @classmethod
-    def registrar(cls, plan, accion, realizado_por, detalle='', estado_anterior=None):
+    def registrar(cls, plan, accion, realizado_por, detalle="", estado_anterior=None):
         return cls.objects.create(
-            plan_ref=plan.pk, codigo=plan.codigo, paciente=str(plan.paciente),
-            estado_anterior=(estado_anterior if estado_anterior is not None
-                             else plan.estado_plan),
-            accion=accion, detalle=detalle, realizado_por=realizado_por)
+            plan_ref=plan.pk,
+            codigo=plan.codigo,
+            paciente=str(plan.paciente),
+            estado_anterior=(
+                estado_anterior if estado_anterior is not None else plan.estado_plan
+            ),
+            accion=accion,
+            detalle=detalle,
+            realizado_por=realizado_por,
+        )

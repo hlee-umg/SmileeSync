@@ -1,0 +1,63 @@
+Run started:2026-11-04 03:11:43.550186+00:00
+
+Test results:
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '***REMOVED***'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: .\prueba_flujos.py:41:30
+40	r = c.post(reverse('login'), {'username': 'admin@smileesync.local',
+41	                              'password': '***REMOVED***'}, follow=True)
+42	probar('inicio de sesión con correo', r.status_code == 200 and
+43	       'Administrador' in r.content.decode())
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'incorrecta'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: .\prueba_flujos.py:46:31
+45	r = cx.post(reverse('login'), {'username': 'admin@smileesync.local',
+46	                               'password': 'incorrecta'})
+47	probar('credenciales incorrectas no entran',
+48	       not r.wsgi_request.user.is_authenticated and
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'NuevaClave123!'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html
+   Location: .\prueba_flujos.py:65:8
+64	c3 = Client()
+65	entro = c3.login(username='admin@smileesync.local', password='NuevaClave123!')
+66	probar('la contraseña nueva funciona', entro)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: .\usuarios\management\commands\seed.py:397:14
+396	
+397	        rng = random.Random(self.SEMILLA)
+398	        hoy = timezone.localdate()
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 7988
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 4
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 3
+		High: 1
+Files skipped (0):

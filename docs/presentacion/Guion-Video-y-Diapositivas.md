@@ -56,9 +56,9 @@ Al terminar, **cerrar el PR sin hacer merge** y borrar la rama:
 gh pr close --delete-branch
 ```
 
-> Alternativa sin esperar a GitHub Pro: grabar la demo con el PR #1 y las ejecuciones ya
-> registradas (#3 rechazada por SonarCloud y #5 aprobada). La protección se muestra al
-> final, cuando esté activa.
+> Alternativa si no hay tiempo de esperar el pipeline: grabar la demo con el PR #1 y las
+> ejecuciones ya registradas (#3 rechazada por SonarCloud y #5 aprobada), y mostrar la regla
+> de `main` en **Settings → Branches**.
 
 ### 1.3 Pestañas abiertas antes de grabar
 

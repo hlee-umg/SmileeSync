@@ -7,9 +7,9 @@ commit `120f743`) y **después** de la intervención de aseguramiento de la cali
 | Dato | Valor |
 |------|-------|
 | Línea base | 2026-11-03, commit `120f743` de `main` |
-| Medición final | 2026-11-04, rama `qa/pipeline-sqa` |
+| Medición final | 2026-11-04 (herramientas locales y rama `qa/pipeline-sqa`) y 2026-11-05 (SonarCloud sobre `main`, commit `fd25fac`) |
 | Evidencias | [`docs/evidencias/04-mejora/`](evidencias/04-mejora/) · reproducir con [`medir.sh`](evidencias/04-mejora/medir.sh) |
-| Estado | Versión final de entrega. Medición sobre la rama `qa/pipeline-sqa` y el pull request #1 (ver sección 6.2) |
+| Estado | Versión final de entrega |
 
 ## 1. Resumen ejecutivo
 
@@ -26,6 +26,9 @@ Después de la intervención:
 - **Se corrigieron 2 bugs reales** (uno de seguridad Blocker), **15 vulnerabilidades de
   dependencias** y todas las contraseñas escritas en el código.
 - Los hallazgos del linter bajaron de **185 a 0** y los archivos sin formato de **67 a 0**.
+- En SonarCloud, el código intervenido quedó con **0 issues** y el gate aprobado. En el
+  código global los issues bajaron de **89 a 75**, pero la seguridad sigue en **E** y la
+  confiabilidad en **C** por issues en archivos que no se intervinieron (deuda documentada).
 
 ## 2. Comparativa general
 
@@ -43,9 +46,12 @@ Después de la intervención:
 | Credenciales de producción en el repositorio | `ONBOARDING.md` con llaves de AWS, Django y PostgreSQL | **0** (archivo retirado, credenciales rotadas) | 0 | ✅ |
 | Contraseñas de cuentas en el código | 3 (`seed.py`) y una usada para iniciar sesión en los scripts | **0**† | 0 | ✅ |
 | Advertencias de `check --deploy` | 4 | **0 de esas 4**\*\* | 0 | ✅ |
-| Riesgos en dependencias (SonarCloud) | 15 (D) | **0 en Django 5.2**\*\*\* | — | ✅ |
+| Riesgos en dependencias (SonarCloud) | 15 (D) | **0 (A)** | — | ✅ |
 | Gate de SonarCloud | No calculado | **Aprobado** en la rama y en el PR | Aprobado | ✅ |
-| Seguridad (SonarCloud, código nuevo) | E (27 issues, global) | **A** (0 issues) | A | ✅ |
+| SonarCloud, código intervenido (código nuevo) | — | **0 issues**, A en las tres calificaciones | A | ✅ |
+| SonarCloud, código global: issues | 89 | **75** | — | ⚠️ |
+| SonarCloud, código global: seguridad | E (27) | **E (12)** | A | ❌ |
+| SonarCloud, código global: confiabilidad | C (61) | **C (61)** | ≤ B | ❌ |
 | Funciones con complejidad > 15 | 4 | **3** | ≤ 3 | ✅ |
 | Complejidad ciclomática promedio | A (3,36) | **A (3,34)** | A | ✅ |
 | Índice de mantenibilidad | A en todos | A en 72 de 73; **B en 1** | A | ⚠️ |
@@ -56,7 +62,6 @@ Después de la intervención:
 \* Medida ejecutando a mano los scripts sobre la base de desarrollo; no era reproducible en CI.<br>
 \*\* Con `DJANGO_HTTPS=True`. Quedan W005 y W021 (HSTS para subdominios y *preload*), que se
 dejan apagados a propósito porque son difíciles de revertir.<br>
-\*\*\* Django 5.2.19 corrige los CVE reportados para 5.0.14. Se confirma en el análisis de `main`.<br>
 † Las pruebas siguen usando claves ficticias propias (por ejemplo, para probar el cambio de
 contraseña). Están permitidas en `tests/` según el SQA Plan y no corresponden a ninguna cuenta.
 
@@ -177,21 +182,31 @@ obsoletas. Sin pruebas, ese cambio habría requerido revisar a mano los 8 módul
 Capturas: [gate fallido](evidencias/04-mejora/run-anterior-sonar-gate.png) ·
 [gate aprobado](evidencias/04-mejora/run-verde-sonar-gate.png).
 
-### 6.2 Alcance de la medición de SonarCloud
+### 6.2 Métricas globales de `main`
 
-En las ramas y los pull requests, SonarCloud evalúa el **código nuevo**: todo lo que cambió
-respecto de `main`. Como la intervención reformateó y corrigió prácticamente todo el código
-de la aplicación (67 archivos), ese "código nuevo" abarca casi todo el proyecto, y sobre él
-el resultado es **0 issues abiertos, calificación A en seguridad, confiabilidad y
-mantenibilidad, 89,7 % de cobertura y 0,3 % de duplicación**.
+Análisis de `main` después de integrar el pull request #1 (commit `fd25fac`, 2026-11-05).
 
-El análisis global de la rama `main` se actualiza cuando el pull request #1 se integra. Al
-cierre del proyecto el PR quedó abierto, con todos los checks aprobados, porque el merge
-despliega automáticamente a la instancia de producción y antes debe verificarse en el
-servidor la variable `DJANGO_SECRET_KEY`, que ahora es obligatoria (Manual Técnico,
-sección 6.5).
+| Métrica | Antes (`120f743`) | Después (`fd25fac`) |
+|---------|------------------:|--------------------:|
+| Quality gate (Sonar way) | No calculado | **Aprobado** |
+| Seguridad | E (27) | **E (12)** |
+| Confiabilidad | C (61) | C (61) |
+| Mantenibilidad | A (3) | **A (2)** |
+| Issues totales | 89 | **75** |
+| Cobertura | no medida | **89,0 %** |
+| Duplicación | 0,9 % | 0,9 % |
+| Riesgos en dependencias | 15 (D) | **0 (A)** |
+| Código nuevo: issues / cobertura / duplicación | — | **0 / 89,74 % / 0,37 %** |
 
-Captura del pull request: [gate aprobado en el PR #1](evidencias/04-mejora/pr1-sonarcloud-gate.png).
+Capturas: [código global](evidencias/04-mejora/sonar-main-global.png) ·
+[código nuevo](evidencias/04-mejora/sonar-main-codigo-nuevo.png).
+
+**Interpretación.** El código que la intervención modificó (unas 7 000 líneas nuevas para
+SonarCloud) no tiene ningún issue abierto, y por eso el gate se aprueba. Los 75 issues que
+quedan están en archivos que no se intervinieron. Por eso la seguridad sigue en E y la
+confiabilidad en C en el código global: su corrección queda como deuda técnica (sección 8).
+Las mejoras globales medibles son la eliminación de los 15 riesgos de dependencias, 15
+issues de seguridad menos y la cobertura medida por primera vez.
 
 ## 7. Proceso: evolución del pipeline
 
@@ -221,6 +236,7 @@ Capturas: [historial](evidencias/04-mejora/historial-ejecuciones.png) ·
 | `agenda/views.py` con mantenibilidad B | Menor | Dividir en módulos por pantalla |
 | Catálogo con 75 % de cobertura | Menor | Pruebas de integración del CRUD del catálogo |
 | `sincronizar` y `capacidad_minutos` con complejidad 16–17 | Menor | Refactor con la misma técnica de verificación por huella |
+| 12 issues de seguridad y 61 de confiabilidad en archivos no intervenidos (SonarCloud, código global) | Mayor | Revisarlos por archivo en SonarCloud y corregirlos con el mismo flujo de PR; el gate de código nuevo impide que aumenten |
 | Credenciales antiguas en el historial de git | Menor (ya rotadas) | Purgar el historial con `git filter-repo` si se requiere un historial limpio |
 
 ## 9. Conclusiones

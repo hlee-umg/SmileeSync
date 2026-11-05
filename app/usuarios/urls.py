@@ -1,16 +1,16 @@
 from django.urls import path
 from . import views
 
-app_name = 'usuarios'
+app_name = "usuarios"
 
 urlpatterns = [
-    path('', views.lista, name='lista'),
-    path('nuevo/', views.crear, name='crear'),
-    path('<int:pk>/editar/', views.editar, name='editar'),
-    path('<int:pk>/estado/', views.cambiar_estado, name='cambiar_estado'),
-    path('historial/', views.historial, name='historial'),
+    path("", views.lista, name="lista"),
+    path("nuevo/", views.crear, name="crear"),
+    path("<int:pk>/editar/", views.editar, name="editar"),
+    path("<int:pk>/estado/", views.cambiar_estado, name="cambiar_estado"),
+    path("historial/", views.historial, name="historial"),
     # Recuperación de contraseña
-    path('recuperar/', views.recuperar_correo, name='recuperar_correo'),
-    path('recuperar/pregunta/', views.recuperar_pregunta, name='recuperar_pregunta'),
-    path('recuperar/nueva/', views.recuperar_nueva, name='recuperar_nueva'),
+    path("recuperar/", views.recuperar_correo, name="recuperar_correo"),
+    path("recuperar/pregunta/", views.recuperar_pregunta, name="recuperar_pregunta"),
+    path("recuperar/nueva/", views.recuperar_nueva, name="recuperar_nueva"),
 ]

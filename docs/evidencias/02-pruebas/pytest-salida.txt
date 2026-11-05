@@ -1,0 +1,262 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Scripts\python.exe
+django: version: 5.0.14, settings: config.settings (from ini)
+rootdir: C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.14.3, cov-7.1.0, django-4.14.0
+collecting ... collected 166 items
+
+tests/integration/test_autenticacion.py::test_pagina_protegida_redirige_al_login PASSED [  0%]
+tests/integration/test_autenticacion.py::test_login_por_correo_entra_a_la_agenda PASSED [  1%]
+tests/integration/test_autenticacion.py::test_login_con_clave_incorrecta_muestra_el_formulario PASSED [  1%]
+tests/integration/test_autenticacion.py::test_logout_cierra_la_sesion PASSED [  2%]
+tests/integration/test_autenticacion.py::test_paginas_dinamicas_no_se_guardan_en_cache PASSED [  3%]
+tests/integration/test_autenticacion.py::test_recuperacion_completa_con_pregunta_secreta PASSED [  3%]
+tests/integration/test_autenticacion.py::test_recuperacion_con_correo_desconocido PASSED [  4%]
+tests/integration/test_autenticacion.py::test_recuperacion_con_respuesta_incorrecta PASSED [  4%]
+tests/integration/test_autenticacion.py::test_no_se_salta_la_pregunta_secreta PASSED [  5%]
+tests/integration/test_autenticacion.py::test_pregunta_sin_haber_indicado_correo PASSED [  6%]
+tests/integration/test_autenticacion.py::test_nueva_clave_invalida[Clave-larga-1-Clave-larga-2-no coinciden] PASSED [  6%]
+tests/integration/test_autenticacion.py::test_nueva_clave_invalida[corta-corta-al menos 8] PASSED [  7%]
+tests/integration/test_citas.py::test_programar_cita_asigna_unidad_y_hora_fin PASSED [  7%]
+tests/integration/test_citas.py::test_programar_fuera_de_disponibilidad_se_rechaza[cambios0-fuera del horario] PASSED [  8%]
+tests/integration/test_citas.py::test_programar_fuera_de_disponibilidad_se_rechaza[cambios1-no tiene horario] PASSED [  9%]
+tests/integration/test_citas.py::test_programar_fuera_de_disponibilidad_se_rechaza[cambios2-fecha pasada] PASSED [  9%]
+tests/integration/test_citas.py::test_no_se_traslapan_citas_del_mismo_odontologo PASSED [ 10%]
+tests/integration/test_citas.py::test_cancelar_conserva_el_registro_y_audita PASSED [ 10%]
+tests/integration/test_citas.py::test_cancelar_redirige_a_una_pagina_interna PASSED [ 11%]
+tests/integration/test_citas.py::test_cancelar_no_redirige_a_un_sitio_externo XFAIL [ 12%]
+tests/integration/test_pacientes.py::test_crear_paciente_registra_auditoria PASSED [ 12%]
+tests/integration/test_pacientes.py::test_formulario_nuevo_propone_el_siguiente_codigo PASSED [ 13%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[nombres-Juan3-solo puede contener letras] PASSED [ 13%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[email-juan@-usuario@dominio.com] PASSED [ 14%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[telefono-abc-solo puede contener n\xfameros] PASSED [ 15%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[fecha_nacimiento-2999-01-01-posterior al d\xeda de hoy] PASSED [ 15%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[fecha_nacimiento-1850-01-01-Verifique la fecha] PASSED [ 16%]
+tests/integration/test_pacientes.py::test_crear_paciente_con_datos_invalidos[codigo-PAC-0001-Ya existe un paciente] PASSED [ 16%]
+tests/integration/test_pacientes.py::test_editar_paciente_actualiza_y_audita PASSED [ 17%]
+tests/integration/test_pacientes.py::test_auditoria_de_edicion_guarda_el_nombre_previo XFAIL [ 18%]
+tests/integration/test_pacientes.py::test_formulario_de_edicion_carga_los_datos PASSED [ 18%]
+tests/integration/test_pacientes.py::test_desactivar_es_borrado_logico PASSED [ 19%]
+tests/integration/test_pacientes.py::test_cambiar_estado_por_get_no_modifica PASSED [ 19%]
+tests/integration/test_pacientes.py::test_lista_oculta_inactivos_salvo_que_se_pidan PASSED [ 20%]
+tests/integration/test_pacientes.py::test_buscar_paciente[L\xf3pez] PASSED [ 21%]
+tests/integration/test_pacientes.py::test_buscar_paciente[pac-0001] PASSED [ 21%]
+tests/integration/test_pacientes.py::test_buscar_paciente[5555-1234] PASSED [ 22%]
+tests/integration/test_pacientes.py::test_buscar_sin_resultados PASSED   [ 22%]
+tests/integration/test_pacientes.py::test_agregar_y_quitar_antecedente PASSED [ 23%]
+tests/integration/test_pacientes.py::test_antecedente_demasiado_corto PASSED [ 24%]
+tests/integration/test_pacientes.py::test_ficha_de_paciente_inexistente_es_404 PASSED [ 24%]
+tests/integration/test_permisos.py::test_recepcion_no_entra_al_modulo_de_usuarios[usuarios:lista] PASSED [ 25%]
+tests/integration/test_permisos.py::test_recepcion_no_entra_al_modulo_de_usuarios[usuarios:crear] PASSED [ 25%]
+tests/integration/test_permisos.py::test_recepcion_no_entra_al_modulo_de_usuarios[usuarios:historial] PASSED [ 26%]
+tests/integration/test_permisos.py::test_recepcion_no_entra_al_catalogo PASSED [ 27%]
+tests/integration/test_permisos.py::test_consulta_ve_pacientes_pero_no_los_crea PASSED [ 27%]
+tests/integration/test_permisos.py::test_consulta_no_puede_desactivar_por_acceso_directo PASSED [ 28%]
+tests/integration/test_permisos.py::test_consulta_no_cancela_citas PASSED [ 28%]
+tests/integration/test_permisos.py::test_escritura_sin_sesion_redirige_al_login PASSED [ 29%]
+tests/integration/test_permisos.py::test_usuario_sin_rol_no_accede PASSED [ 30%]
+tests/integration/test_usuarios.py::test_crear_usuario_usa_el_correo_como_usuario PASSED [ 30%]
+tests/integration/test_usuarios.py::test_crear_usuario_invalido[cambios0-no coinciden] PASSED [ 31%]
+tests/integration/test_usuarios.py::test_crear_usuario_invalido[cambios1-Ya existe un usuario] PASSED [ 31%]
+tests/integration/test_usuarios.py::test_crear_usuario_invalido[cambios2-solo puede contener letras] PASSED [ 32%]
+tests/integration/test_usuarios.py::test_editar_usuario_actualiza_y_audita PASSED [ 33%]
+tests/integration/test_usuarios.py::test_auditoria_de_edicion_guarda_el_estado_previo XFAIL [ 33%]
+tests/integration/test_usuarios.py::test_desactivar_usuario_impide_iniciar_sesion PASSED [ 34%]
+tests/integration/test_usuarios.py::test_no_puede_desactivar_su_propia_cuenta PASSED [ 34%]
+tests/integration/test_usuarios.py::test_lista_busqueda_e_historial PASSED [ 35%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[horarios] PASSED [ 36%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[permisos] PASSED [ 36%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[calendario] PASSED [ 37%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[recomendacion] PASSED [ 37%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[flujos] PASSED [ 38%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[capacidad] PASSED [ 39%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[clinico] PASSED [ 39%]
+tests/regresion/test_flujos_completos.py::test_flujo_sin_verificaciones_fallidas[modelo] PASSED [ 40%]
+tests/unit/test_disponibilidad.py::test_franja_efectiva_es_el_horario_semanal PASSED [ 40%]
+tests/unit/test_disponibilidad.py::test_sin_horario_ese_dia_no_hay_franjas PASSED [ 41%]
+tests/unit/test_disponibilidad.py::test_ausencia_parcial_parte_la_franja PASSED [ 42%]
+tests/unit/test_disponibilidad.py::test_ausencia_de_todo_el_dia_elimina_la_disponibilidad PASSED [ 42%]
+tests/unit/test_disponibilidad.py::test_ausencia_inactiva_no_cuenta PASSED [ 43%]
+tests/unit/test_disponibilidad.py::test_cabe_en_franja[inicio0-fin0-True] PASSED [ 43%]
+tests/unit/test_disponibilidad.py::test_cabe_en_franja[inicio1-fin1-True] PASSED [ 44%]
+tests/unit/test_disponibilidad.py::test_cabe_en_franja[inicio2-fin2-False] PASSED [ 45%]
+tests/unit/test_disponibilidad.py::test_cabe_en_franja[inicio3-fin3-False] PASSED [ 45%]
+tests/unit/test_disponibilidad.py::test_unidad_ocupada_no_esta_libre PASSED [ 46%]
+tests/unit/test_disponibilidad.py::test_cita_cancelada_libera_la_unidad PASSED [ 46%]
+tests/unit/test_disponibilidad.py::test_excluir_la_propia_cita_al_reprogramar PASSED [ 47%]
+tests/unit/test_disponibilidad.py::test_sin_unidades_libres_no_se_asigna PASSED [ 48%]
+tests/unit/test_disponibilidad.py::test_capacidad_limitada_por_unidades PASSED [ 48%]
+tests/unit/test_disponibilidad.py::test_sin_unidades_activas_la_capacidad_es_cero PASSED [ 49%]
+tests/unit/test_usuarios_modelo.py::test_administrador_puede_todo PASSED [ 50%]
+tests/unit/test_usuarios_modelo.py::test_superusuario_sin_rol_es_administrador PASSED [ 50%]
+tests/unit/test_usuarios_modelo.py::test_usuario_sin_rol_no_accede_a_ningun_modulo PASSED [ 51%]
+tests/unit/test_usuarios_modelo.py::test_rol_accede_solo_a_sus_modulos PASSED [ 51%]
+tests/unit/test_usuarios_modelo.py::test_rol_de_consulta_ve_pero_no_escribe PASSED [ 52%]
+tests/unit/test_usuarios_modelo.py::test_expediente_lo_escribe_quien_tiene_escritura_clinica PASSED [ 53%]
+tests/unit/test_usuarios_modelo.py::test_acceso_al_expediente_sin_escritura_clinica_es_de_lectura PASSED [ 53%]
+tests/unit/test_usuarios_modelo.py::test_respuesta_secreta_se_guarda_cifrada_e_ignora_mayusculas PASSED [ 54%]
+tests/unit/test_usuarios_modelo.py::test_sin_respuesta_secreta_no_valida PASSED [ 54%]
+tests/unit/test_usuarios_modelo.py::test_historial_copia_el_estado_previo PASSED [ 55%]
+tests/unit/test_usuarios_modelo.py::test_login_por_correo_sin_importar_mayusculas PASSED [ 56%]
+tests/unit/test_usuarios_modelo.py::test_login_con_clave_incorrecta_falla PASSED [ 56%]
+tests/unit/test_usuarios_modelo.py::test_login_de_correo_inexistente_falla PASSED [ 57%]
+tests/unit/test_usuarios_modelo.py::test_login_sin_datos_falla PASSED    [ 57%]
+tests/unit/test_usuarios_modelo.py::test_usuario_inactivo_no_inicia_sesion PASSED [ 58%]
+tests/unit/test_disponibilidad.py::test_hay_traslape[a0-b0-True] PASSED  [ 59%]
+tests/unit/test_disponibilidad.py::test_hay_traslape[a1-b1-True] PASSED  [ 59%]
+tests/unit/test_disponibilidad.py::test_hay_traslape[a2-b2-True] PASSED  [ 60%]
+tests/unit/test_disponibilidad.py::test_hay_traslape[a3-b3-False] PASSED [ 60%]
+tests/unit/test_disponibilidad.py::test_hay_traslape[a4-b4-False] PASSED [ 61%]
+tests/unit/test_disponibilidad.py::test_restar_intervalos[quitar0-esperado0] PASSED [ 62%]
+tests/unit/test_disponibilidad.py::test_restar_intervalos[quitar1-esperado1] PASSED [ 62%]
+tests/unit/test_disponibilidad.py::test_restar_intervalos[quitar2-esperado2] PASSED [ 63%]
+tests/unit/test_disponibilidad.py::test_restar_intervalos[quitar3-esperado3] PASSED [ 63%]
+tests/unit/test_disponibilidad.py::test_restar_intervalos[quitar4-esperado4] PASSED [ 64%]
+tests/unit/test_disponibilidad.py::test_a_hora_acota_al_dia PASSED       [ 65%]
+tests/unit/test_piezas.py::test_denticion_permanente_tiene_32_piezas PASSED [ 65%]
+tests/unit/test_piezas.py::test_piezas_validas[11] PASSED                [ 66%]
+tests/unit/test_piezas.py::test_piezas_validas[18] PASSED                [ 66%]
+tests/unit/test_piezas.py::test_piezas_validas[21] PASSED                [ 67%]
+tests/unit/test_piezas.py::test_piezas_validas[28] PASSED                [ 68%]
+tests/unit/test_piezas.py::test_piezas_validas[31] PASSED                [ 68%]
+tests/unit/test_piezas.py::test_piezas_validas[38] PASSED                [ 69%]
+tests/unit/test_piezas.py::test_piezas_validas[41] PASSED                [ 69%]
+tests/unit/test_piezas.py::test_piezas_validas[48] PASSED                [ 70%]
+tests/unit/test_piezas.py::test_piezas_validas[36] PASSED                [ 71%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[10] PASSED [ 71%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[19] PASSED [ 72%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[51] PASSED [ 72%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[85] PASSED [ 73%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[0] PASSED  [ 74%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[None] PASSED [ 74%]
+tests/unit/test_piezas.py::test_piezas_invalidas_o_temporales[abc] PASSED [ 75%]
+tests/unit/test_piezas.py::test_nombre_legible[11-Incisivo central superior derecho] PASSED [ 75%]
+tests/unit/test_piezas.py::test_nombre_legible[23-Canino superior izquierdo] PASSED [ 76%]
+tests/unit/test_piezas.py::test_nombre_legible[36-Primer molar inferior izquierdo] PASSED [ 77%]
+tests/unit/test_piezas.py::test_nombre_legible[48-Tercer molar inferior derecho] PASSED [ 77%]
+tests/unit/test_piezas.py::test_nombre_de_pieza_invalida_devuelve_el_valor PASSED [ 78%]
+tests/unit/test_piezas.py::test_filas_arcada_en_orden_de_dibujo PASSED   [ 78%]
+tests/unit/test_validadores.py::test_nombre_acepta_tildes_compuestos_y_guiones[Mar\xeda Jos\xe9] PASSED [ 79%]
+tests/unit/test_validadores.py::test_nombre_acepta_tildes_compuestos_y_guiones[L\xf3pez-Garc\xeda] PASSED [ 80%]
+tests/unit/test_validadores.py::test_nombre_acepta_tildes_compuestos_y_guiones[O'Connor] PASSED [ 80%]
+tests/unit/test_validadores.py::test_nombre_acepta_tildes_compuestos_y_guiones[\xd1u\xf1ez] PASSED [ 81%]
+tests/unit/test_validadores.py::test_nombre_rechaza_numeros_y_caracteres_especiales[Juan2] PASSED [ 81%]
+tests/unit/test_validadores.py::test_nombre_rechaza_numeros_y_caracteres_especiales[Ana@] PASSED [ 82%]
+tests/unit/test_validadores.py::test_nombre_rechaza_numeros_y_caracteres_especiales[-Luis] PASSED [ 83%]
+tests/unit/test_validadores.py::test_nombre_rechaza_numeros_y_caracteres_especiales[Jos\xe9--Mar\xeda] PASSED [ 83%]
+tests/unit/test_validadores.py::test_nombre_rechaza_numeros_y_caracteres_especiales[Ana  Mar\xeda] PASSED [ 84%]
+tests/unit/test_validadores.py::test_nombre_vacio_es_obligatorio[] PASSED [ 84%]
+tests/unit/test_validadores.py::test_nombre_vacio_es_obligatorio[   ] PASSED [ 85%]
+tests/unit/test_validadores.py::test_nombre_vacio_es_obligatorio[None] PASSED [ 86%]
+tests/unit/test_validadores.py::test_email_se_normaliza_a_minusculas PASSED [ 86%]
+tests/unit/test_validadores.py::test_email_con_formato_invalido_usa_mensaje_unico[ana] PASSED [ 87%]
+tests/unit/test_validadores.py::test_email_con_formato_invalido_usa_mensaje_unico[ana@] PASSED [ 87%]
+tests/unit/test_validadores.py::test_email_con_formato_invalido_usa_mensaje_unico[@correo.gt] PASSED [ 88%]
+tests/unit/test_validadores.py::test_email_con_formato_invalido_usa_mensaje_unico[ana@correo] PASSED [ 89%]
+tests/unit/test_validadores.py::test_email_opcional_admite_vacio PASSED  [ 89%]
+tests/unit/test_validadores.py::test_email_obligatorio_rechaza_vacio PASSED [ 90%]
+tests/unit/test_validadores.py::test_codigo_valido_se_normaliza_a_mayusculas[pac-0001-PAC-0001] PASSED [ 90%]
+tests/unit/test_validadores.py::test_codigo_valido_se_normaliza_a_mayusculas[ proc-14 -PROC-14] PASSED [ 91%]
+tests/unit/test_validadores.py::test_codigo_valido_se_normaliza_a_mayusculas[A1-A1] PASSED [ 92%]
+tests/unit/test_validadores.py::test_codigo_invalido_se_rechaza[PAC_01] PASSED [ 92%]
+tests/unit/test_validadores.py::test_codigo_invalido_se_rechaza[-PAC] PASSED [ 93%]
+tests/unit/test_validadores.py::test_codigo_invalido_se_rechaza[PAC-] PASSED [ 93%]
+tests/unit/test_validadores.py::test_codigo_invalido_se_rechaza[P] PASSED [ 94%]
+tests/unit/test_validadores.py::test_codigo_invalido_se_rechaza[PAC 01] PASSED [ 95%]
+tests/unit/test_validadores.py::test_codigo_vacio_es_obligatorio PASSED  [ 95%]
+tests/unit/test_validadores.py::test_telefono_valido[5555-1234] PASSED   [ 96%]
+tests/unit/test_validadores.py::test_telefono_valido[+502 5555 1234] PASSED [ 96%]
+tests/unit/test_validadores.py::test_telefono_valido[(502) 2222-3333] PASSED [ 97%]
+tests/unit/test_validadores.py::test_telefono_invalido[12345] PASSED     [ 98%]
+tests/unit/test_validadores.py::test_telefono_invalido[cinco55551234] PASSED [ 98%]
+tests/unit/test_validadores.py::test_telefono_invalido[5555/1234] PASSED [ 99%]
+tests/unit/test_validadores.py::test_telefono_es_opcional PASSED         [100%]
+
+- generated xml file: C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\docs\evidencias\02-pruebas\resultados-junit.xml -
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.12.10-final-0 _______________
+
+Name                                           Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------
+agenda\__init__.py                                 0      0      0      0   100%
+agenda\admin.py                                   17      0      0      0   100%
+agenda\apps.py                                     4      0      0      0   100%
+agenda\disponibilidad.py                          71      1     32      1    98%   147
+agenda\forms.py                                  182     14     66     17    88%   55->53, 78-80, 111, 129, 154->156, 156->158, 193, 207, 230-233, 234->224, 260->268, 262, 272->274, 275->277, 316, 319, 329
+agenda\models.py                                  70      3      2      0    93%   105-107
+agenda\urls.py                                     4      0      0      0   100%
+agenda\views.py                                  378     42    130     20    86%   50-56, 84, 108->110, 123->121, 135, 236, 284-285, 287, 289, 346, 350, 354-355, 374, 379, 384-385, 428->430, 480-493, 510->522, 546, 587->612, 590->599, 638, 649->672, 690->714, 730-738
+catalogo\__init__.py                               0      0      0      0   100%
+catalogo\admin.py                                 17      0      0      0   100%
+catalogo\apps.py                                   4      0      0      0   100%
+catalogo\forms.py                                121     44     38      7    57%   16->12, 26-28, 31-39, 62-66, 69-74, 77-83, 86-89, 92-96, 131, 134, 136, 159, 161, 167
+catalogo\models.py                                62      1      0      0    98%   19
+catalogo\urls.py                                   4      0      0      0   100%
+catalogo\views.py                                 65     23     20      5    60%   51-52, 64->66, 67, 96-97, 106-116, 127-134
+clinico\__init__.py                                0      0      0      0   100%
+clinico\admin.py                                  24      0      0      0   100%
+clinico\apps.py                                    5      0      0      0   100%
+clinico\forms.py                                 173     12     52     12    88%   49, 118, 161, 163, 169, 207-209, 214->216, 230, 245->247, 272, 274, 290
+clinico\models.py                                237      9     28      5    95%   91, 177, 181, 225, 250, 310, 315, 316->318, 318->321, 334, 430
+clinico\piezas.py                                 17      0      2      0   100%
+clinico\urls.py                                    4      0      0      0   100%
+clinico\views.py                                 249      9     70     15    92%   59, 198->202, 252->254, 289, 291, 314->328, 367-368, 370->382, 408->417, 432->453, 441->444, 472-473, 475-476, 507->509, 532->539
+config\__init__.py                                 0      0      0      0   100%
+config\formats\__init__.py                         0      0      0      0   100%
+config\formats\es\__init__.py                      0      0      0      0   100%
+config\formats\es\formats.py                       3      0      0      0   100%
+config\settings.py                                36      3      2      1    89%   18-19, 81
+config\urls.py                                     5      0      0      0   100%
+config\validadores.py                             41      0     16      0   100%
+inteligencia\__init__.py                           0      0      0      0   100%
+inteligencia\admin.py                             13      0      0      0   100%
+inteligencia\apps.py                               4      0      0      0   100%
+inteligencia\entrenamiento.py                    145      9     32      7    91%   67, 79, 89-91, 174->177, 205, 224, 257->260, 260->268, 276-277
+inteligencia\evaluacion.py                        45      1     16      1    97%   112
+inteligencia\management\__init__.py                0      0      0      0   100%
+inteligencia\management\commands\__init__.py       0      0      0      0   100%
+inteligencia\management\commands\entrenar.py      35     35     10      0     0%   12-91
+inteligencia\models.py                            50      1      0      0    98%   30
+inteligencia\servicio.py                         108     11     22      2    90%   83-84, 89-92, 129-130, 144-146, 217-218, 238
+inteligencia\urls.py                               4      0      0      0   100%
+inteligencia\views.py                             44      7      6      1    80%   36, 101-109
+pacientes\__init__.py                              0      0      0      0   100%
+pacientes\admin.py                                20      0      0      0   100%
+pacientes\apps.py                                  4      0      0      0   100%
+pacientes\forms.py                                69      0     20      2    98%   17->13, 70->77
+pacientes\models.py                               46      1      0      0    98%   43
+pacientes\urls.py                                  4      0      0      0   100%
+pacientes\views.py                                83      0     20      2    98%   71->78, 134->139
+reportes\__init__.py                               0      0      0      0   100%
+reportes\admin.py                                  6      0      0      0   100%
+reportes\apps.py                                   4      0      0      0   100%
+reportes\models.py                                15      0      0      0   100%
+reportes\servicio.py                              73      1     18      3    96%   51->56, 130, 155->151
+reportes\urls.py                                   4      0      0      0   100%
+reportes\views.py                                 16      0      0      0   100%
+usuarios\__init__.py                               0      0      0      0   100%
+usuarios\admin.py                                 17      0      0      0   100%
+usuarios\apps.py                                   5      0      0      0   100%
+usuarios\backends.py                              18      2      4      0    91%   17-18
+usuarios\context_processors.py                     6      0      2      0   100%
+usuarios\decorators.py                            33      2     12      2    91%   13, 34
+usuarios\forms.py                                 84      1     16      3    96%   18->15, 72->74, 98
+usuarios\management\__init__.py                    0      0      0      0   100%
+usuarios\management\commands\__init__.py           0      0      0      0   100%
+usuarios\management\commands\seed.py             247     18     90     13    90%   104-106, 111->116, 122->127, 141->147, 244, 459-460, 464-465, 548->563, 550-561, 568, 626, 663, 677
+usuarios\middleware.py                            11      0      2      1    92%   18->22
+usuarios\models.py                                82      0     12      0   100%
+usuarios\urls.py                                   4      0      0      0   100%
+usuarios\views.py                                107      2     36      6    94%   41->49, 59->71, 90->100, 99, 112->119, 129
+------------------------------------------------------------------------------------------
+TOTAL                                           3199    252    776    126    89%
+Coverage HTML written to dir ../docs/evidencias/02-pruebas/cobertura-html
+Coverage XML written to file ../docs/evidencias/02-pruebas/cobertura.xml
+Required test coverage of 70% reached. Total coverage: 89.13%
+=========================== short test summary info ===========================
+XFAIL tests/integration/test_citas.py::test_cancelar_no_redirige_a_un_sitio_externo - BUG-01: Open Redirect en agenda.views.cancelar (SonarCloud, Blocker). Pendiente de corrección.
+XFAIL tests/integration/test_pacientes.py::test_auditoria_de_edicion_guarda_el_nombre_previo - BUG-02: la auditoría de edición guarda los datos nuevos en lugar del estado previo. Pendiente.
+XFAIL tests/integration/test_usuarios.py::test_auditoria_de_edicion_guarda_el_estado_previo - BUG-02: la auditoría de edición guarda los datos nuevos en lugar del estado previo. Pendiente.
+================= 163 passed, 3 xfailed in 157.35s (0:02:37) ==================

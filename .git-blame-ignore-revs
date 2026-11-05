@@ -1,0 +1,5 @@
+# Commits solo de formato que git blame debe omitir:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Formato Black de todo el código (Fase 4)
+063416d3d3d4b8dcceefc194033a6fcd7cfa0762

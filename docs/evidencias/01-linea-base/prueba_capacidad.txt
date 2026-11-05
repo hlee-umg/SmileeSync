@@ -1,0 +1,85 @@
+Forbidden (Permission denied): /citas/nueva/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Forbidden (Permission denied): /ausencias/2/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 15, in _envuelta
+    return vista(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\agenda\views.py", line 686, in ausencias
+    raise PermissionDenied('Solo puede registrar sus propias ausencias.')
+django.core.exceptions.PermissionDenied: Solo puede registrar sus propias ausencias.
+1. Las unidades son registros del catálogo
+  OK    hay dos unidades sembradas
+  OK    el catálogo las lista
+  OK    se puede dar de alta una unidad nueva
+
+2. La capacidad se deriva de las unidades activas
+  OK    con menos unidades la capacidad no aumenta
+  OK    con dos odontólogos y dos sillones la capacidad es la declarada
+
+3. Se asigna un sillón al programar
+  OK    la cita se crea
+  OK    queda con unidad asignada
+
+4. Se rechaza cuando todas las unidades están ocupadas
+  FALLA la segunda usa la otra unidad SIL-01 - Sillón 1 / SIL-01 - Sillón 1
+  FALLA la tercera se rechaza 
+  FALLA el mensaje explica que no hay unidades 
+  FALLA con una sola unidad el mensaje va en singular 
+  OK    no quedan unidades libres a esa hora
+
+5. Al liberar una unidad vuelve a haber espacio
+  FALLA ahora sí se acepta 
+
+6. Las ausencias descuentan del patrón semanal
+  OK    el odontólogo tiene franjas ese día
+  OK    se registra la ausencia parcial
+  OK    la franja de la mañana desaparece
+  OK    la de la tarde se conserva
+
+7. No se puede programar dentro de una ausencia
+  OK    rechaza la cita en la franja ausente
+  OK    acepta la cita fuera de la ausencia
+
+8. La ausencia de toda la jornada vacía el día
+  OK    no queda ninguna franja
+  OK    el mensaje menciona la ausencia
+
+9. La recomendación respeta las ausencias
+  OK    no propone espacios en un día de ausencia total
+
+10. El odontólogo puede marcar sus propias ausencias
+  OK    su usuario está vinculado a una ficha
+  OK    es un rol de solo consulta
+  OK    no puede crear citas
+  OK    sí entra a sus propias ausencias
+  OK    no entra a las de otro odontólogo
+  OK    registra la suya
+
+11. El calendario del odontólogo se filtra a su agenda
+  OK    aparece la opción "Mi agenda"
+  OK    viene preseleccionada
+  OK    puede volver a ver todos
+
+=== 26 correctas, 5 fallidas ===

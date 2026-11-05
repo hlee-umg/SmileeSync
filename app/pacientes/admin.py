@@ -9,20 +9,20 @@ class AntecedenteInline(admin.TabularInline):
 
 @admin.register(Paciente)
 class PacienteAdmin(admin.ModelAdmin):
-    list_display = ('codigo', 'nombres', 'apellidos', 'telefono', 'estado')
-    list_filter = ('estado', 'sexo')
-    search_fields = ('codigo', 'nombres', 'apellidos')
+    list_display = ("codigo", "nombres", "apellidos", "telefono", "estado")
+    list_filter = ("estado", "sexo")
+    search_fields = ("codigo", "nombres", "apellidos")
     inlines = [AntecedenteInline]
 
 
 @admin.register(AntecedenteMedico)
 class AntecedenteMedicoAdmin(admin.ModelAdmin):
-    list_display = ('paciente', 'tipo', 'estado')
-    list_filter = ('estado',)
+    list_display = ("paciente", "tipo", "estado")
+    list_filter = ("estado",)
 
 
 @admin.register(HistorialPaciente)
 class HistorialPacienteAdmin(admin.ModelAdmin):
-    list_display = ('fecha', 'codigo', 'nombre_completo', 'accion', 'realizado_por')
-    list_filter = ('accion',)
+    list_display = ("fecha", "codigo", "nombre_completo", "accion", "realizado_por")
+    list_filter = ("accion",)
     readonly_fields = [f.name for f in HistorialPaciente._meta.fields]

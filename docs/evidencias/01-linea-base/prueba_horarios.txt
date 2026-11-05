@@ -1,0 +1,50 @@
+Sesión iniciada como admin@smileesync.local
+
+1. Pantalla de un odontólogo sin horarios
+  OK   responde 200
+  OK   muestra la advertencia de sin horario
+
+2. Agregar una franja
+  OK   se creó 1 franja
+  OK   mensaje de éxito
+  OK   ya no muestra la advertencia
+
+3. Rechazo de franja traslapada
+  OK   no se creó
+  OK   explica el traslape
+
+4. Rechazo de hora fin <= hora inicio
+  OK   no se creó
+  OK   explica el error
+
+5. Replicar de lunes a viernes
+  OK   creó 5 franjas (LUN a VIE)
+  OK   no tocó sábado
+
+6. Replicar rechazado si traslapa en cualquier día hábil
+  OK   no creó ninguna
+  OK   explica el traslape
+
+7. Total de horas semanales
+  OK   reporta 24 horas por semana
+
+8. Retirar una franja (borrado lógico)
+  OK   la franja quedó inactiva
+  OK   sigue existiendo el registro (borrado lógico)
+
+9. Advertencia al retirar una franja con citas futuras
+  OK   advierte sobre las citas ya programadas
+     mensaje: ['<div class="alert alert-warning alert-dismissible fade show" role="alert">']
+
+10. Enlace desde el catálogo de odontólogos
+  OK   el listado responde 200
+  OK   incluye el enlace a horarios
+  OK   marca al odontólogo sin franjas
+
+11. La cita ya se puede programar con el odontólogo nuevo
+  OK   la cita se creó dentro de la franja 14:00-18:00
+
+12. Fuera de la franja sigue siendo rechazada
+  OK   rechaza fuera de horario
+
+=== 22 correctas, 0 fallidas ===

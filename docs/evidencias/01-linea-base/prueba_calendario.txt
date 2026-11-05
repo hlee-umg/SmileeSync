@@ -1,0 +1,48 @@
+1. Vista semanal
+  OK    responde 200
+  OK    muestra la semana
+  OK    hay botones Día y Semana
+  OK    hay botón Hoy
+  OK    la vista por omisión es la semana en curso
+
+2. Las citas enlazan a su detalle
+  OK    la rejilla contiene enlaces a detalle
+  OK    el enlace de una cita de la semana está presente
+
+3. Las casillas libres enlazan a la programación
+  OK    hay enlaces de casilla libre con fecha y hora
+  OK    el formulario abre con 200
+  OK    la fecha viene precargada
+  OK    la hora viene precargada
+
+4. El odontólogo del filtro se precarga
+  OK    el enlace de casilla lleva el odontólogo
+  OK    el formulario preselecciona al odontólogo
+
+5. Vista diaria
+  OK    responde 200
+  OK    no muestra el rótulo de semana
+  OK    una sola columna de día
+
+6. Navegación
+  OK    el siguiente apunta a mañana
+  OK    el anterior apunta a ayer
+  OK    una fecha inválida no rompe la pantalla
+
+7. Detalle de la cita
+  OK    responde 200
+  OK    muestra al paciente
+  OK    ofrece registrar la atención
+  OK    ofrece reprogramar
+  OK    ofrece cancelar
+  OK    una cita atendida no ofrece acciones
+  OK    una cita atendida muestra la desviación
+
+8. Un rol de solo consulta no ve acciones ni casillas libres
+  OK    no aparece el botón Nueva cita
+  OK    no aparecen casillas libres
+  OK    ve sus propias citas
+  OK    puede ver las de toda la clínica
+  OK    el detalle explica que es solo consulta
+
+=== 31 correctas, 0 fallidas ===

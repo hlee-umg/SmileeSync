@@ -5,16 +5,19 @@ from django.shortcuts import redirect
 
 def modulo_requerido(modulo):
     """Restringe una vista a los usuarios cuyo rol tiene acceso al módulo."""
+
     def decorador(vista):
         @wraps(vista)
         def _envuelta(request, *args, **kwargs):
             u = request.user
             if not u.is_authenticated:
-                return redirect('login')
+                return redirect("login")
             if u.puede(modulo):
                 return vista(request, *args, **kwargs)
-            raise PermissionDenied('No tiene acceso a este módulo.')
+            raise PermissionDenied("No tiene acceso a este módulo.")
+
         return _envuelta
+
     return decorador
 
 
@@ -26,19 +29,23 @@ def escritura_requerida(modulo):
     tiempos, de modo que la restricción no dependa de ocultar el botón en la
     plantilla: el acceso directo a la dirección también queda denegado.
     """
+
     def decorador(vista):
         @wraps(vista)
         def _envuelta(request, *args, **kwargs):
             u = request.user
             if not u.is_authenticated:
-                return redirect('login')
+                return redirect("login")
             if not u.puede(modulo):
-                raise PermissionDenied('No tiene acceso a este módulo.')
+                raise PermissionDenied("No tiene acceso a este módulo.")
             if u.es_solo_consulta:
                 raise PermissionDenied(
-                    'Su rol es de solo consulta: no puede modificar información.')
+                    "Su rol es de solo consulta: no puede modificar información."
+                )
             return vista(request, *args, **kwargs)
+
         return _envuelta
+
     return decorador
 
 
@@ -50,6 +57,6 @@ def puede_gestionar_odontologo(usuario, odontologo):
     clínica, pero marcar sus ausencias es información suya. Es el único caso en
     que un rol de consulta escribe, y está acotado a sus propios registros.
     """
-    if usuario.puede_escribir('agenda'):
+    if usuario.puede_escribir("agenda"):
         return True
     return bool(odontologo and odontologo.usuario_id == usuario.pk)

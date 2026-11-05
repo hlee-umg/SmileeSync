@@ -40,3 +40,22 @@ app/modelos/
 # leer en un diff. El respaldo son OneDrive y la plataforma de la universidad.
 docs/*.docx
 docs/*.pdf
+
+# Cobertura
+.coverage
+.coverage.*
+htmlcov/
+
+# Resultados locales de pruebas
+junit.xml
+coverage.xml
+
+# Clave secreta generada para desarrollo local
+app/.clave-desarrollo
+
+# Entregables generados a partir del Markdown (docs/herramientas/generar_docx.py)
+docs/entregables/
+
+# Datos de infraestructura y credenciales: nunca se versionan
+claude/
+infra/cdk.context.json

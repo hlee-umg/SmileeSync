@@ -1,0 +1,143 @@
+Forbidden (Permission denied): /citas/nueva/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Forbidden (Permission denied): /citas/676/editar/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Forbidden (Permission denied): /citas/676/tiempos/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Forbidden (Permission denied): /citas/676/cancelar/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+Forbidden (Permission denied): /pacientes/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 16, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+Forbidden (Permission denied): /usuarios/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 16, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+Forbidden (Permission denied): /citas/nueva/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 38, in _envuelta
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: Su rol es de solo consulta: no puede modificar información.
+
+=== Administrador (admin@smileesync.local) ===
+  OK    es_solo_consulta coincide con lo esperado
+  OK    agenda:principal responde 200 (lectura)
+  OK    agenda:lista responde 200 (lectura)
+  OK    agenda:crear permitido (200)
+  OK    agenda:editar permitido (200)
+  OK    agenda:tiempos permitido (200)
+  OK    POST de cancelar permitido
+  OK    el botón "Nueva cita" aparece
+
+=== Recepcionista (recepcion@smileesync.local) ===
+  OK    es_solo_consulta coincide con lo esperado
+  OK    agenda:principal responde 200 (lectura)
+  OK    agenda:lista responde 200 (lectura)
+  OK    agenda:crear permitido (200)
+  OK    agenda:editar permitido (200)
+  OK    agenda:tiempos permitido (200)
+  OK    POST de cancelar permitido
+  OK    el botón "Nueva cita" aparece
+
+=== Odontólogo (hjlee@smileesync.local) ===
+  OK    es_solo_consulta coincide con lo esperado
+  OK    agenda:principal responde 200 (lectura)
+  OK    agenda:lista responde 200 (lectura)
+  OK    agenda:crear bloqueado con 403
+  OK    agenda:editar bloqueado con 403
+  OK    agenda:tiempos bloqueado con 403
+  OK    POST de cancelar bloqueado con 403
+  OK    el botón "Nueva cita" NO aparece
+
+=== Módulo sin acceso ===
+  OK    el asistente entra al módulo Principal
+  OK    el asistente no entra a pacientes (403)
+  OK    el asistente no entra a usuarios (403)
+  OK    el asistente no puede crear citas (403)
+
+=== Regresión: el administrador conserva todo ===
+  OK    pacientes:lista responde 200
+  OK    pacientes:editar responde 200
+  OK    catalogo:lista responde 200
+  OK    usuarios:lista responde 200
+  OK    usuarios:crear responde 200
+
+=== 33 correctas, 0 fallidas ===

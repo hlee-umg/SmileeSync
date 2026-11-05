@@ -1,0 +1,171 @@
+Forbidden (Permission denied): /inteligencia/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 16, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+Forbidden (Permission denied): /reportes/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 16, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+Forbidden (Permission denied): /inteligencia/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 16, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+Forbidden (Permission denied): /inteligencia/version/2/activar/
+Traceback (most recent call last):
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\.venv\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hslee\Documents\UMG_Hee\Aseguramiento de la calidad\Proyecto\SmileeSync-QA\app\usuarios\decorators.py", line 36, in _envuelta
+    raise PermissionDenied('No tiene acceso a este módulo.')
+django.core.exceptions.PermissionDenied: No tiene acceso a este módulo.
+1. El conjunto de entrenamiento se arma desde las citas y sus notas
+  OK    hay registros suficientes para entrenar
+  OK    incluye las variables de la cita
+  OK    incluye las variables de la nota clínica
+  OK    incluye la duración real como objetivo
+  OK    ninguna cita cancelada entra al conjunto
+
+2. El entrenamiento produce métricas comparables contra una línea base
+  OK    el entrenamiento concluye
+  OK    reserva registros para evaluar
+  OK    el error es menor que estimar siempre el promedio
+  OK    la mejora se reporta como porcentaje
+  OK    el entrenamiento toma menos de cinco segundos
+  OK    genera el archivo serializado
+  OK    reporta el peso de las variables
+
+3. El versionado conserva el histórico y activa una sola versión
+  OK    la versión queda registrada
+  OK    la versión nueva está activa
+  OK    solo hay una versión en producción
+  OK    una versión nueva no se activa sola
+  OK    la anterior sigue en producción
+  OK    al activar otra, la anterior se retira
+  OK    sigue habiendo una sola activa
+
+4. La estimación usa el modelo y responde en línea
+  OK    la estimación proviene del modelo
+  OK    declara el origen en la interfaz
+  OK    el bloque recomendado rodea la estimación
+  OK    la estimación crece con el número de piezas
+  OK    distingue el ritmo de cada profesional
+  OK    la estimación que se muestra se redondea a múltiplos de cinco
+
+5. El modelo se conserva en memoria entre peticiones
+  OK    la primera carga es la más costosa
+  OK    las estimaciones siguientes bajan de 100 ms
+
+6. Sin modelo, la cadena de respaldo sostiene la estimación
+  OK    la estimación sigue disponible
+  OK    recae en el promedio histórico
+  OK    explica de dónde salió el número
+  OK    al reactivar, vuelve a usar el modelo
+
+7. Un archivo de modelo inválido no impide agendar
+  OK    la estimación no se interrumpe
+  OK    cae al nivel siguiente de la cadena
+
+8. Pantalla del módulo de Inteligencia
+  OK    responde 200
+  OK    lista las versiones entrenadas
+  OK    muestra el error del modelo
+  OK    contrasta contra el error del catálogo
+  OK    documenta la cadena de estimación
+  OK    indica cómo se entrena
+
+9. Pantalla del módulo de Reportes
+  OK    responde 200
+  OK    presenta los indicadores del período
+  OK    incluye la gráfica de atenciones
+  OK    incluye el contraste catálogo contra real
+  OK    ofrece los datos también en tabla
+  OK    el período es filtrable
+
+10. Control de acceso de los módulos nuevos
+  OK    la recepción entra a reportes
+  OK    la recepción no entra a inteligencia
+  OK    el odontólogo no entra a reportes
+  OK    el odontólogo no entra a inteligencia
+  OK    la recepción no activa versiones del modelo
+
+11. El conjunto de entrenamiento se mantiene al día
+  OK    el conjunto tiene una fila por atención medida
+  OK    sincronizar dos veces no duplica nada
+  OK    una duración corregida se actualiza en el conjunto
+  OK    el conjunto refleja el valor corregido
+  OK    una cita cancelada después de atenderse sale del conjunto
+  OK    al restituirse la atención vuelve a entrar
+  OK    el registro al cerrar una cita no duplica la fila
+  OK    el conjunto guarda las variables de la nota clínica
+  OK    el conjunto guarda la duración de referencia del catálogo
+  OK    el conjunto que se entrena sale de esa tabla
+  OK    cada registro lleva la duración del catálogo para contrastar
+
+12. El modelo se contrasta contra el método que la clínica usa hoy
+  OK    se mide el error de estimar con el catálogo
+  OK    se mide sobre el mismo subconjunto de prueba que el modelo
+  OK    el modelo reduce el error del catálogo
+  OK    la reducción se reporta como porcentaje
+  OK    se declara si alcanza la meta del proyecto
+  OK    la meta del proyecto es reducir un 25 %
+  OK    la versión conserva el error del catálogo
+  OK    la lectura retrospectiva reporta las dos cifras y su diferencia
+  OK    una versión sin métricas no produce lectura
+
+13. Desempeño en operación: predicciones contra la duración real
+  OK    sin predicciones medidas no se inventa un resultado
+  OK    se contrastan todas las predicciones con cita atendida
+  OK    el error del modelo se calcula sobre la duración real
+  OK    se mide también el error del catálogo en las mismas citas
+  OK    se cuenta cuántas atenciones cayeron dentro del bloque sugerido
+  OK    el desglose por procedimiento suma las mismas atenciones
+  OK    el desglose ordena por el error del modelo
+  OK    una cita cancelada sale del contraste
+
+14. El panel presenta la validación de la hipótesis
+  OK    declara la validación de la hipótesis
+  OK    contrasta con los bloques del catálogo
+  OK    reporta la reducción del error
+  OK    declara la meta del proyecto
+  OK    presenta el desempeño en operación
+  OK    informa cuántas atenciones cayeron dentro del bloque
+  OK    informa el tamaño del conjunto de entrenamiento
+  OK    el indicador del catálogo coincide con el de la validación
+
+=== 86 correctas, 0 fallidas ===

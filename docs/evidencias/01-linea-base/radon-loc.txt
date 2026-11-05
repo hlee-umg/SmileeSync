@@ -1,0 +1,12 @@
+** Total **
+    LOC: 8179
+    LLOC: 4771
+    SLOC: 6140
+    Comments: 350
+    Single comments: 336
+    Multi: 510
+    Blank: 1193
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 6%
+        (C + M % L): 11%

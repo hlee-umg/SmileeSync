@@ -1,0 +1,31 @@
+digraph componentes {
+  graph [rankdir=BT, splines=spline, nodesep=0.45, ranksep=0.65, bgcolor=white,
+         fontname="Helvetica", labelloc=t, fontsize=15,
+         label="Componentes de la aplicación y sus dependencias\n(obtenidas del análisis de las importaciones del código fuente)"];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+         fillcolor="#EEF2FF", color="#4F46E5", margin="0.18,0.10"];
+  edge  [color="#64748B", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  config      [label="config\nconfiguración, rutas y WSGI\n9 archivos · 259 líneas", fillcolor="#F1F5F9", color="#475569"];
+  usuarios    [label="usuarios\nautenticación, roles y auditoría\n11 archivos · 584 líneas"];
+  pacientes   [label="pacientes\nficha y antecedentes\n7 archivos · 348 líneas"];
+  catalogo    [label="catalogo\nprocedimientos, odontólogos y unidades\n7 archivos · 440 líneas"];
+  agenda      [label="agenda\ncalendario, citas y disponibilidad\n8 archivos · 1 384 líneas"];
+  clinico     [label="clinico\nexpediente, planes y cobros\n8 archivos · 1 420 líneas"];
+  inteligencia[label="inteligencia\nentrenamiento, estimación y contraste\n10 archivos · 1 038 líneas", fillcolor="#ECFDF5", color="#059669"];
+  reportes    [label="reportes\nindicadores y desviaciones\n7 archivos · 252 líneas"];
+
+  {rank=same; pacientes; catalogo;}
+  {rank=same; agenda; clinico;}
+  {rank=same; reportes; inteligencia;}
+
+  usuarios -> config;
+  pacientes -> usuarios; pacientes -> config;
+  catalogo -> usuarios; catalogo -> config;
+  agenda -> usuarios; agenda -> pacientes; agenda -> catalogo;
+  agenda -> clinico; agenda -> inteligencia;
+  clinico -> usuarios; clinico -> pacientes; clinico -> catalogo; clinico -> agenda;
+  clinico -> inteligencia;
+  inteligencia -> usuarios; inteligencia -> catalogo; inteligencia -> agenda; inteligencia -> clinico;
+  reportes -> usuarios; reportes -> catalogo; reportes -> agenda;
+}

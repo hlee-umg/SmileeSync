@@ -1,0 +1,44 @@
+digraph despliegue {
+  graph [rankdir=TB, splines=spline, nodesep=0.40, ranksep=0.55, bgcolor=white,
+         fontname="Helvetica", labelloc=t, fontsize=15,
+         label="Despliegue en producción: nodos, procesos y puertos"];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10,
+         fillcolor="#EEF2FF", color="#4F46E5", margin="0.16,0.09"];
+  edge  [color="#475569", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+
+  subgraph cluster_cliente {
+    label="Equipo del usuario"; fontsize=12; color="#94A3B8"; style=rounded; bgcolor="#FAFAFA";
+    navegador [label="Navegador\nHTML5 · CSS3 · Bootstrap 5.3", fillcolor="#FFFFFF", color="#64748B"];
+  }
+
+  subgraph cluster_ec2 {
+    label="Amazon EC2 t3.small — Ubuntu 24.04 — 2 vCPU · 2 GB — IP elástica";
+    fontsize=12; color="#64748B"; style=rounded; bgcolor="#FAFAF9";
+    nginx    [label="nginx\nproxy inverso · puerto 80"];
+    gunicorn [label="gunicorn.service\n3 procesos WSGI · 127.0.0.1:8000"];
+    django   [label="Django 5.0\npatrón Modelo-Vista-Plantilla\n67 archivos · 5 725 líneas"];
+    estaticos[label="WhiteNoise\n39 plantillas · estáticos comprimidos", fillcolor="#F1F5F9", color="#475569"];
+    motor    [label="Motor predictivo\nscikit-learn · pandas · joblib", fillcolor="#ECFDF5", color="#059669"];
+    modelo   [label="modelo_activo.joblib\n509 KB", shape=note, fillcolor="#FEF3C7", color="#D97706"];
+    timer    [label="smileesync-entrenar.timer\nreentrenamiento el día 1 de cada mes", fillcolor="#FEF3C7", color="#D97706"];
+    bd       [label="PostgreSQL 16\n24 tablas · 127.0.0.1:5432", shape=cylinder, fillcolor="#ECFDF5", color="#059669"];
+  }
+
+  subgraph cluster_github {
+    label="GitHub"; fontsize=12; color="#94A3B8"; style=rounded; bgcolor="#FAFAFA";
+    repo [label="Repositorio\nrama main", fillcolor="#FFFFFF", color="#64748B"];
+    ci   [label="GitHub Actions\nrevisión y despliegue", fillcolor="#FFFFFF", color="#64748B"];
+  }
+
+  navegador -> nginx [label="  HTTP\n  (HTTPS pendiente)"];
+  nginx -> gunicorn [label="  WSGI"];
+  nginx -> estaticos [label="  /static/", style=dashed];
+  gunicorn -> django;
+  django -> bd [label="  psycopg2"];
+  django -> motor [label="  estimación"];
+  motor -> modelo [label="  carga", style=dashed];
+  timer -> motor [label="  entrena", style=dashed];
+  motor -> bd [style=dashed];
+  repo -> ci [label="  push"];
+  ci -> django [label="  SSH: git pull,\n  migrate, collectstatic", style=dashed];
+}

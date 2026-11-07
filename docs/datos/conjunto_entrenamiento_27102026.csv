@@ -1,0 +1,447 @@
+procedimiento,odontologo,dia_semana,hora_inicio,num_piezas,anestesia,complicacion,duracion_catalogo,duracion_real_min
+Profilaxis dental,Hee Joon Lee,MAR,8,1,0,0,30,32
+Resina compuesta,Rachelle Girón,MAR,8,1,1,0,45,48
+Profilaxis dental,Rachelle Girón,MAR,8,1,0,0,30,38
+Sellante de fosas y fisuras,Hee Joon Lee,MAR,9,1,0,0,25,20
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,9,2,1,0,50,72
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,9,1,1,0,50,51
+Profilaxis dental,Rachelle Girón,MAR,10,1,0,0,30,29
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,10,1,1,0,50,46
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,10,1,1,0,50,56
+Control de ortodoncia,Hee Joon Lee,MAR,14,1,0,0,30,31
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,14,2,1,0,50,55
+Control de ortodoncia,Hee Joon Lee,MAR,14,1,0,0,30,26
+Control de ortodoncia,Hee Joon Lee,MAR,15,1,0,0,30,30
+Tratamiento de conducto,Rachelle Girón,MAR,15,1,1,0,90,89
+Extracción simple,Hee Joon Lee,MAR,15,1,1,0,40,40
+Profilaxis dental,Hee Joon Lee,MAR,16,1,0,0,30,29
+Sellante de fosas y fisuras,Rachelle Girón,MAR,16,1,0,0,25,33
+Profilaxis dental,Rachelle Girón,MAR,17,1,0,0,30,33
+Limpieza profunda por cuadrante,Hee Joon Lee,LUN,8,2,1,0,50,53
+Resina compuesta,Rachelle Girón,LUN,9,1,1,0,45,51
+Control de ortodoncia,Hee Joon Lee,LUN,9,1,0,0,30,29
+Profilaxis dental,Hee Joon Lee,LUN,9,1,0,0,30,28
+Profilaxis dental,Rachelle Girón,LUN,10,1,0,0,30,30
+Aplicación de flúor,Rachelle Girón,LUN,10,1,0,0,20,21
+Control de ortodoncia,Hee Joon Lee,LUN,14,1,0,0,30,29
+Profilaxis dental,Rachelle Girón,LUN,14,1,0,0,30,38
+Profilaxis dental,Hee Joon Lee,LUN,15,1,0,0,30,30
+Profilaxis dental,Hee Joon Lee,LUN,15,1,0,0,30,34
+Aplicación de flúor,Rachelle Girón,LUN,16,1,0,0,20,23
+Control de ortodoncia,Hee Joon Lee,LUN,16,1,0,0,30,33
+Resina compuesta,Hee Joon Lee,VIE,8,1,1,0,45,42
+Control de ortodoncia,Hee Joon Lee,VIE,9,1,0,1,30,39
+Control de ortodoncia,Rachelle Girón,VIE,10,1,0,1,30,46
+Profilaxis dental,Rachelle Girón,VIE,10,1,0,0,30,35
+Aplicación de flúor,Rachelle Girón,VIE,11,1,0,0,20,21
+Extracción simple,Rachelle Girón,VIE,14,1,1,0,40,40
+Control de ortodoncia,Hee Joon Lee,VIE,15,1,0,0,30,24
+Limpieza profunda por cuadrante,Rachelle Girón,VIE,15,2,1,0,50,79
+Control de ortodoncia,Hee Joon Lee,VIE,16,1,0,0,30,27
+Profilaxis dental,Rachelle Girón,VIE,17,1,0,1,30,37
+Extracción simple,Rachelle Girón,JUE,8,1,1,0,40,37
+Profilaxis dental,Rachelle Girón,JUE,8,1,0,0,30,30
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,9,2,1,0,50,61
+Extracción simple,Rachelle Girón,JUE,9,1,1,1,40,59
+Limpieza profunda por cuadrante,Rachelle Girón,JUE,10,2,1,0,50,72
+Tratamiento de conducto,Hee Joon Lee,JUE,10,1,1,0,90,95
+Profilaxis dental,Rachelle Girón,JUE,11,1,0,0,30,32
+Aplicación de flúor,Rachelle Girón,JUE,14,1,0,0,20,22
+Resina compuesta,Hee Joon Lee,JUE,14,2,1,0,45,64
+Profilaxis dental,Rachelle Girón,JUE,14,1,0,1,30,34
+Aplicación de flúor,Rachelle Girón,JUE,15,1,0,0,20,24
+Tratamiento de conducto,Hee Joon Lee,JUE,15,1,1,0,90,83
+Resina compuesta,Rachelle Girón,JUE,17,1,1,0,45,47
+Profilaxis dental,Rachelle Girón,MIE,8,1,0,0,30,32
+Aplicación de flúor,Hee Joon Lee,MIE,8,1,0,0,20,18
+Profilaxis dental,Rachelle Girón,MIE,8,1,0,0,30,31
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,9,1,1,1,50,58
+Resina compuesta,Rachelle Girón,MIE,9,1,1,0,45,40
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,10,2,1,0,50,75
+Profilaxis dental,Hee Joon Lee,MIE,10,1,0,0,30,31
+Aplicación de flúor,Hee Joon Lee,MIE,10,1,0,0,20,21
+Profilaxis dental,Rachelle Girón,MIE,11,1,0,0,30,33
+Control de ortodoncia,Hee Joon Lee,MIE,14,1,0,0,30,31
+Extracción simple,Rachelle Girón,MIE,14,1,1,1,40,58
+Resina compuesta,Rachelle Girón,MIE,14,1,1,1,45,55
+Colocación de brackets,Hee Joon Lee,MIE,15,14,0,0,120,111
+Profilaxis dental,Rachelle Girón,MIE,16,1,0,0,30,35
+Control de ortodoncia,Hee Joon Lee,MIE,17,1,0,0,30,25
+Profilaxis dental,Rachelle Girón,MIE,17,1,0,0,30,28
+Resina compuesta,Hee Joon Lee,MAR,8,1,1,0,45,44
+Sellante de fosas y fisuras,Rachelle Girón,MAR,8,2,0,0,25,35
+Aplicación de flúor,Rachelle Girón,MAR,8,1,0,0,20,18
+Profilaxis dental,Hee Joon Lee,MAR,9,1,0,1,30,30
+Profilaxis dental,Rachelle Girón,MAR,9,1,0,0,30,26
+Colocación de brackets,Hee Joon Lee,MAR,9,10,0,0,120,110
+Tratamiento de conducto,Rachelle Girón,MAR,9,1,1,0,90,95
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,14,2,1,0,50,68
+Tratamiento de conducto,Rachelle Girón,MAR,14,1,1,0,90,99
+Tratamiento de conducto,Hee Joon Lee,MAR,15,1,1,0,90,85
+Sellante de fosas y fisuras,Rachelle Girón,MAR,15,2,0,0,25,39
+Profilaxis dental,Rachelle Girón,MAR,16,1,0,0,30,30
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,17,1,1,0,50,49
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,17,1,1,0,50,43
+Control de ortodoncia,Hee Joon Lee,LUN,8,1,0,0,30,36
+Profilaxis dental,Rachelle Girón,LUN,8,1,0,0,30,35
+Limpieza profunda por cuadrante,Hee Joon Lee,LUN,9,2,1,0,50,63
+Profilaxis dental,Rachelle Girón,LUN,10,1,0,0,30,32
+Profilaxis dental,Hee Joon Lee,LUN,11,1,0,0,30,30
+Extracción simple,Rachelle Girón,LUN,14,1,1,1,40,52
+Profilaxis dental,Hee Joon Lee,LUN,14,1,0,1,30,34
+Sellante de fosas y fisuras,Rachelle Girón,LUN,14,1,0,0,25,28
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,1,30,33
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,0,30,27
+Profilaxis dental,Rachelle Girón,LUN,15,1,0,0,30,35
+Control de ortodoncia,Hee Joon Lee,LUN,16,1,0,1,30,36
+Control de ortodoncia,Hee Joon Lee,LUN,16,1,0,0,30,27
+Resina compuesta,Hee Joon Lee,VIE,8,1,1,0,45,45
+Resina compuesta,Rachelle Girón,VIE,8,2,1,0,45,74
+Control de ortodoncia,Rachelle Girón,VIE,9,1,0,0,30,30
+Colocación de brackets,Hee Joon Lee,VIE,9,10,0,0,120,113
+Profilaxis dental,Rachelle Girón,VIE,10,1,0,0,30,35
+Extracción simple,Rachelle Girón,VIE,11,1,1,0,40,44
+Colocación de brackets,Hee Joon Lee,VIE,14,14,0,0,120,105
+Limpieza profunda por cuadrante,Rachelle Girón,VIE,14,2,1,0,50,75
+Aplicación de flúor,Rachelle Girón,VIE,16,1,0,0,20,22
+Profilaxis dental,Hee Joon Lee,VIE,16,1,0,0,30,21
+Control de ortodoncia,Hee Joon Lee,VIE,16,1,0,0,30,27
+Control de ortodoncia,Rachelle Girón,VIE,17,1,0,0,30,29
+Sellante de fosas y fisuras,Hee Joon Lee,VIE,17,1,0,0,25,20
+Resina compuesta,Hee Joon Lee,JUE,8,2,1,0,45,58
+Tratamiento de conducto,Rachelle Girón,JUE,8,1,1,0,90,95
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,9,1,1,1,50,64
+Sellante de fosas y fisuras,Rachelle Girón,JUE,9,1,0,1,25,34
+Retiro de brackets,Hee Joon Lee,JUE,10,1,0,0,60,71
+Resina compuesta,Rachelle Girón,JUE,10,1,1,0,45,54
+Control de ortodoncia,Hee Joon Lee,JUE,11,1,0,0,30,28
+Control de ortodoncia,Hee Joon Lee,JUE,14,1,0,0,30,35
+Control de ortodoncia,Rachelle Girón,JUE,14,1,0,1,30,40
+Resina compuesta,Hee Joon Lee,JUE,14,1,1,0,45,44
+Extracción simple,Rachelle Girón,JUE,14,1,1,0,40,44
+Control de ortodoncia,Hee Joon Lee,JUE,15,1,0,0,30,25
+Profilaxis dental,Rachelle Girón,JUE,15,1,0,0,30,30
+Aplicación de flúor,Rachelle Girón,JUE,16,1,0,1,20,27
+Resina compuesta,Hee Joon Lee,JUE,16,1,1,0,45,47
+Aplicación de flúor,Rachelle Girón,JUE,16,1,0,0,20,20
+Extracción simple,Rachelle Girón,JUE,17,1,1,0,40,44
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,8,2,1,0,50,71
+Tratamiento de conducto,Hee Joon Lee,MIE,8,1,1,0,90,86
+Extracción simple,Rachelle Girón,MIE,9,1,1,0,40,41
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,10,2,1,0,50,64
+Sellante de fosas y fisuras,Rachelle Girón,MIE,10,2,0,1,25,47
+Sellante de fosas y fisuras,Rachelle Girón,MIE,11,1,0,0,25,31
+Resina compuesta,Hee Joon Lee,MIE,14,1,1,0,45,41
+Tratamiento de conducto,Rachelle Girón,MIE,14,1,1,0,90,103
+Tratamiento de conducto,Hee Joon Lee,MIE,14,1,1,0,90,94
+Resina compuesta,Rachelle Girón,MIE,16,3,1,0,45,86
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,16,2,1,0,50,59
+Profilaxis dental,Hee Joon Lee,MAR,8,1,0,0,30,23
+Profilaxis dental,Rachelle Girón,MAR,8,1,0,0,30,28
+Colocación de brackets,Hee Joon Lee,MAR,8,12,0,0,120,123
+Resina compuesta,Rachelle Girón,MAR,9,2,1,0,45,66
+Resina compuesta,Rachelle Girón,MAR,10,1,1,0,45,59
+Extracción simple,Hee Joon Lee,MAR,11,1,1,0,40,35
+Profilaxis dental,Hee Joon Lee,MAR,14,1,0,0,30,25
+Profilaxis dental,Hee Joon Lee,MAR,14,1,0,0,30,24
+Resina compuesta,Rachelle Girón,MAR,14,1,1,0,45,52
+Control de ortodoncia,Hee Joon Lee,MAR,15,1,0,0,30,30
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,15,1,1,0,50,52
+Control de ortodoncia,Hee Joon Lee,MAR,16,1,0,0,30,29
+Resina compuesta,Rachelle Girón,MAR,16,1,1,0,45,45
+Profilaxis dental,Hee Joon Lee,MAR,17,1,0,0,30,27
+Sellante de fosas y fisuras,Rachelle Girón,LUN,8,1,0,0,25,24
+Profilaxis dental,Rachelle Girón,LUN,8,1,0,0,30,34
+Control de ortodoncia,Hee Joon Lee,LUN,9,1,0,0,30,30
+Profilaxis dental,Rachelle Girón,LUN,9,1,0,0,30,28
+Colocación de brackets,Hee Joon Lee,LUN,9,10,0,0,120,103
+Profilaxis dental,Rachelle Girón,LUN,9,1,0,0,30,35
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,10,2,1,0,50,76
+Profilaxis dental,Hee Joon Lee,LUN,14,1,0,0,30,27
+Extracción simple,Rachelle Girón,LUN,14,1,1,0,40,41
+Resina compuesta,Rachelle Girón,LUN,14,3,1,0,45,93
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,0,30,26
+Resina compuesta,Hee Joon Lee,LUN,15,1,1,0,45,42
+Profilaxis dental,Rachelle Girón,LUN,16,1,0,0,30,32
+Extracción simple,Rachelle Girón,LUN,17,1,1,1,40,52
+Profilaxis dental,Hee Joon Lee,LUN,17,1,0,0,30,29
+Control de ortodoncia,Hee Joon Lee,VIE,8,1,0,0,30,28
+Control de ortodoncia,Hee Joon Lee,VIE,8,1,0,1,30,39
+Resina compuesta,Hee Joon Lee,VIE,10,1,1,0,45,40
+Limpieza profunda por cuadrante,Rachelle Girón,VIE,10,2,1,0,50,66
+Resina compuesta,Hee Joon Lee,VIE,10,1,1,0,45,38
+Limpieza profunda por cuadrante,Rachelle Girón,VIE,14,2,1,0,50,75
+Control de ortodoncia,Hee Joon Lee,VIE,14,1,0,0,30,28
+Profilaxis dental,Hee Joon Lee,VIE,15,1,0,0,30,26
+Tratamiento de conducto,Rachelle Girón,VIE,15,1,1,0,90,92
+Aplicación de flúor,Hee Joon Lee,VIE,15,1,0,0,20,16
+Retiro de brackets,Hee Joon Lee,VIE,16,1,0,0,60,62
+Profilaxis dental,Rachelle Girón,VIE,17,1,0,1,30,43
+Control de ortodoncia,Hee Joon Lee,VIE,17,1,0,0,30,28
+Retiro de brackets,Hee Joon Lee,JUE,8,1,0,0,60,57
+Profilaxis dental,Rachelle Girón,JUE,8,1,0,0,30,31
+Limpieza profunda por cuadrante,Rachelle Girón,JUE,9,1,1,0,50,49
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,9,1,1,1,50,53
+Resina compuesta,Rachelle Girón,JUE,10,1,1,0,45,51
+Control de ortodoncia,Hee Joon Lee,JUE,10,1,0,0,30,31
+Profilaxis dental,Hee Joon Lee,JUE,11,1,0,0,30,23
+Resina compuesta,Hee Joon Lee,JUE,14,3,1,0,45,70
+Aplicación de flúor,Rachelle Girón,JUE,14,1,0,0,20,21
+Profilaxis dental,Rachelle Girón,JUE,14,1,0,0,30,30
+Colocación de brackets,Hee Joon Lee,JUE,15,14,0,0,120,119
+Resina compuesta,Rachelle Girón,JUE,15,2,1,1,45,93
+Extracción simple,Rachelle Girón,JUE,16,1,1,0,40,51
+Extracción simple,Rachelle Girón,MIE,8,1,1,0,40,45
+Sellante de fosas y fisuras,Hee Joon Lee,MIE,8,1,0,0,25,22
+Tratamiento de conducto,Rachelle Girón,MIE,8,1,1,0,90,105
+Profilaxis dental,Hee Joon Lee,MIE,9,1,0,0,30,29
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,9,2,1,0,50,66
+Profilaxis dental,Rachelle Girón,MIE,10,1,0,0,30,30
+Profilaxis dental,Hee Joon Lee,MIE,11,1,0,0,30,24
+Profilaxis dental,Rachelle Girón,MIE,11,1,0,0,30,36
+Extracción simple,Rachelle Girón,MIE,14,1,1,1,40,57
+Aplicación de flúor,Hee Joon Lee,MIE,14,1,0,0,20,19
+Colocación de brackets,Hee Joon Lee,MIE,14,10,0,1,120,170
+Resina compuesta,Rachelle Girón,MIE,14,1,1,0,45,46
+Aplicación de flúor,Rachelle Girón,MIE,15,1,0,0,20,20
+Profilaxis dental,Rachelle Girón,MIE,16,1,0,0,30,32
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,16,2,1,0,50,72
+Sellante de fosas y fisuras,Hee Joon Lee,MIE,16,2,0,0,25,36
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,8,1,1,0,50,43
+Tratamiento de conducto,Rachelle Girón,MAR,8,1,1,0,90,86
+Control de ortodoncia,Hee Joon Lee,MAR,9,1,0,0,30,24
+Profilaxis dental,Rachelle Girón,MAR,9,1,0,0,30,35
+Extracción simple,Rachelle Girón,MAR,10,1,1,0,40,47
+Control de ortodoncia,Hee Joon Lee,MAR,10,1,0,0,30,24
+Profilaxis dental,Hee Joon Lee,MAR,11,1,0,0,30,26
+Control de ortodoncia,Hee Joon Lee,MAR,14,1,0,0,30,25
+Resina compuesta,Rachelle Girón,MAR,14,1,1,0,45,42
+Colocación de brackets,Hee Joon Lee,MAR,14,14,0,0,120,96
+Resina compuesta,Rachelle Girón,MAR,16,3,1,0,45,83
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,16,2,1,0,50,50
+Resina compuesta,Hee Joon Lee,LUN,8,1,1,0,45,42
+Extracción simple,Rachelle Girón,LUN,8,1,1,0,40,42
+Colocación de brackets,Hee Joon Lee,LUN,8,10,0,0,120,138
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,9,2,1,0,50,72
+Extracción simple,Rachelle Girón,LUN,10,1,1,0,40,37
+Control de ortodoncia,Hee Joon Lee,LUN,14,1,0,0,30,29
+Control de ortodoncia,Rachelle Girón,LUN,14,1,0,0,30,34
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,14,1,1,1,50,74
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,0,30,31
+Control de ortodoncia,Rachelle Girón,LUN,15,1,0,0,30,31
+Tratamiento de conducto,Hee Joon Lee,LUN,16,1,1,0,90,85
+Resina compuesta,Rachelle Girón,LUN,16,1,1,0,45,51
+Aplicación de flúor,Rachelle Girón,LUN,17,1,0,0,20,21
+Resina compuesta,Hee Joon Lee,VIE,8,1,1,0,45,47
+Tratamiento de conducto,Rachelle Girón,VIE,8,1,1,0,90,88
+Profilaxis dental,Rachelle Girón,VIE,10,1,0,0,30,32
+Control de ortodoncia,Hee Joon Lee,VIE,10,1,0,0,30,32
+Control de ortodoncia,Hee Joon Lee,VIE,11,1,0,0,30,24
+Control de ortodoncia,Hee Joon Lee,VIE,14,1,0,0,30,24
+Profilaxis dental,Rachelle Girón,VIE,14,1,0,0,30,32
+Resina compuesta,Rachelle Girón,VIE,14,3,1,0,45,92
+Profilaxis dental,Rachelle Girón,VIE,16,1,0,0,30,29
+Control de ortodoncia,Hee Joon Lee,VIE,16,1,0,0,30,30
+Profilaxis dental,Hee Joon Lee,VIE,17,1,0,0,30,33
+Profilaxis dental,Rachelle Girón,VIE,17,1,0,0,30,33
+Control de ortodoncia,Hee Joon Lee,JUE,8,1,0,0,30,32
+Resina compuesta,Rachelle Girón,JUE,8,2,1,0,45,79
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,8,2,1,0,50,72
+Extracción simple,Rachelle Girón,JUE,9,1,1,0,40,46
+Profilaxis dental,Hee Joon Lee,JUE,9,1,0,1,30,30
+Limpieza profunda por cuadrante,Rachelle Girón,JUE,10,1,1,0,50,49
+Control de ortodoncia,Hee Joon Lee,JUE,10,1,0,1,30,37
+Profilaxis dental,Rachelle Girón,JUE,11,1,0,0,30,29
+Control de ortodoncia,Hee Joon Lee,JUE,11,1,0,0,30,28
+Aplicación de flúor,Rachelle Girón,JUE,14,1,0,0,20,20
+Retiro de brackets,Hee Joon Lee,JUE,14,1,0,1,60,79
+Profilaxis dental,Rachelle Girón,JUE,14,1,0,1,30,38
+Tratamiento de conducto,Rachelle Girón,JUE,15,1,1,0,90,96
+Resina compuesta,Hee Joon Lee,JUE,15,1,1,0,45,51
+Retiro de brackets,Hee Joon Lee,JUE,16,1,0,0,60,57
+Extracción simple,Rachelle Girón,JUE,16,1,1,0,40,51
+Control de ortodoncia,Hee Joon Lee,JUE,17,1,0,0,30,29
+Profilaxis dental,Rachelle Girón,JUE,17,1,0,0,30,31
+Extracción simple,Rachelle Girón,MIE,8,1,1,0,40,48
+Control de ortodoncia,Hee Joon Lee,MIE,8,1,0,0,30,24
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,8,1,1,0,50,51
+Control de ortodoncia,Hee Joon Lee,MIE,9,1,0,0,30,27
+Aplicación de flúor,Rachelle Girón,MIE,9,1,0,0,20,21
+Sellante de fosas y fisuras,Hee Joon Lee,MIE,10,1,0,0,25,23
+Retiro de brackets,Hee Joon Lee,MIE,10,1,0,1,60,65
+Extracción simple,Rachelle Girón,MIE,11,1,1,0,40,42
+Control de ortodoncia,Hee Joon Lee,MIE,14,1,0,0,30,30
+Resina compuesta,Hee Joon Lee,MIE,14,1,1,0,45,50
+Tratamiento de conducto,Rachelle Girón,MIE,14,1,1,0,90,108
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,15,2,1,0,50,58
+Resina compuesta,Rachelle Girón,MIE,16,1,1,0,45,50
+Control de ortodoncia,Hee Joon Lee,MIE,16,1,0,1,30,31
+Resina compuesta,Rachelle Girón,MIE,16,2,1,0,45,69
+Control de ortodoncia,Hee Joon Lee,MIE,17,1,0,0,30,26
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,8,2,1,0,50,69
+Resina compuesta,Rachelle Girón,MAR,8,1,1,0,45,41
+Resina compuesta,Hee Joon Lee,MAR,9,1,1,0,45,39
+Limpieza profunda por cuadrante,Rachelle Girón,MAR,9,2,1,0,50,84
+Extracción simple,Hee Joon Lee,MAR,14,1,1,0,40,33
+Profilaxis dental,Rachelle Girón,MAR,14,1,0,0,30,34
+Control de ortodoncia,Hee Joon Lee,MAR,14,1,0,0,30,32
+Sellante de fosas y fisuras,Rachelle Girón,MAR,15,1,0,0,25,25
+Control de ortodoncia,Hee Joon Lee,MAR,15,1,0,0,30,32
+Resina compuesta,Rachelle Girón,MAR,15,1,1,0,45,48
+Resina compuesta,Hee Joon Lee,MAR,16,1,1,0,45,36
+Profilaxis dental,Rachelle Girón,MAR,16,1,0,0,30,33
+Control de ortodoncia,Hee Joon Lee,MAR,17,1,0,0,30,27
+Profilaxis dental,Hee Joon Lee,LUN,8,1,0,0,30,28
+Extracción simple,Rachelle Girón,LUN,8,1,1,0,40,40
+Resina compuesta,Rachelle Girón,LUN,8,1,1,1,45,64
+Limpieza profunda por cuadrante,Hee Joon Lee,LUN,9,1,1,0,50,48
+Extracción simple,Rachelle Girón,LUN,9,1,1,0,40,37
+Tratamiento de conducto,Hee Joon Lee,LUN,10,1,1,0,90,81
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,10,2,1,0,50,75
+Resina compuesta,Rachelle Girón,LUN,14,3,1,0,45,75
+Limpieza profunda por cuadrante,Hee Joon Lee,LUN,14,1,1,0,50,41
+Profilaxis dental,Rachelle Girón,LUN,15,1,0,0,30,35
+Resina compuesta,Hee Joon Lee,LUN,16,1,1,0,45,39
+Control de ortodoncia,Rachelle Girón,LUN,16,1,0,0,30,31
+Extracción simple,Hee Joon Lee,LUN,17,1,1,0,40,35
+Control de ortodoncia,Hee Joon Lee,VIE,8,1,0,0,30,28
+Aplicación de flúor,Rachelle Girón,VIE,8,1,0,0,20,20
+Extracción simple,Rachelle Girón,VIE,8,1,1,0,40,49
+Tratamiento de conducto,Hee Joon Lee,VIE,9,1,1,0,90,81
+Profilaxis dental,Rachelle Girón,VIE,10,1,0,0,30,31
+Profilaxis dental,Rachelle Girón,VIE,10,1,0,1,30,40
+Profilaxis dental,Hee Joon Lee,VIE,10,1,0,1,30,33
+Control de ortodoncia,Hee Joon Lee,VIE,14,1,0,1,30,39
+Resina compuesta,Rachelle Girón,VIE,14,2,1,0,45,75
+Profilaxis dental,Hee Joon Lee,VIE,15,1,0,0,30,29
+Resina compuesta,Rachelle Girón,VIE,16,1,1,0,45,50
+Control de ortodoncia,Hee Joon Lee,VIE,16,1,0,0,30,28
+Control de ortodoncia,Hee Joon Lee,JUE,8,1,0,0,30,28
+Aplicación de flúor,Rachelle Girón,JUE,8,1,0,0,20,24
+Profilaxis dental,Rachelle Girón,JUE,8,1,0,0,30,34
+Control de ortodoncia,Hee Joon Lee,JUE,8,1,0,0,30,33
+Profilaxis dental,Rachelle Girón,JUE,8,1,0,1,30,46
+Profilaxis dental,Hee Joon Lee,JUE,9,1,0,1,30,35
+Resina compuesta,Rachelle Girón,JUE,9,1,1,0,45,48
+Colocación de brackets,Hee Joon Lee,JUE,9,10,0,0,120,110
+Limpieza profunda por cuadrante,Rachelle Girón,JUE,10,1,1,0,50,65
+Resina compuesta,Rachelle Girón,JUE,14,3,1,0,45,81
+Profilaxis dental,Hee Joon Lee,JUE,14,1,0,0,30,32
+Tratamiento de conducto,Hee Joon Lee,JUE,15,1,1,0,90,87
+Extracción simple,Rachelle Girón,JUE,15,1,1,0,40,49
+Control de ortodoncia,Rachelle Girón,JUE,16,1,0,0,30,24
+Resina compuesta,Hee Joon Lee,JUE,16,1,1,0,45,41
+Aplicación de flúor,Hee Joon Lee,JUE,17,1,0,0,20,20
+Profilaxis dental,Rachelle Girón,MIE,8,1,0,1,30,45
+Profilaxis dental,Hee Joon Lee,MIE,8,1,0,0,30,33
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,8,2,1,0,50,61
+Profilaxis dental,Hee Joon Lee,MIE,9,1,0,0,30,29
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,9,2,1,0,50,67
+Aplicación de flúor,Rachelle Girón,MIE,9,1,0,1,20,27
+Profilaxis dental,Rachelle Girón,MIE,10,1,0,0,30,32
+Sellante de fosas y fisuras,Hee Joon Lee,MIE,10,1,0,0,25,25
+Resina compuesta,Rachelle Girón,MIE,11,1,1,0,45,49
+Limpieza profunda por cuadrante,Hee Joon Lee,MIE,14,1,1,0,50,37
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,14,1,1,1,50,66
+Control de ortodoncia,Hee Joon Lee,MIE,14,1,0,0,30,28
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,15,1,1,0,50,55
+Control de ortodoncia,Hee Joon Lee,MIE,15,1,0,0,30,29
+Profilaxis dental,Hee Joon Lee,MIE,15,1,0,0,30,29
+Profilaxis dental,Rachelle Girón,MIE,16,1,0,0,30,31
+Retiro de brackets,Hee Joon Lee,MIE,16,1,0,0,60,53
+Aplicación de flúor,Rachelle Girón,MIE,16,1,0,0,20,19
+Extracción simple,Rachelle Girón,MIE,17,1,1,1,40,56
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,8,2,1,1,50,84
+Resina compuesta,Rachelle Girón,MAR,8,1,1,0,45,48
+Tratamiento de conducto,Rachelle Girón,MAR,9,1,1,0,90,94
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,9,1,1,0,50,53
+Control de ortodoncia,Hee Joon Lee,MAR,10,1,0,0,30,24
+Profilaxis dental,Rachelle Girón,MAR,10,1,0,1,30,42
+Extracción simple,Rachelle Girón,MAR,14,1,1,0,40,46
+Resina compuesta,Hee Joon Lee,MAR,14,2,1,0,45,66
+Extracción simple,Rachelle Girón,MAR,14,1,1,0,40,46
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,15,2,1,0,50,66
+Extracción simple,Rachelle Girón,MAR,15,1,1,0,40,43
+Control de ortodoncia,Hee Joon Lee,MAR,16,1,0,0,30,29
+Control de ortodoncia,Hee Joon Lee,MAR,17,1,0,0,30,29
+Sellante de fosas y fisuras,Hee Joon Lee,LUN,8,1,0,0,25,23
+Control de ortodoncia,Rachelle Girón,LUN,8,1,0,0,30,36
+Resina compuesta,Rachelle Girón,LUN,9,1,1,0,45,49
+Resina compuesta,Rachelle Girón,LUN,10,1,1,0,45,49
+Control de ortodoncia,Hee Joon Lee,LUN,11,1,0,0,30,28
+Profilaxis dental,Hee Joon Lee,LUN,14,1,0,0,30,28
+Profilaxis dental,Hee Joon Lee,LUN,14,1,0,0,30,29
+Sellante de fosas y fisuras,Rachelle Girón,LUN,14,1,0,0,25,25
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,0,30,32
+Control de ortodoncia,Hee Joon Lee,LUN,15,1,0,0,30,26
+Resina compuesta,Rachelle Girón,LUN,16,1,1,0,45,53
+Extracción simple,Hee Joon Lee,LUN,16,1,1,0,40,36
+Control de ortodoncia,Hee Joon Lee,LUN,17,1,0,0,30,30
+Control de ortodoncia,Hee Joon Lee,VIE,8,1,0,0,30,27
+Profilaxis dental,Rachelle Girón,VIE,8,1,0,0,30,32
+Resina compuesta,Rachelle Girón,VIE,8,2,1,0,45,68
+Sellante de fosas y fisuras,Rachelle Girón,VIE,10,3,0,0,25,51
+Resina compuesta,Hee Joon Lee,VIE,10,1,1,0,45,44
+Control de ortodoncia,Rachelle Girón,VIE,10,1,0,0,30,24
+Profilaxis dental,Hee Joon Lee,VIE,11,1,0,1,30,38
+Extracción simple,Rachelle Girón,VIE,14,1,1,0,40,45
+Limpieza profunda por cuadrante,Rachelle Girón,VIE,16,1,1,0,50,50
+Control de ortodoncia,Hee Joon Lee,VIE,16,1,0,0,30,29
+Sellante de fosas y fisuras,Rachelle Girón,VIE,17,2,0,0,25,36
+Resina compuesta,Hee Joon Lee,JUE,8,1,1,0,45,40
+Extracción simple,Rachelle Girón,JUE,8,1,1,0,40,41
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,8,1,1,0,50,48
+Control de ortodoncia,Rachelle Girón,JUE,9,1,0,0,30,38
+Profilaxis dental,Rachelle Girón,JUE,10,1,0,0,30,32
+Limpieza profunda por cuadrante,Hee Joon Lee,JUE,10,2,1,0,50,61
+Resina compuesta,Rachelle Girón,JUE,10,1,1,0,45,56
+Profilaxis dental,Hee Joon Lee,JUE,11,1,0,0,30,28
+Profilaxis dental,Hee Joon Lee,JUE,14,1,0,0,30,23
+Retiro de brackets,Hee Joon Lee,JUE,14,1,0,1,60,79
+Profilaxis dental,Rachelle Girón,JUE,15,1,0,0,30,35
+Limpieza profunda por cuadrante,Rachelle Girón,JUE,15,1,1,0,50,53
+Colocación de brackets,Hee Joon Lee,JUE,16,14,0,0,120,100
+Sellante de fosas y fisuras,Rachelle Girón,JUE,16,1,0,1,25,34
+Profilaxis dental,Hee Joon Lee,MIE,8,1,0,0,30,27
+Profilaxis dental,Rachelle Girón,MIE,8,1,0,0,30,32
+Tratamiento de conducto,Hee Joon Lee,MIE,8,1,1,0,90,88
+Limpieza profunda por cuadrante,Rachelle Girón,MIE,9,2,1,0,50,77
+Retiro de brackets,Hee Joon Lee,MIE,10,1,0,0,60,51
+Resina compuesta,Rachelle Girón,MIE,10,1,1,0,45,48
+Profilaxis dental,Rachelle Girón,MIE,11,1,0,0,30,32
+Control de ortodoncia,Hee Joon Lee,MIE,11,1,0,0,30,27
+Profilaxis dental,Hee Joon Lee,MIE,14,1,0,0,30,29
+Aplicación de flúor,Rachelle Girón,MIE,14,1,0,0,20,20
+Resina compuesta,Rachelle Girón,MIE,14,1,1,0,45,53
+Colocación de brackets,Hee Joon Lee,MIE,15,10,0,0,120,120
+Extracción simple,Rachelle Girón,MIE,15,1,1,0,40,46
+Sellante de fosas y fisuras,Rachelle Girón,MIE,16,1,0,0,25,29
+Profilaxis dental,Rachelle Girón,MIE,16,1,0,0,30,26
+Resina compuesta,Hee Joon Lee,MAR,8,1,1,0,45,45
+Aplicación de flúor,Rachelle Girón,MAR,8,1,0,0,20,20
+Profilaxis dental,Rachelle Girón,MAR,8,1,0,0,30,31
+Profilaxis dental,Rachelle Girón,MAR,8,1,0,0,30,35
+Sellante de fosas y fisuras,Hee Joon Lee,MAR,9,1,0,0,25,26
+Resina compuesta,Hee Joon Lee,MAR,9,1,1,0,45,45
+Sellante de fosas y fisuras,Rachelle Girón,MAR,9,1,0,0,25,29
+Aplicación de flúor,Hee Joon Lee,MAR,10,1,0,0,20,19
+Aplicación de flúor,Hee Joon Lee,MAR,10,1,0,0,20,19
+Profilaxis dental,Rachelle Girón,MAR,10,1,0,0,30,31
+Limpieza profunda por cuadrante,Hee Joon Lee,MAR,11,1,1,0,50,39
+Profilaxis dental,Hee Joon Lee,MAR,14,1,0,0,30,31
+Extracción simple,Rachelle Girón,MAR,14,1,1,0,40,38
+Resina compuesta,Hee Joon Lee,MAR,14,1,1,1,45,59
+Profilaxis dental,Rachelle Girón,MAR,14,1,0,0,30,32
+Resina compuesta,Rachelle Girón,MAR,15,2,1,0,45,71
+Control de ortodoncia,Hee Joon Lee,MAR,15,1,0,0,30,27
+Control de ortodoncia,Hee Joon Lee,MAR,16,1,0,0,30,31
+Resina compuesta,Rachelle Girón,MAR,16,2,1,1,45,91
+Resina compuesta,Hee Joon Lee,LUN,8,3,1,0,45,80
+Control de ortodoncia,Rachelle Girón,LUN,8,1,0,0,30,33
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,9,1,1,0,50,51
+Colocación de brackets,Hee Joon Lee,LUN,9,14,0,0,120,126
+Profilaxis dental,Rachelle Girón,LUN,10,1,0,0,30,33
+Profilaxis dental,Hee Joon Lee,LUN,14,1,0,0,30,26
+Extracción simple,Hee Joon Lee,LUN,15,1,1,1,40,46
+Limpieza profunda por cuadrante,Rachelle Girón,LUN,15,2,1,1,50,98
+Tratamiento de conducto,Hee Joon Lee,LUN,16,1,1,0,90,82

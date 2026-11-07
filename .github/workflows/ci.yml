@@ -227,7 +227,8 @@ jobs:
           script: |
             set -e
             cd ~/smileesync
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             cd app
             source .venv/bin/activate
             pip install -r requirements.txt

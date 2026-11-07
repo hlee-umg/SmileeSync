@@ -59,3 +59,12 @@ docs/entregables/
 # Datos de infraestructura y credenciales: nunca se versionan
 claude/
 infra/cdk.context.json
+
+# Evidencia de las sesiones de prueba con usuarios finales: fotografías y fichas
+# firmadas. Contienen imágenes y firmas de personas; viven en el documento.
+docs/evidencias/*.jpg
+docs/evidencias/paginas/
+docs/evidencias/sesiones/
+
+# Notas de continuidad del documento
+docs/herramientas/ONBOARDING.md

@@ -1,0 +1,140 @@
+{
+ "recepción": [
+  [
+   "Pregunta prevista",
+   "Respuesta"
+  ],
+  [
+   "¿Cómo sé cuánto tiempo reservarle a un paciente que pide una resina en dos piezas?",
+   "En el calendario se elige el procedimiento, el odontólogo que lo atenderá y el número de piezas. El sistema estima la duración, dice de dónde sacó ese número y resalta en verde los espacios de la semana donde esa cita cabe completa. Basta pulsar uno de esos espacios para programarla."
+  ],
+  [
+   "El sistema me dice 75 minutos, pero el doctor dice que él lo hace en 60. ¿A quién le hago caso?",
+   "Al doctor: la duración se puede escribir a mano y el sistema la acepta. La estimación es una recomendación, no una restricción. Además, al registrarse los tiempos reales el modelo aprende el ritmo de cada profesional, de modo que si efectivamente lo hace en 60 minutos, en unas semanas el sistema propondrá 60."
+  ],
+  [
+   "¿Por qué no me deja agendar a las 11:30 si el doctor está libre a esa hora?",
+   "El sistema exige cuatro condiciones y el mensaje de error indica cuál no se cumple. Las dos más frecuentes son que la cita no termine antes de que cierre la franja de atención —una cita de una hora no cabe a las 11:30 si la jornada termina a las 12:00— y que los dos sillones estén ocupados a esa hora, aunque el odontólogo esté libre."
+  ],
+  [
+   "Un paciente quiere cambiar su cita del martes al jueves. ¿Tengo que cancelarla y crear otra?",
+   "No. Se abre la cita y se cambia la fecha: es la misma cita reprogramada. El historial conserva la fecha anterior y quién hizo el cambio. Cancelar y crear de nuevo haría que la clínica apareciera con una cancelación que no ocurrió."
+  ],
+  [
+   "¿Y si el paciente no llega?",
+   "Se cancela la cita. El registro no desaparece: queda como cancelada y suma a la tasa de cancelación del reporte, que es información que la clínica necesita. Las citas canceladas no se cuentan para entrenar el modelo, porque no hay duración real que aprender de ellas."
+  ],
+  [
+   "¿Puedo escribir en el expediente del paciente?",
+   "Puede consultarlo completo, pero no escribir en él. El odontograma, las notas de evolución y los planes los registra el personal odontológico, porque son actos clínicos. Si abre la pantalla, verá la información sin los botones para modificarla."
+  ],
+  [
+   "¿Dónde registro que el paciente abonó Q300 de su tratamiento?",
+   "En el módulo de cobros, como un abono sobre el plan aprobado del paciente. El saldo se recalcula solo: no hay que anotarlo en ninguna parte."
+  ],
+  [
+   "Registré un pago con el monto equivocado. ¿Lo puedo borrar?",
+   "Se anula, que no es lo mismo que borrarlo. El abono queda marcado como anulado, el saldo se corrige y queda constancia de que existió un cobro mal registrado. Después se ingresa el abono correcto."
+  ],
+  [
+   "¿Tengo que anotar a qué hora terminó realmente la consulta?",
+   "Sí, y es la anotación más importante del sistema. Es lo que permite que la estimación mejore: cada atención con su tiempo real se incorpora al conjunto con que se entrena el modelo. Sin ese registro el sistema seguiría estimando con la duración del catálogo indefinidamente."
+  ],
+  [
+   "Me equivoqué al escribir el apellido de un paciente. ¿Lo puedo corregir?",
+   "Sí. Se edita la ficha y el historial conserva el valor anterior, de modo que la corrección quede documentada."
+  ],
+  [
+   "¿Puedo entrar desde mi teléfono?",
+   "Sí: es un sitio web y las pantallas se adaptan al tamaño de la ventana. Para el calendario semanal conviene la computadora, porque muestra seis días a la vez."
+  ]
+ ],
+ "odontólogos": [
+  [
+   "Pregunta prevista",
+   "Respuesta"
+  ],
+  [
+   "Al entrar, ¿veo la agenda de toda la clínica o solo la mía?",
+   "La suya. El sistema reconoce al usuario vinculado a su ficha profesional y preselecciona su agenda al ingresar. Si necesita ver la de la clínica completa, se elige «Todos los odontólogos» en el filtro superior."
+  ],
+  [
+   "¿Puedo agendar una cita yo mismo?",
+   "La programación de citas corresponde a la recepción, de modo que su acceso a la agenda es de consulta. Sí puede, en cambio, registrar sus ausencias, porque esa es información suya."
+  ],
+  [
+   "Voy a salir a un congreso el 20 de noviembre. ¿Cómo bloqueo ese día?",
+   "En su ficha, en la pantalla de ausencias, se registra la fecha y el rango de horas. Desde ese momento el sistema deja de ofrecer espacios en esa franja y rechaza cualquier intento de agendar ahí, con un mensaje que explica que existe una ausencia registrada. Una ausencia de medio día no cancela el resto de la jornada: el sistema la resta y conserva disponible lo que queda."
+  ],
+  [
+   "¿Tengo que llenar el odontograma completo del paciente la primera vez que lo atiendo?",
+   "No. Se registran únicamente los hallazgos que observa; las piezas sin registro se muestran como sanas. El odontograma se va completando con cada visita."
+  ],
+  [
+   "Registré un hallazgo en la pieza equivocada. ¿Se borra el anterior?",
+   "El registro se marca como inactivo y deja de contar para el odontograma vigente, pero no desaparece del historial de la pieza. El expediente conserva la secuencia completa de lo que se observó y cuándo, que es lo que permite seguir la evolución de un diente."
+  ],
+  [
+   "¿Por qué el sistema me pide el número de piezas tratadas y si usé anestesia?",
+   "Porque son dos de las tres variables que más explican cuánto dura una atención. Juntas con la aparición de complicaciones reúnen el 60.7 % del peso del modelo, de modo que son esos tres datos, y no el tipo de procedimiento por sí solo, los que permiten que el sistema estime con precisión. Es también la razón por la que la nota de evolución no es un trámite: es la fuente de la que el sistema aprende."
+  ],
+  [
+   "¿La nota clínica se puede modificar después de guardarla?",
+   "No desde la pantalla, y es deliberado: una nota de evolución es la constancia de lo ocurrido en una visita, y un expediente que se puede reescribir a posteriori pierde su valor como documento. Cada visita admite una sola nota; si hay algo que agregar, se consigna en la nota de la visita siguiente."
+  ],
+  [
+   "El plan que presupuesté dice que requiere cinco sesiones. ¿De dónde sale ese número?",
+   "De la suma de las duraciones estimadas de cada renglón del plan, repartidas en bloques que no pasan de dos horas de sillón y respetando el orden de las fases, de modo que una fase posterior no se adelante. Es una previsión para conversar con el paciente, no una reserva: agendar cada sesión sigue siendo decisión de la recepción."
+  ],
+  [
+   "¿Puedo ver cuánto me desvío del tiempo que me asignan?",
+   "Sí. En la consulta de citas, cada atención muestra el tiempo asignado, el real y la diferencia entre ambos. El reporte que consolida esa desviación por procedimiento corresponde al administrador, porque es información de la clínica y no de un profesional."
+  ],
+  [
+   "Si el sistema no está disponible un día, ¿cómo atiendo?",
+   "La agenda del día se puede imprimir desde la vista por día del calendario, y las atenciones de ese día se registran después. El registro posterior no afecta al modelo: lo que importa es la duración real, no el momento en que se capturó."
+  ]
+ ],
+ "administrador": [
+  [
+   "Pregunta prevista",
+   "Respuesta"
+  ],
+  [
+   "¿Cada cuánto hay que volver a entrenar el modelo?",
+   "No existe una regla única; el criterio es la cantidad de información nueva. Con el volumen de la clínica —alrededor de setenta atenciones al mes— un reentrenamiento mensual incorpora material suficiente para que las métricas cambien. El comando admite la opción de activar la versión nueva únicamente si reduce el error de la vigente, con lo que reentrenar no implica riesgo."
+  ],
+  [
+   "¿El sistema se detiene mientras se entrena el modelo?",
+   "No. El entrenamiento es un comando que se ejecuta aparte del servidor web y tarda menos de un segundo; mientras corre, el sistema sigue estimando con la versión que está en producción. La versión nueva entra en operación solo cuando se la activa."
+  ],
+  [
+   "Si el modelo nuevo resulta peor que el anterior, ¿cómo vuelvo atrás?",
+   "El panel de inteligencia conserva el histórico completo de las versiones entrenadas con sus métricas. Se activa la versión anterior desde ese mismo panel y el cambio es inmediato: solo una versión está en producción a la vez."
+  ],
+  [
+   "¿Qué pasa con la estimación cuando agregamos un procedimiento nuevo al catálogo?",
+   "El modelo no conoce ese procedimiento, de modo que la estimación recae en la duración de referencia que se declare al darlo de alta. Cuando se acumulan tres atenciones, pasa a usar el promedio real de la clínica; y al siguiente reentrenamiento, el modelo lo incorpora. La pantalla declara en cada caso de dónde proviene el número, de modo que se sabe en qué etapa está."
+  ],
+  [
+   "¿Cómo doy de alta a una asistente nueva?",
+   "En el módulo de usuarios, con el rol de asistente, que da acceso de consulta a la agenda y al expediente. El sistema envía al usuario a definir su contraseña y exige que registre una pregunta secreta para poder recuperarla."
+  ],
+  [
+   "¿Puedo eliminar un procedimiento que ya no realizamos?",
+   "Se da de baja, lo que lo retira de los formularios y del catálogo activo sin borrarlo. Eliminarlo haría que las citas históricas que lo usaron quedaran sin procedimiento y la clínica perdería su propio historial, que es justamente lo que alimenta la estimación."
+  ],
+  [
+   "Si compramos un tercer sillón, ¿hay que modificar el sistema?",
+   "No: se registra en el catálogo de unidades dentales. La capacidad de la clínica, la validación al programar y la recomendación de espacios se calculan a partir de las unidades dadas de alta, de modo que las tres se ajustan solas al nuevo sillón."
+  ],
+  [
+   "¿Quién puede ver el expediente clínico de un paciente?",
+   "El personal odontológico lo escribe y lo consulta; la recepción lo consulta sin escribir; el administrador tiene acceso completo. Cada cambio queda registrado con el usuario que lo hizo, de modo que el acceso es trazable."
+  ],
+  [
+   "¿Dónde quedan los datos y qué pasa si se pierde el servidor?",
+   "Los datos residen en la base de datos PostgreSQL de la instancia. El respaldo periódico de esa base es la tarea pendiente más importante del plan de puesta en producción, junto con la habilitación de HTTPS; ambas se documentan en la sección 4.1.3.5."
+  ]
+ ]
+}
